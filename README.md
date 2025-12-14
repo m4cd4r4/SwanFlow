@@ -28,6 +28,18 @@ Perfect for:
 
 ---
 
+## Dashboard Preview
+
+![Perth Traffic Watch Dashboard - Cottesloe Dark Theme](frontend/web-dashboard/screenshot-cottesloe-dark.png)
+
+**Real-time traffic monitoring dashboard featuring:**
+- 🗺️ **Interactive Map** - Live traffic visualization with color-coded markers
+- 📊 **Traffic Flow Corridor** - Directional flow analysis along Mounts Bay Road
+- 📈 **Hourly Charts** - Historical traffic patterns with Chart.js
+- 🎨 **WA-Themed UI** - Cottesloe Beach and Indigenous Earth color schemes (light/dark modes)
+
+---
+
 ## Features
 
 ### Hardware
