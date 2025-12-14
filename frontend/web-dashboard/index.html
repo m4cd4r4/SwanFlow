@@ -4,14 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perth Traffic Watch - Real-time Vehicle Monitoring</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
     <!-- Header -->
     <header>
-      <h1>Perth Traffic Watch</h1>
-      <p class="subtitle">Real-time vehicle detection using Edge AI</p>
+      <div class="header-content">
+        <div>
+          <h1>Perth Traffic Watch</h1>
+          <p class="subtitle">Real-time vehicle detection using Edge AI</p>
+        </div>
+        <div class="theme-controls">
+          <label for="theme-select">Theme:</label>
+          <select id="theme-select">
+            <option value="cottesloe-light">Cottesloe Beach</option>
+            <option value="cottesloe-dark">Cottesloe Night</option>
+            <option value="indigenous-light">Indigenous Earth</option>
+            <option value="indigenous-dark">Indigenous Night</option>
+          </select>
+        </div>
+      </div>
     </header>
 
     <!-- Site Selector -->
@@ -30,33 +44,132 @@
         <option value="30d">Last 30 Days</option>
       </select>
 
-      <button id="refresh-btn">Refresh</button>
+      <button type="button" id="refresh-btn">Refresh</button>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Total Vehicles</h3>
-        <div class="stat-value" id="total-count">-</div>
-        <div class="stat-label">Since deployment</div>
+    <!-- Map and Stats Row -->
+    <div class="map-stats-row">
+      <!-- Live Map -->
+      <div class="map-container">
+        <h2>Live Traffic Map</h2>
+        <div id="traffic-map"></div>
       </div>
 
-      <div class="stat-card">
-        <h3>Average Hourly</h3>
-        <div class="stat-value" id="avg-hourly">-</div>
-        <div class="stat-label">Vehicles per hour</div>
-      </div>
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Vehicles</h3>
+          <div class="stat-value" id="total-count">-</div>
+          <div class="stat-label">Since deployment</div>
+        </div>
 
-      <div class="stat-card">
-        <h3>Detection Confidence</h3>
-        <div class="stat-value" id="avg-confidence">-</div>
-        <div class="stat-label">Average accuracy</div>
-      </div>
+        <div class="stat-card">
+          <h3>Average Hourly</h3>
+          <div class="stat-value" id="avg-hourly">-</div>
+          <div class="stat-label">Vehicles per hour</div>
+        </div>
 
-      <div class="stat-card">
-        <h3>Last Update</h3>
-        <div class="stat-value" id="last-update">-</div>
-        <div class="stat-label">Time since last data</div>
+        <div class="stat-card">
+          <h3>Detection Confidence</h3>
+          <div class="stat-value" id="avg-confidence">-</div>
+          <div class="stat-label">Average accuracy</div>
+        </div>
+
+        <div class="stat-card">
+          <h3>Last Update</h3>
+          <div class="stat-value" id="last-update">-</div>
+          <div class="stat-label">Time since last data</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Traffic Flow Corridor -->
+    <div class="flow-container">
+      <h2>Mounts Bay Road Traffic Flow</h2>
+      <div class="flow-corridor">
+        <div class="flow-site" id="flow-site-1">
+          <div class="site-name">Kings Park</div>
+          <div class="flow-arrows">
+            <div class="flow-direction northbound">
+              <span class="arrow">↑</span>
+              <span class="label">NB</span>
+              <span class="count" id="flow-nb-1">-</span>
+            </div>
+            <div class="flow-direction southbound">
+              <span class="arrow">↓</span>
+              <span class="label">SB</span>
+              <span class="count" id="flow-sb-1">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-connector">
+          <div class="connector-line northbound" id="connector-nb-1"></div>
+          <div class="connector-line southbound" id="connector-sb-1"></div>
+        </div>
+
+        <div class="flow-site" id="flow-site-2">
+          <div class="site-name">Mill Point</div>
+          <div class="flow-arrows">
+            <div class="flow-direction northbound">
+              <span class="arrow">↑</span>
+              <span class="label">NB</span>
+              <span class="count" id="flow-nb-2">-</span>
+            </div>
+            <div class="flow-direction southbound">
+              <span class="arrow">↓</span>
+              <span class="label">SB</span>
+              <span class="count" id="flow-sb-2">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-connector">
+          <div class="connector-line northbound" id="connector-nb-2"></div>
+          <div class="connector-line southbound" id="connector-sb-2"></div>
+        </div>
+
+        <div class="flow-site" id="flow-site-3">
+          <div class="site-name">Fraser Ave</div>
+          <div class="flow-arrows">
+            <div class="flow-direction northbound">
+              <span class="arrow">↑</span>
+              <span class="label">NB</span>
+              <span class="count" id="flow-nb-3">-</span>
+            </div>
+            <div class="flow-direction southbound">
+              <span class="arrow">↓</span>
+              <span class="label">SB</span>
+              <span class="count" id="flow-sb-3">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-connector">
+          <div class="connector-line northbound" id="connector-nb-3"></div>
+          <div class="connector-line southbound" id="connector-sb-3"></div>
+        </div>
+
+        <div class="flow-site" id="flow-site-4">
+          <div class="site-name">Malcolm St</div>
+          <div class="flow-arrows">
+            <div class="flow-direction northbound">
+              <span class="arrow">↑</span>
+              <span class="label">NB</span>
+              <span class="count" id="flow-nb-4">-</span>
+            </div>
+            <div class="flow-direction southbound">
+              <span class="arrow">↓</span>
+              <span class="label">SB</span>
+              <span class="count" id="flow-sb-4">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-legend">
+        <span class="legend-item"><span class="legend-color low"></span> Light (&lt;150/hr)</span>
+        <span class="legend-item"><span class="legend-color medium"></span> Moderate (150-250/hr)</span>
+        <span class="legend-item"><span class="legend-color high"></span> Heavy (&gt;250/hr)</span>
       </div>
     </div>
 
@@ -97,7 +210,8 @@
     </footer>
   </div>
 
-  <!-- Chart.js for visualization -->
+  <!-- Libraries -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="app.js"></script>
 </body>

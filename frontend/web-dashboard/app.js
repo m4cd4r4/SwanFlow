@@ -12,15 +12,20 @@ const REFRESH_INTERVAL = 60000; // 60 seconds
 // State
 let currentSite = null;
 let currentPeriod = '24h';
+let currentTheme = 'cottesloe-light';
 let refreshTimer = null;
 let trafficChart = null;
+let trafficMap = null;
+let siteMarkers = {};
+let allSitesData = [];
 
-// DOM Elements
-const siteSelect = document.getElementById('site-select');
-const periodSelect = document.getElementById('period-select');
-const refreshBtn = document.getElementById('refresh-btn');
-const statusIndicator = document.querySelector('.status-indicator');
-const statusText = document.querySelector('.status-text');
+// DOM Elements (will be initialized after DOM loads)
+let siteSelect;
+let periodSelect;
+let themeSelect;
+let refreshBtn;
+let statusIndicator;
+let statusText;
 
 // ============================================================================
 // API Functions
@@ -93,6 +98,189 @@ async function fetchRecentDetections(site, limit = 20) {
 }
 
 // ============================================================================
+// Theme Management
+// ============================================================================
+
+function loadTheme() {
+  const savedTheme = localStorage.getItem('perth-traffic-theme');
+  if (savedTheme && ['cottesloe-light', 'cottesloe-dark', 'indigenous-light', 'indigenous-dark'].includes(savedTheme)) {
+    currentTheme = savedTheme;
+  }
+  applyTheme(currentTheme);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  if (themeSelect) {
+    themeSelect.value = theme;
+  }
+  currentTheme = theme;
+  localStorage.setItem('perth-traffic-theme', theme);
+
+  // Update chart colors if chart exists
+  if (trafficChart) {
+    updateChartColors();
+  }
+
+  // Update map tiles if map exists
+  if (trafficMap) {
+    updateMapTiles();
+  }
+}
+
+function updateChartColors() {
+  const style = getComputedStyle(document.documentElement);
+  const chartPrimary = style.getPropertyValue('--chart-primary').trim();
+  const chartFill = style.getPropertyValue('--chart-fill').trim();
+
+  if (trafficChart && trafficChart.data.datasets[0]) {
+    trafficChart.data.datasets[0].borderColor = chartPrimary;
+    trafficChart.data.datasets[0].backgroundColor = chartFill;
+    trafficChart.update('none'); // Update without animation
+  }
+}
+
+function getThemeColors() {
+  const style = getComputedStyle(document.documentElement);
+  return {
+    primary: style.getPropertyValue('--chart-primary').trim(),
+    fill: style.getPropertyValue('--chart-fill').trim()
+  };
+}
+
+// ============================================================================
+// Map Management
+// ============================================================================
+
+function initMap() {
+  // Center on Mounts Bay Road, Perth
+  const center = [-31.9689, 115.8523]; // Mill Point area
+
+  trafficMap = L.map('traffic-map').setView(center, 13);
+
+  // Use different tile layers based on theme
+  const isDark = currentTheme.includes('dark');
+  const tileUrl = isDark
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+  L.tileLayer(tileUrl, {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 19
+  }).addTo(trafficMap);
+}
+
+function getTrafficColor(hourlyCount) {
+  if (!hourlyCount || hourlyCount < 150) return '#10b981'; // Green - light
+  if (hourlyCount < 250) return '#f59e0b'; // Orange - moderate
+  return '#ef4444'; // Red - heavy
+}
+
+function updateMapMarkers(sites) {
+  // Clear existing markers
+  Object.values(siteMarkers).forEach(marker => trafficMap.removeLayer(marker));
+  siteMarkers = {};
+
+  sites.forEach((site, index) => {
+    const marker = L.circleMarker([site.latitude, site.longitude], {
+      radius: 8,
+      fillColor: getTrafficColor(site.current_hourly),
+      color: '#fff',
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.8
+    }).addTo(trafficMap);
+
+    const popupContent = `
+      <div style="font-family: sans-serif;">
+        <strong>${site.name}</strong><br>
+        <span style="color: #666;">Current: ${site.current_hourly || '-'} vehicles/hr</span><br>
+        <span style="color: #666;">Confidence: ${site.avg_confidence ? (site.avg_confidence * 100).toFixed(1) + '%' : '-'}</span>
+      </div>
+    `;
+
+    marker.bindPopup(popupContent);
+    marker.on('click', () => {
+      currentSite = site.name;
+      siteSelect.value = site.name;
+      loadDashboard();
+    });
+
+    siteMarkers[site.name] = marker;
+  });
+}
+
+function updateMapTiles() {
+  if (!trafficMap) return;
+
+  // Remove old tiles
+  trafficMap.eachLayer((layer) => {
+    if (layer instanceof L.TileLayer) {
+      trafficMap.removeLayer(layer);
+    }
+  });
+
+  // Add new tiles based on theme
+  const isDark = currentTheme.includes('dark');
+  const tileUrl = isDark
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+  L.tileLayer(tileUrl, {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 19
+  }).addTo(trafficMap);
+}
+
+// ============================================================================
+// Traffic Flow Visualization
+// ============================================================================
+
+function updateFlowCorridor(sites) {
+  // Map of site names to flow IDs
+  const flowMap = {
+    'Mounts Bay Rd @ Kings Park (Northbound)': { id: 1, dir: 'nb' },
+    'Mounts Bay Rd @ Kings Park (Southbound)': { id: 1, dir: 'sb' },
+    'Mounts Bay Rd @ Mill Point (Northbound)': { id: 2, dir: 'nb' },
+    'Mounts Bay Rd @ Mill Point (Southbound)': { id: 2, dir: 'sb' },
+    'Mounts Bay Rd @ Fraser Ave (Northbound)': { id: 3, dir: 'nb' },
+    'Mounts Bay Rd @ Fraser Ave (Southbound)': { id: 3, dir: 'sb' },
+    'Mounts Bay Rd @ Malcolm St (Northbound)': { id: 4, dir: 'nb' },
+    'Mounts Bay Rd @ Malcolm St (Southbound)': { id: 4, dir: 'sb' }
+  };
+
+  sites.forEach(site => {
+    const mapping = flowMap[site.name];
+    if (!mapping) return;
+
+    const countEl = document.getElementById(`flow-${mapping.dir}-${mapping.id}`);
+    const connectorEl = document.getElementById(`connector-${mapping.dir}-${mapping.id}`);
+
+    if (countEl) {
+      const hourlyCount = site.current_hourly || 0;
+      countEl.textContent = `${hourlyCount}/hr`;
+
+      // Color code based on traffic level
+      const color = getTrafficColor(hourlyCount);
+      countEl.style.color = color;
+    }
+
+    if (connectorEl && mapping.id < 4) {
+      const hourlyCount = site.current_hourly || 0;
+      const color = getTrafficColor(hourlyCount);
+
+      // Update connector color
+      const style = getComputedStyle(document.documentElement);
+      const primaryColor = mapping.dir === 'nb' ?
+        style.getPropertyValue('--primary').trim() :
+        style.getPropertyValue('--accent').trim();
+
+      connectorEl.style.background = `linear-gradient(to right, transparent, ${color}, transparent)`;
+    }
+  });
+}
+
+// ============================================================================
 // UI Updates
 // ============================================================================
 
@@ -143,12 +331,15 @@ function updateChart(hourlyData) {
 
   const counts = hourlyData.map(d => Math.round(d.avg_count));
 
+  // Get theme colors
+  const colors = getThemeColors();
+
   // Destroy existing chart if it exists
   if (trafficChart) {
     trafficChart.destroy();
   }
 
-  // Create new chart
+  // Create new chart with theme colors
   trafficChart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -156,8 +347,8 @@ function updateChart(hourlyData) {
       datasets: [{
         label: 'Vehicles per Hour',
         data: counts,
-        borderColor: '#2563eb',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        borderColor: colors.primary,
+        backgroundColor: colors.fill,
         borderWidth: 2,
         tension: 0.3,
         fill: true
@@ -225,6 +416,29 @@ function updateDetectionsTable(detections) {
 // Data Loading
 // ============================================================================
 
+async function loadAllSitesData() {
+  // Fetch stats for all sites
+  const sites = await fetchSites();
+  const sitesWithStats = await Promise.all(
+    sites.map(async (site) => {
+      const stats = await fetchStats(site.name, '1h');
+      return {
+        ...site,
+        current_hourly: stats ? stats.avg_hourly : 0,
+        avg_confidence: stats ? stats.avg_confidence : 0
+      };
+    })
+  );
+
+  allSitesData = sitesWithStats;
+
+  // Update map and flow
+  if (trafficMap) {
+    updateMapMarkers(sitesWithStats);
+    updateFlowCorridor(sitesWithStats);
+  }
+}
+
 async function loadDashboard() {
   if (!currentSite) {
     console.log('No site selected');
@@ -237,7 +451,8 @@ async function loadDashboard() {
   const [stats, hourlyData, detections] = await Promise.all([
     fetchStats(currentSite, currentPeriod),
     fetchHourlyData(currentSite, getPeriodHours(currentPeriod)),
-    fetchRecentDetections(currentSite)
+    fetchRecentDetections(currentSite),
+    loadAllSitesData() // Also load all sites for map/flow
   ]);
 
   // Update UI
@@ -273,6 +488,20 @@ function getPeriodHours(period) {
 
 async function init() {
   console.log('Initializing Perth Traffic Watch Dashboard...');
+
+  // Initialize DOM elements
+  siteSelect = document.getElementById('site-select');
+  periodSelect = document.getElementById('period-select');
+  themeSelect = document.getElementById('theme-select');
+  refreshBtn = document.getElementById('refresh-btn');
+  statusIndicator = document.querySelector('.status-indicator');
+  statusText = document.querySelector('.status-text');
+
+  // Load saved theme first
+  loadTheme();
+
+  // Initialize map
+  initMap();
 
   // Load sites
   const sites = await fetchSites();
@@ -313,6 +542,10 @@ siteSelect.addEventListener('change', async (e) => {
 periodSelect.addEventListener('change', async (e) => {
   currentPeriod = e.target.value;
   await loadDashboard();
+});
+
+themeSelect.addEventListener('change', (e) => {
+  applyTheme(e.target.value);
 });
 
 refreshBtn.addEventListener('click', async () => {
