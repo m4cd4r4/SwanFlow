@@ -333,7 +333,6 @@ Dashboard → Fetch API → Chart.js → User
 - [ ] Direction detection (northbound vs. southbound)
 - [ ] Speed estimation (optional)
 - [ ] Alerts (email/SMS)
-
 - [ ] Solar power deployment
 - [ ] Mobile app (React Native)
 
@@ -466,7 +465,6 @@ Free to use, modify, and distribute. No warranty.
 - **TinyGSM** - Modem library
 - **Chart.js** - Dashboard visualisation
 
-
 ---
 
 ## Contact
@@ -474,12 +472,9 @@ Free to use, modify, and distribute. No warranty.
 - **GitHub Issues**: Report bugs and request features
 - **GitHub Discussions**: Ask questions and share ideas
 
-
 ---
 
 ## Related Projects
-
-
 
 - **Edge Impulse**: https://edgeimpulse.com
 - **ESP32-CAM Community**: https://github.com/espressif/esp32-camera

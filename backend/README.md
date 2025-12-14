@@ -148,7 +148,6 @@ Expose port 3000 (or use reverse proxy like nginx).
 
 ### Option 3: Hetzner VPS
 
-
 Budget: CX33 instance (~€5.49/mo) is affordable for IoT projects.
 
 ## Security Considerations
@@ -166,4 +165,3 @@ Budget: CX33 instance (~€5.49/mo) is affordable for IoT projects.
 - [ ] User authentication for dashboard
 - [ ] Export data to CSV/JSON
 - [ ] Alerting (email/SMS when traffic exceeds threshold)
-
