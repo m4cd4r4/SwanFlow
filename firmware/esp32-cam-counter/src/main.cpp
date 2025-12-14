@@ -5,7 +5,7 @@
  * passing a defined detection line using on-device ML inference.
  *
  * Hardware:
- * - ESP32-CAM (AI-Thinker module with OV2640)
+ * - ESP32-CAM (AI-Thinker module with OV2640 + PSRAM)
  * - SIM7000A LTE-M module (for data transmission)
  * - 18650 battery with BMS
  * - 5W solar panel
@@ -20,67 +20,36 @@
  */
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include "esp_camera.h"
 #include "esp_timer.h"
 #include "esp_log.h"
+#include "time.h"
 
-// TODO: Add TensorFlow Lite Micro includes
-// #include "tensorflow/lite/micro/micro_interpreter.h"
-
-// =============================================================================
-// Configuration
-// =============================================================================
-
-// Camera pins for AI-Thinker ESP32-CAM
-#define PWDN_GPIO_NUM     32
-#define RESET_GPIO_NUM    -1
-#define XCLK_GPIO_NUM      0
-#define SIOD_GPIO_NUM     26
-#define SIOC_GPIO_NUM     27
-#define Y9_GPIO_NUM       35
-#define Y8_GPIO_NUM       34
-#define Y7_GPIO_NUM       39
-#define Y6_GPIO_NUM       36
-#define Y5_GPIO_NUM       21
-#define Y4_GPIO_NUM       19
-#define Y3_GPIO_NUM       18
-#define Y2_GPIO_NUM        5
-#define VSYNC_GPIO_NUM    25
-#define HREF_GPIO_NUM     23
-#define PCLK_GPIO_NUM     22
-
-// SIM7000A pins (adjust based on wiring)
-#define SIM_TX_PIN        14
-#define SIM_RX_PIN        15
-#define SIM_PWR_PIN       13
-
-// Battery monitoring
-#define BATTERY_ADC_PIN   33
-#define BATTERY_DIVIDER_RATIO 2.0  // Voltage divider ratio
-
-// Timing
-#define CAPTURE_INTERVAL_MS     200   // 5 FPS
-#define TRANSMIT_INTERVAL_MS    60000 // Every 60 seconds
-#define DEEP_SLEEP_DURATION_US  300000000  // 5 minutes (night mode)
-
-// Detection line position (fraction of frame height)
-#define DETECTION_LINE_Y        0.5
+#include "config.h"
+#include "vehicle_counter.h"
+#include "lte_modem.h"
 
 // =============================================================================
-// Global State
+// Global Objects
 // =============================================================================
 
 static const char* TAG = "TrafficWatch";
 
-volatile uint32_t vehicleCount = 0;
+VehicleCounter vehicleCounter;
+LTEModem modem;
+
 volatile uint32_t lastTransmitTime = 0;
 volatile float batteryVoltage = 0.0;
+bool modemInitialized = false;
 
 // =============================================================================
 // Camera Initialization
 // =============================================================================
 
 bool initCamera() {
+    Serial.println("[Camera] Initializing...");
+
     camera_config_t config;
     config.ledc_channel = LEDC_CHANNEL_0;
     config.ledc_timer = LEDC_TIMER_0;
@@ -101,10 +70,13 @@ bool initCamera() {
     config.pin_pwdn = PWDN_GPIO_NUM;
     config.pin_reset = RESET_GPIO_NUM;
     config.xclk_freq_hz = 20000000;
-    config.pixel_format = PIXFORMAT_GRAYSCALE;  // Grayscale for ML inference
 
-    // Lower resolution for faster processing
-    config.frame_size = FRAMESIZE_QVGA;  // 320x240
+    // Grayscale for ML inference - matches FOMO input requirements
+    config.pixel_format = PIXFORMAT_GRAYSCALE;
+
+    // 96x96 for FOMO model input
+    // Note: Camera doesn't support 96x96 directly, we'll crop/resize
+    config.frame_size = FRAMESIZE_QQVGA;  // 160x120, closest to our needs
     config.jpeg_quality = 12;
     config.fb_count = 2;
     config.fb_location = CAMERA_FB_IN_PSRAM;
@@ -112,11 +84,21 @@ bool initCamera() {
 
     esp_err_t err = esp_camera_init(&config);
     if (err != ESP_OK) {
-        ESP_LOGE(TAG, "Camera init failed: 0x%x", err);
+        Serial.printf("[Camera] Init failed: 0x%x\n", err);
         return false;
     }
 
-    ESP_LOGI(TAG, "Camera initialized successfully");
+    // Adjust camera settings for traffic detection
+    sensor_t* sensor = esp_camera_sensor_get();
+    if (sensor) {
+        sensor->set_brightness(sensor, 0);     // -2 to 2
+        sensor->set_contrast(sensor, 1);       // -2 to 2
+        sensor->set_saturation(sensor, 0);     // -2 to 2
+        sensor->set_exposure_ctrl(sensor, 1);  // Auto exposure
+        sensor->set_gain_ctrl(sensor, 1);      // Auto gain
+    }
+
+    Serial.println("[Camera] Initialized successfully");
     return true;
 }
 
@@ -134,56 +116,67 @@ float readBatteryVoltage() {
     return voltage;
 }
 
-// =============================================================================
-// Vehicle Detection (Placeholder)
-// =============================================================================
+bool isBatteryLow() {
+    float v = readBatteryVoltage();
+    return v < BATTERY_LOW_VOLTAGE && v > 2.0;  // > 2.0 to filter noise when no battery
+}
 
-/**
- * Process a frame and detect vehicles crossing the detection line.
- *
- * TODO: Implement TensorFlow Lite Micro inference
- * - Load quantized model (models/vehicle_detector.tflite)
- * - Run inference on frame
- * - Track objects crossing detection line
- * - Increment counter
- */
-int processFrame(camera_fb_t* fb) {
-    // Placeholder: actual ML inference goes here
-
-    // For now, return 0 (no detection)
-    // This will be replaced with actual TFLite Micro code
-
-    return 0;
+bool isBatteryCritical() {
+    float v = readBatteryVoltage();
+    return v < BATTERY_CRITICAL_VOLTAGE && v > 2.0;
 }
 
 // =============================================================================
-// Data Transmission (Placeholder)
+// Time Utilities
 // =============================================================================
 
-/**
- * Transmit vehicle count to backend via LTE-M.
- *
- * TODO: Implement SIM7000A communication
- * - Initialize modem
- * - Connect to network
- * - POST to backend API
- * - Handle response
- */
-bool transmitData(uint32_t count, float voltage) {
-    ESP_LOGI(TAG, "Transmitting: count=%d, voltage=%.2fV", count, voltage);
+bool isNightMode() {
+    // TODO: Implement RTC or get time from network
+    // For now, always return false (never night mode)
+    return false;
+}
 
-    // Placeholder: actual LTE transmission goes here
-    // JSON payload:
-    // {
-    //   "sensor_id": "MB001",
-    //   "timestamp": 1702500000,
-    //   "vehicle_count": 42,
-    //   "interval_seconds": 60,
-    //   "battery_voltage": 3.85,
-    //   "signal_strength": -75
-    // }
+uint32_t getTimestamp() {
+    // TODO: Sync time via NTP or use RTC
+    // For now, return millis as placeholder
+    return millis() / 1000;
+}
 
-    return true;
+// =============================================================================
+// Data Transmission
+// =============================================================================
+
+bool transmitData(uint32_t count, float voltage, int rssi) {
+    // Build JSON payload
+    StaticJsonDocument<256> doc;
+    doc["sensor_id"] = SENSOR_ID;
+    doc["timestamp"] = getTimestamp();
+    doc["count"] = count;
+    doc["interval_sec"] = TRANSMIT_INTERVAL_MS / 1000;
+    doc["battery_v"] = voltage;
+    doc["rssi"] = rssi;
+    doc["version"] = FIRMWARE_VERSION;
+
+    char jsonBuffer[256];
+    serializeJson(doc, jsonBuffer);
+
+    Serial.printf("[TX] Sending: %s\n", jsonBuffer);
+
+    // Transmit via LTE
+    if (!modemInitialized) {
+        Serial.println("[TX] Modem not initialized, skipping transmission");
+        return false;
+    }
+
+    int httpStatus = modem.httpPost(API_ENDPOINT, jsonBuffer);
+
+    if (httpStatus >= 200 && httpStatus < 300) {
+        Serial.printf("[TX] Success! HTTP %d\n", httpStatus);
+        return true;
+    } else {
+        Serial.printf("[TX] Failed! HTTP %d\n", httpStatus);
+        return false;
+    }
 }
 
 // =============================================================================
@@ -191,23 +184,48 @@ bool transmitData(uint32_t count, float voltage) {
 // =============================================================================
 
 void setup() {
-    Serial.begin(115200);
-    Serial.println("\n\n=== Perth Traffic Watch ===");
-    Serial.println("Initializing...\n");
+    Serial.begin(DEBUG_BAUD_RATE);
+    delay(1000);
 
-    // Initialize camera
-    if (!initCamera()) {
-        ESP_LOGE(TAG, "Camera init failed, entering deep sleep");
-        esp_deep_sleep(DEEP_SLEEP_DURATION_US);
-    }
+    Serial.println("\n");
+    Serial.println("╔═══════════════════════════════════════╗");
+    Serial.println("║       Perth Traffic Watch v0.1        ║");
+    Serial.println("║    ESP32-CAM Vehicle Counter          ║");
+    Serial.println("╚═══════════════════════════════════════╝");
+    Serial.println();
 
     // Configure ADC for battery monitoring
     analogReadResolution(12);
     analogSetAttenuation(ADC_11db);
 
-    // TODO: Initialize SIM7000A modem
+    // Check battery before proceeding
+    batteryVoltage = readBatteryVoltage();
+    Serial.printf("[Power] Battery: %.2fV\n", batteryVoltage);
 
-    ESP_LOGI(TAG, "Initialization complete");
+    if (isBatteryCritical()) {
+        Serial.println("[Power] Battery critical! Entering deep sleep...");
+        esp_deep_sleep(DEEP_SLEEP_DURATION_US);
+    }
+
+    // Initialize camera
+    if (!initCamera()) {
+        Serial.println("[ERROR] Camera init failed, entering deep sleep");
+        esp_deep_sleep(DEEP_SLEEP_DURATION_US);
+    }
+
+    // Initialize vehicle detection model
+    if (!vehicleCounter.begin()) {
+        Serial.println("[WARNING] Vehicle counter init failed, continuing anyway");
+    }
+
+    // Initialize LTE modem
+    Serial.println("[LTE] Initializing modem...");
+    modemInitialized = modem.begin();
+    if (!modemInitialized) {
+        Serial.println("[WARNING] Modem init failed, will retry later");
+    }
+
+    Serial.println("\n[READY] System initialized, starting detection loop\n");
     lastTransmitTime = millis();
 }
 
@@ -216,33 +234,58 @@ void setup() {
 // =============================================================================
 
 void loop() {
+    // Check for night mode
+    if (isNightMode()) {
+        Serial.println("[Power] Night mode, entering deep sleep...");
+        modem.powerDown();
+        esp_deep_sleep(DEEP_SLEEP_DURATION_US);
+    }
+
+    // Check battery
+    if (isBatteryCritical()) {
+        Serial.println("[Power] Battery critical, entering deep sleep...");
+        modem.powerDown();
+        esp_deep_sleep(DEEP_SLEEP_DURATION_US);
+    }
+
     // Capture frame
     camera_fb_t* fb = esp_camera_fb_get();
     if (!fb) {
-        ESP_LOGE(TAG, "Frame capture failed");
+        Serial.println("[Camera] Frame capture failed");
         delay(100);
         return;
     }
 
     // Process frame for vehicle detection
-    int detected = processFrame(fb);
-    vehicleCount += detected;
+    int newVehicles = vehicleCounter.processFrame(fb->buf, fb->width, fb->height);
 
-    // Return frame buffer
+    if (newVehicles > 0) {
+        Serial.printf("[Detection] +%d vehicles (total: %d)\n",
+                      newVehicles, vehicleCounter.getCount());
+    }
+
+    // Return frame buffer immediately to free memory
     esp_camera_fb_return(fb);
 
     // Check if it's time to transmit
-    if (millis() - lastTransmitTime >= TRANSMIT_INTERVAL_MS) {
+    unsigned long now = millis();
+    if (now - lastTransmitTime >= TRANSMIT_INTERVAL_MS) {
         batteryVoltage = readBatteryVoltage();
+        int rssi = modemInitialized ? modem.getSignalStrength() : 0;
 
-        if (transmitData(vehicleCount, batteryVoltage)) {
-            ESP_LOGI(TAG, "Transmitted %d vehicles", vehicleCount);
-            vehicleCount = 0;
+        uint32_t count = vehicleCounter.getCount();
+
+        Serial.printf("\n[Report] Interval complete: %d vehicles, %.2fV, %d dBm\n",
+                      count, batteryVoltage, rssi);
+
+        if (transmitData(count, batteryVoltage, rssi)) {
+            vehicleCounter.resetCount();
         }
 
-        lastTransmitTime = millis();
+        lastTransmitTime = now;
+        Serial.println();
     }
 
-    // Small delay between captures
+    // Delay between captures
     delay(CAPTURE_INTERVAL_MS);
 }

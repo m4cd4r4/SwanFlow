@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perth Traffic Watch</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Perth Traffic Watch</h1>
+        <p class="subtitle">Real-time traffic density on Mounts Bay Road</p>
+    </header>
+
+    <main>
+        <!-- Quick Answer Section -->
+        <section id="should-i-drive" class="card">
+            <h2>Should I Drive?</h2>
+            <div id="recommendation" class="recommendation loading">
+                <div class="answer">Loading...</div>
+                <p class="message"></p>
+            </div>
+            <button id="refresh-btn" onclick="refreshData()">Refresh</button>
+        </section>
+
+        <!-- Map Section -->
+        <section id="map-section" class="card">
+            <h2>Sensor Map</h2>
+            <div id="map"></div>
+            <div class="legend">
+                <span class="legend-item"><span class="dot light"></span> Light</span>
+                <span class="legend-item"><span class="dot moderate"></span> Moderate</span>
+                <span class="legend-item"><span class="dot heavy"></span> Heavy</span>
+                <span class="legend-item"><span class="dot congested"></span> Congested</span>
+                <span class="legend-item"><span class="dot offline"></span> Offline</span>
+            </div>
+        </section>
+
+        <!-- Sensors Grid -->
+        <section id="sensors-section" class="card">
+            <h2>Sensor Status</h2>
+            <div id="sensors-grid" class="sensors-grid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Traffic Chart -->
+        <section id="chart-section" class="card">
+            <h2>Traffic Over Time (Last 24h)</h2>
+            <canvas id="traffic-chart"></canvas>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            Open source project:
+            <a href="https://github.com/your-username/perth-traffic-watch">GitHub</a>
+            | Data updates every 60 seconds
+        </p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
