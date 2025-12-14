@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perth Traffic Watch - Real-time Vehicle Monitoring</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>Perth Traffic Watch</h1>
+      <p class="subtitle">Real-time vehicle detection using Edge AI</p>
+    </header>
+
+    <!-- Site Selector -->
+    <div class="controls">
+      <label for="site-select">Select Site:</label>
+      <select id="site-select">
+        <option value="">Loading sites...</option>
+      </select>
+
+      <label for="period-select">Period:</label>
+      <select id="period-select">
+        <option value="1h">Last Hour</option>
+        <option value="6h">Last 6 Hours</option>
+        <option value="24h" selected>Last 24 Hours</option>
+        <option value="7d">Last 7 Days</option>
+        <option value="30d">Last 30 Days</option>
+      </select>
+
+      <button id="refresh-btn">Refresh</button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Vehicles</h3>
+        <div class="stat-value" id="total-count">-</div>
+        <div class="stat-label">Since deployment</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Average Hourly</h3>
+        <div class="stat-value" id="avg-hourly">-</div>
+        <div class="stat-label">Vehicles per hour</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Detection Confidence</h3>
+        <div class="stat-value" id="avg-confidence">-</div>
+        <div class="stat-label">Average accuracy</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Last Update</h3>
+        <div class="stat-value" id="last-update">-</div>
+        <div class="stat-label">Time since last data</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-container">
+      <h2>Hourly Traffic Flow</h2>
+      <canvas id="traffic-chart"></canvas>
+    </div>
+
+    <!-- Recent Detections Table -->
+    <div class="table-container">
+      <h2>Recent Detections</h2>
+      <table id="detections-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Total Count</th>
+            <th>Hourly Count</th>
+            <th>Confidence</th>
+            <th>Uptime</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="5" class="loading">Loading data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>Powered by Edge Impulse FOMO + ESP32-CAM | Data refreshes every 60 seconds</p>
+      <p class="status" id="connection-status">
+        <span class="status-indicator"></span>
+        <span class="status-text">Connecting...</span>
+      </p>
+    </footer>
+  </div>
+
+  <!-- Chart.js for visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
