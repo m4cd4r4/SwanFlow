@@ -1,19 +1,151 @@
 /**
  * Perth Traffic Watch - Dashboard Styles
+ * WA-themed with Cottesloe Beach blues and Indigenous earth tones
  */
 
-:root {
-  --primary: #2563eb;
-  --primary-dark: #1e40af;
+/* ============================================================================
+   COTTESLOE BEACH THEME (Light) - Default
+   Ocean blues, sand beige, sunset orange
+   ============================================================================ */
+:root,
+[data-theme="cottesloe-light"] {
+  /* Primary colors - Cottesloe ocean blues */
+  --primary: #2D8B94;
+  --primary-dark: #236A72;
+  --primary-light: #4A9DA5;
+  --accent: #E89B5F;
+  --accent-dark: #D68847;
+
+  /* Status colors */
   --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --bg: #f8fafc;
-  --card-bg: #ffffff;
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
-  --shadow: rgba(0, 0, 0, 0.1);
+  --warning: #E89B5F;
+  --danger: #CC5544;
+
+  /* Background colors - Beach sand tones */
+  --bg: #F5F2EB;
+  --bg-secondary: #E8DCC4;
+  --card-bg: #FFFFFF;
+
+  /* Text colors */
+  --text: #2C3E50;
+  --text-muted: #6B7280;
+  --text-inverse: #FFFFFF;
+
+  /* Border and shadow */
+  --border: #D4C4A8;
+  --shadow: rgba(45, 139, 148, 0.15);
+
+  /* Chart colors */
+  --chart-primary: #2D8B94;
+  --chart-fill: rgba(45, 139, 148, 0.1);
+}
+
+/* ============================================================================
+   COTTESLOE BEACH THEME (Dark) - Night beach
+   Deep ocean blues, dark sand, moonlight
+   ============================================================================ */
+[data-theme="cottesloe-dark"] {
+  /* Primary colors - Night ocean */
+  --primary: #4A9DA5;
+  --primary-dark: #5CB3BB;
+  --primary-light: #6EC9D1;
+  --accent: #E89B5F;
+  --accent-dark: #F4B17A;
+
+  /* Status colors */
+  --success: #34D399;
+  --warning: #E89B5F;
+  --danger: #EF4444;
+
+  /* Background colors - Night beach */
+  --bg: #0F1419;
+  --bg-secondary: #1A2027;
+  --card-bg: #1E2A35;
+
+  /* Text colors */
+  --text: #E8F0F2;
+  --text-muted: #9CA3AF;
+  --text-inverse: #0F1419;
+
+  /* Border and shadow */
+  --border: #2D4A5C;
+  --shadow: rgba(74, 157, 165, 0.2);
+
+  /* Chart colors */
+  --chart-primary: #4A9DA5;
+  --chart-fill: rgba(74, 157, 165, 0.15);
+}
+
+/* ============================================================================
+   INDIGENOUS EARTH THEME (Light) - Red ochre & desert tones
+   Warm earth colors, ochre, red earth
+   ============================================================================ */
+[data-theme="indigenous-light"] {
+  /* Primary colors - Ochre and red earth */
+  --primary: #A65E4A;
+  --primary-dark: #8B4E3A;
+  --primary-light: #C67B5C;
+  --accent: #D4A574;
+  --accent-dark: #C09560;
+
+  /* Status colors */
+  --success: #7C9D3A;
+  --warning: #D4A574;
+  --danger: #A63A2A;
+
+  /* Background colors - Warm earth */
+  --bg: #F7F3E8;
+  --bg-secondary: #EDE5D8;
+  --card-bg: #FFFFFF;
+
+  /* Text colors */
+  --text: #3A2A1A;
+  --text-muted: #6B5B4B;
+  --text-inverse: #FFFFFF;
+
+  /* Border and shadow */
+  --border: #D4C4A8;
+  --shadow: rgba(166, 94, 74, 0.15);
+
+  /* Chart colors */
+  --chart-primary: #A65E4A;
+  --chart-fill: rgba(166, 94, 74, 0.1);
+}
+
+/* ============================================================================
+   INDIGENOUS EARTH THEME (Dark) - Night desert
+   Deep earth tones, charcoal, burnt ochre
+   ============================================================================ */
+[data-theme="indigenous-dark"] {
+  /* Primary colors - Burnt earth at night */
+  --primary: #C67B5C;
+  --primary-dark: #D89070;
+  --primary-light: #E5A58D;
+  --accent: #D4A574;
+  --accent-dark: #E5B985;
+
+  /* Status colors */
+  --success: #8FAD4A;
+  --warning: #D4A574;
+  --danger: #CC5544;
+
+  /* Background colors - Night desert */
+  --bg: #1A1410;
+  --bg-secondary: #2A1F18;
+  --card-bg: #352820;
+
+  /* Text colors */
+  --text: #F0E8D8;
+  --text-muted: #B8A890;
+  --text-inverse: #1A1410;
+
+  /* Border and shadow */
+  --border: #4A3828;
+  --shadow: rgba(198, 123, 92, 0.2);
+
+  /* Chart colors */
+  --chart-primary: #C67B5C;
+  --chart-fill: rgba(198, 123, 92, 0.15);
 }
 
 * {
@@ -37,8 +169,15 @@ body {
 
 /* Header */
 header {
-  text-align: center;
   margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 header h1 {
@@ -50,6 +189,41 @@ header h1 {
 .subtitle {
   color: var(--text-muted);
   font-size: 1.1rem;
+}
+
+/* Theme Controls */
+.theme-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.theme-controls label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.theme-controls select {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-controls select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--chart-fill);
 }
 
 /* Controls */
@@ -99,12 +273,40 @@ header h1 {
   background: var(--primary-dark);
 }
 
+/* Map and Stats Row */
+.map-stats-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Live Map */
+.map-container {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.map-container h2 {
+  margin-bottom: 1rem;
+  color: var(--text);
+  font-size: 1.5rem;
+}
+
+#traffic-map {
+  height: 400px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
 .stat-card {
@@ -133,6 +335,186 @@ header h1 {
 .stat-label {
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+/* Traffic Flow Corridor */
+.flow-container {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.flow-container h2 {
+  margin-bottom: 1.5rem;
+  color: var(--text);
+  font-size: 1.5rem;
+}
+
+.flow-corridor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 1rem;
+  background: var(--bg);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.flow-site {
+  text-align: center;
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  min-width: 140px;
+  transition: all 0.3s;
+}
+
+.flow-site:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow);
+}
+
+.site-name {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.flow-arrows {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.flow-direction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.flow-direction .arrow {
+  font-size: 2rem;
+  font-weight: bold;
+  animation: pulse-flow 2s infinite;
+}
+
+.flow-direction.northbound .arrow {
+  color: var(--primary);
+}
+
+.flow-direction.southbound .arrow {
+  color: var(--accent);
+}
+
+.flow-direction .label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.flow-direction .count {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Flow connectors between sites */
+.flow-connector {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+  min-width: 60px;
+}
+
+.connector-line {
+  height: 3px;
+  background: linear-gradient(to right, var(--border), var(--primary), var(--border));
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.connector-line.northbound {
+  background: linear-gradient(to right, transparent, var(--primary), transparent);
+}
+
+.connector-line.southbound {
+  background: linear-gradient(to right, transparent, var(--accent), transparent);
+}
+
+.connector-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: flow-animation 2s infinite;
+}
+
+@keyframes flow-animation {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes pulse-flow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Flow legend */
+.flow-legend {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.legend-color {
+  width: 20px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-color.low {
+  background: var(--success);
+}
+
+.legend-color.medium {
+  background: var(--warning);
+}
+
+.legend-color.high {
+  background: var(--danger);
 }
 
 /* Chart */
@@ -249,13 +631,34 @@ footer {
     padding: 1rem;
   }
 
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   header h1 {
     font-size: 2rem;
+  }
+
+  .theme-controls {
+    width: 100%;
+  }
+
+  .theme-controls select {
+    flex: 1;
   }
 
   .controls {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .map-stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  #traffic-map {
+    height: 300px;
   }
 
   .stats-grid {
@@ -264,6 +667,27 @@ footer {
 
   .stat-value {
     font-size: 2rem;
+  }
+
+  .flow-corridor {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .flow-connector {
+    flex-direction: row;
+    width: 100%;
+    min-width: auto;
+    padding: 0.5rem 0;
+  }
+
+  .connector-line {
+    width: 100%;
+    height: 3px;
+  }
+
+  .flow-legend {
+    flex-wrap: wrap;
   }
 
   table {
