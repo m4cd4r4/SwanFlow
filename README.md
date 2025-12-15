@@ -487,7 +487,7 @@ Free to use, modify, and distribute. No warranty.
 
 ---
 
-## Next Steps (For You!)
+## Next Steps
 
 1. Star this repository
 2. Order hardware (see [hardware/shopping-lists.md](hardware/shopping-lists.md))
