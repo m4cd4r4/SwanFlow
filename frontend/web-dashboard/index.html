@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perth Traffic Watch - Real-time Vehicle Monitoring</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,6 +26,15 @@
             <option value="indigenous-dark">Indigenous Night</option>
           </select>
         </div>
+      </div>
+      <!-- Simulated Data Notice -->
+      <div class="poc-notice">
+        <span class="notice-icon">⚠️</span>
+        <div class="notice-content">
+          <strong>PROOF OF CONCEPT - SIMULATED DATA</strong>
+          <p>This dashboard displays simulated traffic data for demonstration purposes. Hardware deployment at Mounts Bay Road in development.</p>
+        </div>
+        <span class="notice-badge">PoC v0.1</span>
       </div>
     </header>
 
@@ -94,11 +104,13 @@
               <span class="arrow">↑</span>
               <span class="label">NB</span>
               <span class="count" id="flow-nb-1">-</span>
+              <span class="speed" id="speed-nb-1">-</span>
             </div>
             <div class="flow-direction southbound">
               <span class="arrow">↓</span>
               <span class="label">SB</span>
               <span class="count" id="flow-sb-1">-</span>
+              <span class="speed" id="speed-sb-1">-</span>
             </div>
           </div>
         </div>
@@ -115,11 +127,13 @@
               <span class="arrow">↑</span>
               <span class="label">NB</span>
               <span class="count" id="flow-nb-2">-</span>
+              <span class="speed" id="speed-nb-2">-</span>
             </div>
             <div class="flow-direction southbound">
               <span class="arrow">↓</span>
               <span class="label">SB</span>
               <span class="count" id="flow-sb-2">-</span>
+              <span class="speed" id="speed-sb-2">-</span>
             </div>
           </div>
         </div>
@@ -136,11 +150,13 @@
               <span class="arrow">↑</span>
               <span class="label">NB</span>
               <span class="count" id="flow-nb-3">-</span>
+              <span class="speed" id="speed-nb-3">-</span>
             </div>
             <div class="flow-direction southbound">
               <span class="arrow">↓</span>
               <span class="label">SB</span>
               <span class="count" id="flow-sb-3">-</span>
+              <span class="speed" id="speed-sb-3">-</span>
             </div>
           </div>
         </div>
@@ -157,19 +173,22 @@
               <span class="arrow">↑</span>
               <span class="label">NB</span>
               <span class="count" id="flow-nb-4">-</span>
+              <span class="speed" id="speed-nb-4">-</span>
             </div>
             <div class="flow-direction southbound">
               <span class="arrow">↓</span>
               <span class="label">SB</span>
               <span class="count" id="flow-sb-4">-</span>
+              <span class="speed" id="speed-sb-4">-</span>
             </div>
           </div>
         </div>
       </div>
       <div class="flow-legend">
-        <span class="legend-item"><span class="legend-color low"></span> Light (&lt;150/hr)</span>
-        <span class="legend-item"><span class="legend-color medium"></span> Moderate (150-250/hr)</span>
-        <span class="legend-item"><span class="legend-color high"></span> Heavy (&gt;250/hr)</span>
+        <span class="legend-item"><span class="legend-color low"></span> Flowing: 55-65 km/h (at speed limit)</span>
+        <span class="legend-item"><span class="legend-color medium"></span> Moderate: 30-50 km/h (slowdown)</span>
+        <span class="legend-item"><span class="legend-color high"></span> Heavy: 15-35 km/h (congestion)</span>
+        <span class="legend-item"><span class="legend-color gridlock"></span> Gridlock: 5-20 km/h (crawling)</span>
       </div>
     </div>
 
@@ -212,6 +231,7 @@
 
   <!-- Libraries -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
