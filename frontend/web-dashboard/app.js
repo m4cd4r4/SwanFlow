@@ -17,6 +17,7 @@ let refreshTimer = null;
 let trafficChart = null;
 let trafficMap = null;
 let siteMarkers = {};
+let roadPolylines = []; // Array to store road segment polylines
 let allSitesData = [];
 
 // DOM Elements (will be initialized after DOM loads)
@@ -153,10 +154,10 @@ function getThemeColors() {
 // ============================================================================
 
 function initMap() {
-  // Center on Mounts Bay Road, Perth
-  const center = [-31.9689, 115.8523]; // Mill Point area
+  // Center on Mounts Bay Road, Perth (middle of the monitored stretch)
+  const center = [-31.9685, 115.8531]; // Center of route
 
-  trafficMap = L.map('traffic-map').setView(center, 13);
+  trafficMap = L.map('traffic-map').setView(center, 14); // Zoom 14 for better view of road
 
   // Use different tile layers based on theme
   const isDark = currentTheme.includes('dark');
@@ -170,31 +171,188 @@ function initMap() {
   }).addTo(trafficMap);
 }
 
+// ============================================================================
+// Speed Estimation Algorithm
+// ============================================================================
+
+/**
+ * Estimates average speed using traffic flow theory
+ *
+ * Based on: Flow = Density × Speed, therefore Speed = Flow / Density
+ *
+ * For a closed road segment (no entry/exit points between sensors):
+ * - Higher flow with lower density = free flow (near speed limit)
+ * - Higher flow with higher density = compression (slower speeds)
+ *
+ * Calibrated for Mounts Bay Road (60 km/h speed limit, single lane each direction)
+ * Expected flow ranges: 50-400 vehicles/hour per direction
+ *
+ * @param {number} hourlyCount - Vehicles per hour (flow rate)
+ * @returns {number} Estimated speed in km/h
+ */
+function estimateSpeed(hourlyCount) {
+  if (!hourlyCount || hourlyCount < 10) {
+    return 60; // Minimal traffic, speed limit
+  }
+
+  // For single-lane arterial road with 60 km/h limit:
+  // Density estimation based on flow compression
+
+  let density; // vehicles per km
+
+  if (hourlyCount < 120) {
+    // Very light: Flow ~100 veh/h at 60 km/h = ~1.7 veh/km (600m spacing)
+    density = hourlyCount / 60;
+  } else if (hourlyCount < 200) {
+    // Light: Flow ~150 veh/h at 55 km/h = ~2.7 veh/km (370m spacing)
+    density = hourlyCount / 55;
+  } else if (hourlyCount < 280) {
+    // Moderate: Flow ~240 veh/h at 40 km/h = ~6 veh/km (167m spacing)
+    density = hourlyCount / 40;
+  } else if (hourlyCount < 360) {
+    // Heavy: Flow ~320 veh/h at 25 km/h = ~13 veh/km (77m spacing)
+    density = hourlyCount / 25;
+  } else {
+    // Gridlock: Flow ~400 veh/h at 10 km/h = ~40 veh/km (25m spacing)
+    density = hourlyCount / 10 + (hourlyCount - 360) * 0.1;
+  }
+
+  // Calculate speed: Flow / Density
+  const calculatedSpeed = hourlyCount / density;
+
+  // Bound to realistic range
+  return Math.max(5, Math.min(65, calculatedSpeed));
+}
+
+/**
+ * Get color for traffic visualization based on estimated speed
+ * Green = flowing at/near speed limit (good)
+ * Red = heavy congestion (bad)
+ *
+ * @param {number} hourlyCount - Vehicles per hour
+ * @returns {string} Hex color code
+ */
 function getTrafficColor(hourlyCount) {
-  if (!hourlyCount || hourlyCount < 150) return '#10b981'; // Green - light
-  if (hourlyCount < 250) return '#f59e0b'; // Orange - moderate
-  return '#ef4444'; // Red - heavy
+  const speed = estimateSpeed(hourlyCount);
+
+  if (speed >= 50) return '#10b981'; // Green - flowing at speed limit
+  if (speed >= 35) return '#f59e0b'; // Orange - moderate slowdown
+  if (speed >= 20) return '#ef4444'; // Red - heavy congestion
+  return '#991b1b'; // Dark red - gridlock
+}
+
+/**
+ * Get traffic density level description
+ * @param {number} hourlyCount - Vehicles per hour
+ * @returns {string} Traffic level description
+ */
+function getTrafficLevel(hourlyCount) {
+  const speed = estimateSpeed(hourlyCount);
+
+  if (speed >= 50) return 'Flowing';
+  if (speed >= 35) return 'Moderate';
+  if (speed >= 20) return 'Heavy';
+  return 'Gridlock';
 }
 
 function updateMapMarkers(sites) {
-  // Clear existing markers
+  // Clear existing markers and polylines
   Object.values(siteMarkers).forEach(marker => trafficMap.removeLayer(marker));
+  roadPolylines.forEach(polyline => trafficMap.removeLayer(polyline));
   siteMarkers = {};
+  roadPolylines = [];
 
+  // Group sites by location (NB/SB pairs)
+  const locations = ['Kings Park', 'Mill Point', 'Fraser Ave', 'Malcolm St'];
+
+  // Draw routes between consecutive monitoring locations for each direction
+  ['Northbound', 'Southbound'].forEach(direction => {
+    const offset = direction === 'Southbound' ? 0.0001 : -0.0001; // Slight offset for parallel routes
+
+    for (let i = 0; i < locations.length - 1; i++) {
+      const startSite = sites.find(s => s.name.includes(locations[i]) && s.name.includes(direction));
+      const endSite = sites.find(s => s.name.includes(locations[i + 1]) && s.name.includes(direction));
+
+      if (startSite && endSite && startSite.latitude && endSite.latitude) {
+        const startCoord = L.latLng(startSite.latitude + offset, startSite.longitude);
+        const endCoord = L.latLng(endSite.latitude + offset, endSite.longitude);
+
+        const hourlyCount = Math.round(startSite.current_hourly || 0);
+        const color = getTrafficColor(hourlyCount);
+        const estimatedSpeed = Math.round(estimateSpeed(hourlyCount));
+        const trafficLevel = getTrafficLevel(hourlyCount);
+
+        // Create routing control with custom styling
+        const routingControl = L.Routing.control({
+          waypoints: [startCoord, endCoord],
+          router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1'
+          }),
+          lineOptions: {
+            styles: [{
+              color: color,
+              weight: 6,
+              opacity: 0.85
+            }]
+          },
+          createMarker: () => null, // Don't create default markers
+          addWaypoints: false,
+          routeWhileDragging: false,
+          fitSelectedRoutes: false,
+          show: false, // Hide the instruction panel
+          collapsible: false
+        }).addTo(trafficMap);
+
+        // Store for cleanup
+        roadPolylines.push(routingControl);
+
+        // Add popup to the route line when it's created
+        routingControl.on('routesfound', function(e) {
+          const routes = e.routes;
+          const line = routes[0].coordinates;
+
+          // Find the polyline and add popup
+          trafficMap.eachLayer(layer => {
+            if (layer instanceof L.Polyline && layer.options.color === color) {
+              layer.bindPopup(`
+                <div style="font-family: sans-serif;">
+                  <strong>${locations[i]} to ${locations[i + 1]} (${direction.substring(0, 2)})</strong><br>
+                  <span style="color: #666;">Flow: ${hourlyCount} veh/hr</span><br>
+                  <span style="color: #666;">Est. Speed: ${estimatedSpeed} km/h</span><br>
+                  <span style="color: #666;">Level: ${trafficLevel}</span>
+                </div>
+              `);
+            }
+          });
+        });
+      }
+    }
+  });
+
+  // Add markers at monitoring sites
   sites.forEach((site, index) => {
+    if (!site.latitude || !site.longitude) return;
+
+    const hourlyCount = Math.round(site.current_hourly || 0);
+    const estimatedSpeed = hourlyCount > 0 ? Math.round(estimateSpeed(hourlyCount)) : '-';
+    const trafficLevel = getTrafficLevel(hourlyCount);
+
+    // Small marker to show monitoring point
     const marker = L.circleMarker([site.latitude, site.longitude], {
-      radius: 8,
-      fillColor: getTrafficColor(site.current_hourly),
-      color: '#fff',
+      radius: 5,
+      fillColor: '#fff',
+      color: getTrafficColor(site.current_hourly),
       weight: 2,
       opacity: 1,
-      fillOpacity: 0.8
+      fillOpacity: 0.9
     }).addTo(trafficMap);
 
     const popupContent = `
       <div style="font-family: sans-serif;">
         <strong>${site.name}</strong><br>
-        <span style="color: #666;">Current: ${site.current_hourly || '-'} vehicles/hr</span><br>
+        <span style="color: #666;">Traffic: ${hourlyCount} vehicles/hr</span><br>
+        <span style="color: #666;">Est. Speed: ${estimatedSpeed} km/h</span><br>
+        <span style="color: #666;">Level: ${trafficLevel}</span><br>
         <span style="color: #666;">Confidence: ${site.avg_confidence ? (site.avg_confidence * 100).toFixed(1) + '%' : '-'}</span>
       </div>
     `;
@@ -254,28 +412,36 @@ function updateFlowCorridor(sites) {
     if (!mapping) return;
 
     const countEl = document.getElementById(`flow-${mapping.dir}-${mapping.id}`);
+    const speedEl = document.getElementById(`speed-${mapping.dir}-${mapping.id}`);
     const connectorEl = document.getElementById(`connector-${mapping.dir}-${mapping.id}`);
 
     if (countEl) {
-      const hourlyCount = site.current_hourly || 0;
+      const hourlyCount = Math.round(site.current_hourly || 0); // Round to whole number
+      const estimatedSpeed = Math.round(estimateSpeed(hourlyCount));
+      const trafficLevel = getTrafficLevel(hourlyCount);
+
+      // Update count display
       countEl.textContent = `${hourlyCount}/hr`;
 
       // Color code based on traffic level
       const color = getTrafficColor(hourlyCount);
       countEl.style.color = color;
+
+      // Update speed display if element exists
+      if (speedEl) {
+        speedEl.textContent = `~${estimatedSpeed} km/h`;
+        speedEl.style.color = color;
+        speedEl.title = `Traffic Level: ${trafficLevel}`;
+      }
     }
 
     if (connectorEl && mapping.id < 4) {
-      const hourlyCount = site.current_hourly || 0;
+      const hourlyCount = Math.round(site.current_hourly || 0);
       const color = getTrafficColor(hourlyCount);
 
-      // Update connector color
-      const style = getComputedStyle(document.documentElement);
-      const primaryColor = mapping.dir === 'nb' ?
-        style.getPropertyValue('--primary').trim() :
-        style.getPropertyValue('--accent').trim();
-
+      // Enhanced heat-line gradient with traffic color
       connectorEl.style.background = `linear-gradient(to right, transparent, ${color}, transparent)`;
+      connectorEl.style.boxShadow = `0 0 8px ${color}40`; // Add glow effect
     }
   });
 }
@@ -524,39 +690,36 @@ async function init() {
   // Load initial data
   await loadDashboard();
 
+  // Setup event listeners
+  siteSelect.addEventListener('change', async (e) => {
+    currentSite = e.target.value;
+    await loadDashboard();
+  });
+
+  periodSelect.addEventListener('change', async (e) => {
+    currentPeriod = e.target.value;
+    await loadDashboard();
+  });
+
+  themeSelect.addEventListener('change', (e) => {
+    applyTheme(e.target.value);
+  });
+
+  refreshBtn.addEventListener('click', async () => {
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = 'Refreshing...';
+
+    await loadDashboard();
+
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = 'Refresh';
+  });
+
   // Setup auto-refresh
   refreshTimer = setInterval(loadDashboard, REFRESH_INTERVAL);
 
   console.log('Dashboard initialized');
 }
-
-// ============================================================================
-// Event Listeners
-// ============================================================================
-
-siteSelect.addEventListener('change', async (e) => {
-  currentSite = e.target.value;
-  await loadDashboard();
-});
-
-periodSelect.addEventListener('change', async (e) => {
-  currentPeriod = e.target.value;
-  await loadDashboard();
-});
-
-themeSelect.addEventListener('change', (e) => {
-  applyTheme(e.target.value);
-});
-
-refreshBtn.addEventListener('click', async () => {
-  refreshBtn.disabled = true;
-  refreshBtn.textContent = 'Refreshing...';
-
-  await loadDashboard();
-
-  refreshBtn.disabled = false;
-  refreshBtn.textContent = 'Refresh';
-});
 
 // Start dashboard when page loads
 window.addEventListener('DOMContentLoaded', init);

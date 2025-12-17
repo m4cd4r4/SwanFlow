@@ -10,6 +10,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const Database = require('better-sqlite3');
+const { startSimulator } = require('./live-simulator');
 require('dotenv').config();
 
 const app = express();
@@ -218,9 +219,9 @@ app.get('/api/stats/:site', (req, res) => {
     else if (period === '7d') hours = 24 * 7;
     else if (period === '30d') hours = 24 * 30;
 
-    const thresholdMs = Date.now() - (hours * 60 * 60 * 1000);
+    let thresholdMs = Date.now() - (hours * 60 * 60 * 1000);
 
-    const stats = db.prepare(`
+    let stats = db.prepare(`
       SELECT
         COUNT(*) as data_points,
         MAX(total_count) as current_total,
@@ -231,6 +232,31 @@ app.get('/api/stats/:site', (req, res) => {
       FROM detections
       WHERE site = ? AND timestamp > ?
     `).get(site, thresholdMs);
+
+    // DEMO MODE: If no recent data, use the most recent data available
+    if (!stats || stats.data_points === 0) {
+      // Get the most recent timestamp for this site
+      const mostRecent = db.prepare(`
+        SELECT MAX(timestamp) as latest FROM detections WHERE site = ?
+      `).get(site);
+
+      if (mostRecent && mostRecent.latest) {
+        // Use data from the requested period relative to the most recent data
+        thresholdMs = mostRecent.latest - (hours * 60 * 60 * 1000);
+
+        stats = db.prepare(`
+          SELECT
+            COUNT(*) as data_points,
+            MAX(total_count) as current_total,
+            AVG(hour_count) as avg_hourly,
+            AVG(avg_confidence) as avg_confidence,
+            MIN(created_at) as first_seen,
+            MAX(created_at) as last_seen
+          FROM detections
+          WHERE site = ? AND timestamp > ?
+        `).get(site, thresholdMs);
+      }
+    }
 
     if (!stats || stats.data_points === 0) {
       return res.status(404).json({ error: 'No data found for site' });
@@ -255,9 +281,9 @@ app.get('/api/stats/:site/hourly', (req, res) => {
   const { hours = 24 } = req.query;
 
   try {
-    const thresholdMs = Date.now() - (parseInt(hours) * 60 * 60 * 1000);
+    let thresholdMs = Date.now() - (parseInt(hours) * 60 * 60 * 1000);
 
-    const hourlyData = db.prepare(`
+    let hourlyData = db.prepare(`
       SELECT
         strftime('%Y-%m-%d %H:00', created_at) as hour,
         AVG(hour_count) as avg_count,
@@ -267,6 +293,28 @@ app.get('/api/stats/:site/hourly', (req, res) => {
       GROUP BY hour
       ORDER BY hour ASC
     `).all(site, thresholdMs);
+
+    // DEMO MODE: If no recent data, use the most recent data available
+    if (!hourlyData || hourlyData.length === 0) {
+      const mostRecent = db.prepare(`
+        SELECT MAX(timestamp) as latest FROM detections WHERE site = ?
+      `).get(site);
+
+      if (mostRecent && mostRecent.latest) {
+        thresholdMs = mostRecent.latest - (parseInt(hours) * 60 * 60 * 1000);
+
+        hourlyData = db.prepare(`
+          SELECT
+            strftime('%Y-%m-%d %H:00', created_at) as hour,
+            AVG(hour_count) as avg_count,
+            COUNT(*) as data_points
+          FROM detections
+          WHERE site = ? AND timestamp > ?
+          GROUP BY hour
+          ORDER BY hour ASC
+        `).all(site, thresholdMs);
+      }
+    }
 
     res.json({
       success: true,
@@ -304,6 +352,9 @@ app.listen(PORT, () => {
   console.log(`  GET  /api/stats/:site`);
   console.log(`  GET  /api/stats/:site/hourly`);
   console.log(`=================================\n`);
+
+  // Start live traffic simulator
+  startSimulator();
 });
 
 // Graceful shutdown

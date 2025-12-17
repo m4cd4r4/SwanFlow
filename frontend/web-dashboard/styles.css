@@ -226,6 +226,55 @@ header h1 {
   box-shadow: 0 0 0 3px var(--chart-fill);
 }
 
+/* POC Notice Banner */
+.poc-notice {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--warning) 0%, var(--accent-dark) 100%);
+  border-radius: 8px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 12px rgba(232, 155, 95, 0.3);
+}
+
+.notice-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.notice-content {
+  flex: 1;
+  color: var(--text-inverse);
+}
+
+.notice-content strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.5px;
+}
+
+.notice-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.95;
+}
+
+.notice-badge {
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-inverse);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
 /* Controls */
 .controls {
   display: flex;
@@ -424,6 +473,15 @@ header h1 {
   color: var(--text);
 }
 
+.flow-direction .speed {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  font-style: italic;
+  transition: color 0.3s;
+}
+
 /* Flow connectors between sites */
 .flow-connector {
   flex: 1;
@@ -435,11 +493,12 @@ header h1 {
 }
 
 .connector-line {
-  height: 3px;
+  height: 4px;
   background: linear-gradient(to right, var(--border), var(--primary), var(--border));
   border-radius: 2px;
   position: relative;
   overflow: hidden;
+  transition: all 0.5s ease;
 }
 
 .connector-line.northbound {
@@ -506,15 +565,19 @@ header h1 {
 }
 
 .legend-color.low {
-  background: var(--success);
+  background: #10b981;
 }
 
 .legend-color.medium {
-  background: var(--warning);
+  background: #f59e0b;
 }
 
 .legend-color.high {
-  background: var(--danger);
+  background: #ef4444;
+}
+
+.legend-color.gridlock {
+  background: #991b1b;
 }
 
 /* Chart */
