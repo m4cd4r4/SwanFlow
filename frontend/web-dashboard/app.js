@@ -5,7 +5,7 @@
 // Configuration
 const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : 'https://your-backend-url.com'; // Change in production
+  : 'https://perth-traffic-watch.onrender.com'; // Render backend
 
 const REFRESH_INTERVAL = 60000; // 60 seconds
 
