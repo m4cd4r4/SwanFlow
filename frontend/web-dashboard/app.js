@@ -686,7 +686,8 @@ function updateDetectionsTable(detections) {
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
+      timeZone: 'Australia/Perth'
     });
 
     const uptimeHours = Math.floor(d.uptime / 3600);
