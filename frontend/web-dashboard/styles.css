@@ -11,6 +11,7 @@
 [data-theme="cottesloe-light"] {
   /* Primary colors - Cottesloe ocean blues */
   --primary: #2D8B94;
+  --primary-rgb: 45, 139, 148;
   --primary-dark: #236A72;
   --primary-light: #4A9DA5;
   --accent: #E89B5F;
@@ -47,6 +48,7 @@
 [data-theme="cottesloe-dark"] {
   /* Primary colors - Night ocean */
   --primary: #4A9DA5;
+  --primary-rgb: 74, 157, 165;
   --primary-dark: #5CB3BB;
   --primary-light: #6EC9D1;
   --accent: #E89B5F;
@@ -83,6 +85,7 @@
 [data-theme="indigenous-light"] {
   /* Primary colors - Ochre and red earth */
   --primary: #A65E4A;
+  --primary-rgb: 166, 94, 74;
   --primary-dark: #8B4E3A;
   --primary-light: #C67B5C;
   --accent: #D4A574;
@@ -119,6 +122,7 @@
 [data-theme="indigenous-dark"] {
   /* Primary colors - Burnt earth at night */
   --primary: #C67B5C;
+  --primary-rgb: 198, 123, 92;
   --primary-dark: #D89070;
   --primary-light: #E5A58D;
   --accent: #D4A574;
@@ -319,6 +323,52 @@ header h1 {
   }
 }
 
+/* Data Update Animations */
+@keyframes flashUpdate {
+  0% { background-color: var(--card-bg); }
+  50% { background-color: rgba(var(--primary-rgb), 0.1); }
+  100% { background-color: var(--card-bg); }
+}
+
+@keyframes pulseValue {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.data-updated {
+  animation: flashUpdate 0.6s ease-out;
+}
+
+.value-updated {
+  animation: pulseValue 0.4s ease-out;
+}
+
+/* Loading state skeleton screens */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--card-bg) 0%,
+    rgba(var(--primary-rgb), 0.05) 50%,
+    var(--card-bg) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  color: transparent !important;
+  user-select: none;
+  pointer-events: none;
+}
+
+.skeleton::after {
+  content: '\00a0'; /* Non-breaking space to maintain height */
+}
+
 .hero-label {
   font-size: 0.95rem;
   font-weight: 600;
@@ -365,6 +415,7 @@ header h1 {
   font-size: 1.2rem;
   padding: 1rem 2rem;
   background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   font-weight: 600;
@@ -499,6 +550,7 @@ header h1 {
   border-radius: 8px;
   box-shadow: 0 1px 3px var(--shadow);
   text-align: center;
+  transition: background-color 0.6s ease-out;
 }
 
 .stat-card h3 {
@@ -516,6 +568,7 @@ header h1 {
   font-variant-numeric: tabular-nums;
   color: var(--primary);
   margin-bottom: 0.25rem;
+  transition: transform 0.4s ease-out;
 }
 
 .stat-label {
@@ -610,6 +663,7 @@ header h1 {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text);
+  transition: transform 0.3s ease-out;
 }
 
 .flow-direction .speed {
