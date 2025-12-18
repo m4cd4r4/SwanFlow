@@ -833,6 +833,34 @@ async function init() {
     applyTheme(e.target.value);
   });
 
+  // Mobile theme FAB and menu
+  const themeFab = document.getElementById('theme-fab');
+  const themeMenu = document.getElementById('theme-menu');
+  const themeOptions = document.querySelectorAll('.theme-option');
+
+  if (themeFab && themeMenu) {
+    // Toggle theme menu
+    themeFab.addEventListener('click', () => {
+      themeMenu.classList.toggle('open');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!themeFab.contains(e.target) && !themeMenu.contains(e.target)) {
+        themeMenu.classList.remove('open');
+      }
+    });
+
+    // Handle theme selection from mobile menu
+    themeOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const theme = option.dataset.theme;
+        applyTheme(theme);
+        themeMenu.classList.remove('open');
+      });
+    });
+  }
+
   refreshBtn.addEventListener('click', async () => {
     refreshBtn.disabled = true;
     refreshBtn.textContent = 'Refreshing...';

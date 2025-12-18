@@ -56,14 +56,18 @@
     </header>
 
     <!-- Site Selector -->
-    <div class="controls">
+    <div class="controls" role="toolbar" aria-label="Dashboard controls">
       <label for="site-select">Select Site:</label>
-      <select id="site-select">
+      <select
+        id="site-select"
+        aria-label="Select monitoring site">
         <option value="">Loading sites...</option>
       </select>
 
       <label for="period-select">Period:</label>
-      <select id="period-select">
+      <select
+        id="period-select"
+        aria-label="Select time period">
         <option value="1h">Last Hour</option>
         <option value="6h">Last 6 Hours</option>
         <option value="24h" selected>Last 24 Hours</option>
@@ -71,7 +75,12 @@
         <option value="30d">Last 30 Days</option>
       </select>
 
-      <button type="button" id="refresh-btn">Refresh</button>
+      <button
+        type="button"
+        id="refresh-btn"
+        aria-label="Refresh dashboard data">
+        Refresh
+      </button>
     </div>
 
     <!-- Map and Stats Row -->
@@ -79,32 +88,35 @@
       <!-- Live Map -->
       <div class="map-container">
         <h2>Live Traffic Map</h2>
-        <div id="traffic-map"></div>
+        <div
+          id="traffic-map"
+          role="img"
+          aria-label="Live traffic map showing corridor routes with color-coded congestion levels"></div>
       </div>
 
       <!-- Stats Cards -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Total Vehicles</h3>
-          <div class="stat-value" id="total-count">-</div>
+      <div class="stats-grid" role="region" aria-label="Traffic statistics">
+        <div class="stat-card" role="group" aria-labelledby="stat-total-label">
+          <h3 id="stat-total-label">Total Vehicles</h3>
+          <div class="stat-value" id="total-count" aria-live="polite">-</div>
           <div class="stat-label">Since deployment</div>
         </div>
 
-        <div class="stat-card">
-          <h3>Average Hourly</h3>
-          <div class="stat-value" id="avg-hourly">-</div>
+        <div class="stat-card" role="group" aria-labelledby="stat-hourly-label">
+          <h3 id="stat-hourly-label">Average Hourly</h3>
+          <div class="stat-value" id="avg-hourly" aria-live="polite">-</div>
           <div class="stat-label">Vehicles per hour</div>
         </div>
 
-        <div class="stat-card">
-          <h3>Detection Confidence</h3>
-          <div class="stat-value" id="avg-confidence">-</div>
+        <div class="stat-card" role="group" aria-labelledby="stat-confidence-label">
+          <h3 id="stat-confidence-label">Detection Confidence</h3>
+          <div class="stat-value" id="avg-confidence" aria-live="polite">-</div>
           <div class="stat-label">Average accuracy</div>
         </div>
 
-        <div class="stat-card">
-          <h3>Last Update</h3>
-          <div class="stat-value" id="last-update">-</div>
+        <div class="stat-card" role="group" aria-labelledby="stat-update-label">
+          <h3 id="stat-update-label">Last Update</h3>
+          <div class="stat-value" id="last-update" aria-live="polite">-</div>
           <div class="stat-label">Time since last data</div>
         </div>
       </div>
@@ -244,6 +256,36 @@
         <span class="status-text">Connecting...</span>
       </p>
     </footer>
+  </div>
+
+  <!-- Floating Theme Button (Mobile Only) -->
+  <button
+    type="button"
+    id="theme-fab"
+    class="theme-fab"
+    aria-label="Change theme"
+    title="Change theme">
+    🎨
+  </button>
+
+  <!-- Mobile Theme Menu -->
+  <div id="theme-menu" class="theme-menu" role="menu" aria-label="Theme selection">
+    <button type="button" class="theme-option" data-theme="cottesloe-light" role="menuitem">
+      <span class="theme-preview cottesloe-light"></span>
+      <span class="theme-name">Cottesloe Beach</span>
+    </button>
+    <button type="button" class="theme-option" data-theme="cottesloe-dark" role="menuitem">
+      <span class="theme-preview cottesloe-dark"></span>
+      <span class="theme-name">Cottesloe Night</span>
+    </button>
+    <button type="button" class="theme-option" data-theme="indigenous-light" role="menuitem">
+      <span class="theme-preview indigenous-light"></span>
+      <span class="theme-name">Indigenous Earth</span>
+    </button>
+    <button type="button" class="theme-option" data-theme="indigenous-dark" role="menuitem">
+      <span class="theme-preview indigenous-dark"></span>
+      <span class="theme-name">Indigenous Night</span>
+    </button>
   </div>
 
   <!-- Libraries -->
