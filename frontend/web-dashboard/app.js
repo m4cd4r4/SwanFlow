@@ -13,6 +13,7 @@ const REFRESH_INTERVAL = 60000; // 60 seconds
 let currentSite = null;
 let currentPeriod = '24h';
 let currentTheme = 'cottesloe-light';
+let currentNetwork = 'arterial'; // 'arterial', 'freeway', or 'all'
 let refreshTimer = null;
 let trafficChart = null;
 let trafficMap = null;
@@ -46,6 +47,41 @@ async function fetchSites() {
     console.error('Error fetching sites:', error);
     setStatus('error', 'Connection error');
     return [];
+  }
+}
+
+async function fetchFreewaySites() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/freeway/sites`);
+    const data = await response.json();
+
+    if (data.success && data.sites.length > 0) {
+      return data.sites;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching freeway sites:', error);
+    setStatus('error', 'Connection error');
+    return [];
+  }
+}
+
+async function fetchAllNetworkSites() {
+  try {
+    const [arterialSites, freewaySites] = await Promise.all([
+      fetchSites(),
+      fetchFreewaySites()
+    ]);
+
+    return {
+      arterial: arterialSites,
+      freeway: freewaySites,
+      all: [...arterialSites, ...freewaySites]
+    };
+  } catch (error) {
+    console.error('Error fetching all network sites:', error);
+    return { arterial: [], freeway: [], all: [] };
   }
 }
 
@@ -778,6 +814,72 @@ function getPeriodHours(period) {
 }
 
 // ============================================================================
+// Network Switching
+// ============================================================================
+
+async function switchNetwork(network) {
+  currentNetwork = network;
+
+  // Update tab active states
+  document.querySelectorAll('.network-tab').forEach(tab => {
+    tab.classList.remove('active');
+    if (tab.dataset.network === network) {
+      tab.classList.add('active');
+    }
+  });
+
+  // Update network info text
+  const networkInfo = document.getElementById('network-info');
+  if (networkInfo) {
+    const infoText = networkInfo.querySelector('p');
+    if (infoText) {
+      if (network === 'arterial') {
+        infoText.textContent = 'Monitoring arterial roads: Mounts Bay Road & Stirling Highway';
+      } else if (network === 'freeway') {
+        infoText.textContent = 'Monitoring freeways: Mitchell Freeway (18 sites) & Kwinana Freeway (12 sites)';
+      } else {
+        infoText.textContent = 'Unified Perth traffic view: All arterial roads and freeways (52 monitoring sites)';
+      }
+    }
+  }
+
+  // Reload sites for selected network
+  await loadSitesForNetwork(network);
+}
+
+async function loadSitesForNetwork(network) {
+  setStatus('loading', 'Loading sites...');
+
+  let sites = [];
+  if (network === 'arterial') {
+    sites = await fetchSites();
+  } else if (network === 'freeway') {
+    sites = await fetchFreewaySites();
+  } else {
+    const allSites = await fetchAllNetworkSites();
+    sites = allSites.all;
+  }
+
+  if (sites.length === 0) {
+    siteSelect.innerHTML = '<option value="">No sites available</option>';
+    setStatus('error', 'No monitoring sites found');
+    return;
+  }
+
+  // Populate site selector
+  siteSelect.innerHTML = sites.map(site =>
+    `<option value="${site.name}">${site.name}</option>`
+  ).join('');
+
+  // Set default site
+  currentSite = sites[0].name;
+  siteSelect.value = currentSite;
+
+  // Load dashboard for new site
+  await loadDashboard();
+}
+
+// ============================================================================
 // Initialization
 // ============================================================================
 
@@ -820,6 +922,14 @@ async function init() {
   await loadDashboard();
 
   // Setup event listeners
+  // Network tabs
+  document.querySelectorAll('.network-tab').forEach(tab => {
+    tab.addEventListener('click', async () => {
+      const network = tab.dataset.network;
+      await switchNetwork(network);
+    });
+  });
+
   siteSelect.addEventListener('change', async (e) => {
     currentSite = e.target.value;
     await loadDashboard();

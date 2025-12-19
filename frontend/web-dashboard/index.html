@@ -55,6 +55,30 @@
       </div>
     </header>
 
+    <!-- Network Selector (Arterial vs Freeway) -->
+    <div class="network-selector">
+      <div class="network-tabs">
+        <button class="network-tab active" data-network="arterial">
+          <span class="tab-icon">🚗</span>
+          <span class="tab-label">Arterial Roads</span>
+          <span class="tab-count" id="arterial-count">22</span>
+        </button>
+        <button class="network-tab" data-network="freeway">
+          <span class="tab-icon">🛣️</span>
+          <span class="tab-label">Freeways</span>
+          <span class="tab-count" id="freeway-count">30</span>
+        </button>
+        <button class="network-tab" data-network="all">
+          <span class="tab-icon">🗺️</span>
+          <span class="tab-label">All Perth</span>
+          <span class="tab-count" id="all-count">52</span>
+        </button>
+      </div>
+      <div class="network-info" id="network-info">
+        <p>Monitoring arterial roads: Mounts Bay Road & Stirling Highway</p>
+      </div>
+    </div>
+
     <!-- Site Selector -->
     <div class="controls" role="toolbar" aria-label="Dashboard controls">
       <label for="site-select">Select Site:</label>
