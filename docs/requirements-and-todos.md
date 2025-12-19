@@ -154,6 +154,8 @@ Project requirements, development roadmap, and task tracking for Perth Traffic W
 
 ## Phase 4: Advanced Features (3-6 Months)
 
+> **See Also**: [Freeway Expansion Plan](./freeway-expansion-plan.md) for the aspirational Phase 5+ covering Mitchell & Kwinana Freeway simulation and monitoring.
+
 ### Multi-Class Detection
 
 - [ ] Train model to detect vehicle types:
@@ -243,6 +245,38 @@ Project requirements, development roadmap, and task tracking for Perth Traffic W
 - [ ] Integration with Unif-eye complete
 - [ ] Open-source community contributions
 
+## Phase 5: Freeway Expansion (Aspirational)
+
+> **Full Documentation**: [Freeway Expansion Plan](./freeway-expansion-plan.md)
+
+### Vision
+
+Expand Perth Traffic Watch from arterial road monitoring to high-speed freeway corridors, covering Mitchell Freeway (north) and Kwinana Freeway (south) within 5km of the Narrows Bridge.
+
+### Key Components
+
+- [ ] **Traffic Simulator**: Model realistic freeway patterns for development/testing
+- [ ] **30 Virtual Sensors**: Cover all on/off ramps within monitoring zone
+- [ ] **Recalibrated Speed Algorithm**: Adapted for 100 km/h freeway conditions
+- [ ] **Unique Feature Detection (UFD)**: Privacy-preserving ground-truth speed sampling
+- [ ] **Unified Dashboard**: Combined arterial + freeway view with navigation
+- [ ] **GPS Integration**: "My Location" to destination journey planning
+
+### Advocacy Goals
+
+- [ ] Demonstrate citizen engineering can approximate government sensors
+- [ ] Advocate for open access to Main Roads WA sensor data
+- [ ] Propose novel algorithms (like UFD) for existing infrastructure
+- [ ] Highlight cost-effectiveness ($143/site vs. $50,000+ government sensors)
+
+### Public Data Integration
+
+- [ ] Integrate available Main Roads WA open data
+- [ ] Submit FOI requests for real-time sensor data
+- [ ] Document the "data gap" between what exists and what's public
+
+---
+
 ## Resources and Links
 
 - **Edge Impulse**: https://studio.edgeimpulse.com
@@ -268,6 +302,6 @@ Project requirements, development roadmap, and task tracking for Perth Traffic W
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2025-12-14
+**Document Version**: 1.1
+**Last Updated**: 2025-12-19
 **Owner**: Macdara

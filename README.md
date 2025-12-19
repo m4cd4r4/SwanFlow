@@ -390,6 +390,13 @@ Dashboard → Fetch API → Chart.js → User
 - [ ] Solar power deployment
 - [ ] Mobile app (React Native)
 
+### Phase 5: Freeway Expansion (Aspirational)
+- [ ] **Traffic Simulator**: Mitchell & Kwinana Freeways (5km each from Narrows Bridge)
+- [ ] **30 Virtual Sensors**: All on/off ramps in monitoring zone
+- [ ] **Unique Feature Detection (UFD)**: Privacy-preserving speed sampling
+- [ ] **Unified Dashboard**: Combined arterial + freeway view with GPS navigation
+- [ ] **Open Data Advocacy**: Demonstrate value of citizen traffic monitoring
+
 See [docs/requirements-and-todos.md](docs/requirements-and-todos.md) for full roadmap.
 
 ---
@@ -399,6 +406,8 @@ See [docs/requirements-and-todos.md](docs/requirements-and-todos.md) for full ro
 | Document | Description |
 |----------|-------------|
 | [**docs/corridor-architecture.md**](docs/corridor-architecture.md) | **3-stretch system architecture, algorithm details, ML integration** |
+| [**docs/freeway-expansion-plan.md**](docs/freeway-expansion-plan.md) | **Aspirational Phase 5: Mitchell & Kwinana Freeway simulation, UFD, advocacy** |
+| [**docs/cost-effectiveness-analysis.md**](docs/cost-effectiveness-analysis.md) | **$143 vs $500M: Citizen monitoring vs government infrastructure** |
 | [hardware/bom.md](hardware/bom.md) | Bill of materials |
 | [hardware/shopping-lists.md](hardware/shopping-lists.md) | AliExpress + Bunnings orders |
 | [docs/ml-development-guide.md](docs/ml-development-guide.md) | Edge Impulse FOMO training |
