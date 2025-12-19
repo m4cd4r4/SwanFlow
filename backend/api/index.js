@@ -55,6 +55,76 @@ db.exec(`
 console.log('Database initialized');
 
 // ============================================================================
+// Initialize Sites on Startup (for ephemeral filesystems like Render)
+// ============================================================================
+const siteCount = db.prepare('SELECT COUNT(*) as count FROM sites').get();
+
+if (siteCount.count === 0) {
+  console.log('Populating sites table with monitoring locations...');
+
+  // Site definitions (matching live-simulator.js)
+  const sites = [
+    // Mounts Bay Road (Crawley → Point Lewis) - PoC
+    { name: 'Mounts Bay Rd @ Kings Park (Northbound)', description: 'Mounts Bay Road near Kings Park' },
+    { name: 'Mounts Bay Rd @ Kings Park (Southbound)', description: 'Mounts Bay Road near Kings Park' },
+    { name: 'Mounts Bay Rd @ Mill Point (Northbound)', description: 'Mounts Bay Road at Mill Point' },
+    { name: 'Mounts Bay Rd @ Mill Point (Southbound)', description: 'Mounts Bay Road at Mill Point' },
+    { name: 'Mounts Bay Rd @ Fraser Ave (Northbound)', description: 'Mounts Bay Road at Fraser Avenue' },
+    { name: 'Mounts Bay Rd @ Fraser Ave (Southbound)', description: 'Mounts Bay Road at Fraser Avenue' },
+    { name: 'Mounts Bay Rd @ Malcolm St (Northbound)', description: 'Mounts Bay Road at Malcolm Street' },
+    { name: 'Mounts Bay Rd @ Malcolm St (Southbound)', description: 'Mounts Bay Road at Malcolm Street' },
+
+    // Stirling Hwy - Swanbourne (Grant St → Eric St) - Phase 1
+    { name: 'Stirling Hwy @ Grant St (Northbound)', description: 'Stirling Highway at Grant Street, Swanbourne' },
+    { name: 'Stirling Hwy @ Grant St (Southbound)', description: 'Stirling Highway at Grant Street, Swanbourne' },
+    { name: 'Stirling Hwy @ Campbell Barracks (Northbound)', description: 'Stirling Highway near Campbell Barracks' },
+    { name: 'Stirling Hwy @ Campbell Barracks (Southbound)', description: 'Stirling Highway near Campbell Barracks' },
+    { name: 'Stirling Hwy @ Eric St (Northbound)', description: 'Stirling Highway at Eric Street' },
+    { name: 'Stirling Hwy @ Eric St (Southbound)', description: 'Stirling Highway at Eric Street' },
+
+    // Stirling Hwy - Mosman Park (Forrest St → Victoria St) - Phase 1
+    { name: 'Stirling Hwy @ Forrest St (Northbound)', description: 'Stirling Highway at Forrest Street, Mosman Park' },
+    { name: 'Stirling Hwy @ Forrest St (Southbound)', description: 'Stirling Highway at Forrest Street, Mosman Park' },
+    { name: 'Stirling Hwy @ Bay View Terrace (Northbound)', description: 'Stirling Highway at Bay View Terrace' },
+    { name: 'Stirling Hwy @ Bay View Terrace (Southbound)', description: 'Stirling Highway at Bay View Terrace' },
+    { name: 'Stirling Hwy @ McCabe St (Northbound)', description: 'Stirling Highway at McCabe Street' },
+    { name: 'Stirling Hwy @ McCabe St (Southbound)', description: 'Stirling Highway at McCabe Street' },
+    { name: 'Stirling Hwy @ Victoria St (Northbound)', description: 'Stirling Highway at Victoria Street' },
+    { name: 'Stirling Hwy @ Victoria St (Southbound)', description: 'Stirling Highway at Victoria Street' }
+  ];
+
+  const insertSite = db.prepare(`
+    INSERT INTO sites (name, description, active)
+    VALUES (?, ?, 1)
+  `);
+
+  const insertDetection = db.prepare(`
+    INSERT INTO detections (
+      site, latitude, longitude, timestamp,
+      total_count, hour_count, minute_count,
+      avg_confidence, uptime
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const transaction = db.transaction(() => {
+    sites.forEach(site => {
+      insertSite.run(site.name, site.description);
+
+      // Create initial detection record for simulator
+      const now = Date.now();
+      insertDetection.run(
+        site.name, null, null, now, 0, 0, 0, 0.85, 0
+      );
+    });
+  });
+
+  transaction();
+  console.log(`✓ Populated ${sites.length} monitoring sites`);
+} else {
+  console.log(`✓ Found ${siteCount.count} existing monitoring sites`);
+}
+
+// ============================================================================
 // Middleware
 // ============================================================================
 app.use(helmet());
