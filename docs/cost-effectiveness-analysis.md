@@ -160,7 +160,7 @@ Even accounting for gantries and control systems, individual sensor costs are es
 |------------|-------------|--------|
 | **Open Traffic** | Global platform linking GPS data to OSM | Piloted in Philippines |
 | **OpenStreetMap** | Community-mapped road network | Active, no traffic data |
-| **Open Transport Map** | EU traffic visualization | Active in Europe |
+| **Open Transport Map** | EU traffic visualisation | Active in Europe |
 
 ---
 
