@@ -108,8 +108,8 @@ function simulateTrafficUpdate() {
 
     // Generate new vehicles
     const newVehicles = getVehicleCount(hour, site);
-    if (newVehicles === 0 && Math.random() > 0.3) return; // 70% chance to skip if no vehicles
 
+    // Always update, even if 0 vehicles (important for low-traffic periods)
     const totalCount = latest.total_count + newVehicles;
     const hourCount = newVehicles * (3600 / (UPDATE_INTERVAL / 1000)); // Extrapolate to hourly
     const minuteCount = newVehicles * (60 / (UPDATE_INTERVAL / 1000)); // Extrapolate to per minute
