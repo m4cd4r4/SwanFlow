@@ -4,7 +4,7 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: cd backend/api && npm install && npm run init-db
+    buildCommand: cd backend/api && npm install && node scripts/init-freeway-sites.js
     startCommand: cd backend/api && npm start
     envVars:
       - key: NODE_ENV
@@ -13,5 +13,7 @@ services:
         generateValue: true
       - key: PORT
         value: 3000
+      - key: SIMULATE_FREEWAY
+        value: true
     healthCheckPath: /health
     autoDeploy: true
