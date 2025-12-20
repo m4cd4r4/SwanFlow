@@ -572,9 +572,18 @@ app.get('/api/freeway/live', (req, res) => {
   }
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not found' });
+// Serve frontend static files
+const path = require('path');
+const frontendPath = path.join(__dirname, '..', '..', 'frontend', 'web-dashboard');
+app.use(express.static(frontendPath));
+
+// Fallback to index.html for client-side routing
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes
+  if (req.path.startsWith('/api/') || req.path.startsWith('/health')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // ============================================================================

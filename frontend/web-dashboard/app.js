@@ -4,27 +4,26 @@
 
 // Configuration
 const API_BASE_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:3000'
-  : 'https://perth-traffic-watch.onrender.com'; // Render backend
+  ? 'http://localhost:3000'  // Local dev: separate frontend server
+  : window.location.origin;  // Production: same server serves frontend and API
 
 const REFRESH_INTERVAL = 60000; // 60 seconds
 
 // State
 let currentSite = null;
 let currentPeriod = '24h';
-let currentTheme = 'cottesloe-light';
+let currentTheme = 'light';
 let currentNetwork = 'arterial'; // 'arterial', 'freeway', or 'all'
 let refreshTimer = null;
 let trafficChart = null;
 let trafficMap = null;
 let siteMarkers = {};
-let roadPolylines = []; // Array to store road segment polylines
+let roadPolylines = []; // Array to store road segment polylines (now stores dot markers)
 let allSitesData = [];
 
 // DOM Elements (will be initialized after DOM loads)
 let siteSelect;
 let periodSelect;
-let themeSelect;
 let refreshBtn;
 let statusIndicator;
 let statusText;
@@ -140,17 +139,19 @@ async function fetchRecentDetections(site, limit = 20) {
 
 function loadTheme() {
   const savedTheme = localStorage.getItem('perth-traffic-theme');
-  if (savedTheme && ['cottesloe-light', 'cottesloe-dark', 'indigenous-light', 'indigenous-dark'].includes(savedTheme)) {
-    currentTheme = savedTheme;
+  // Migrate old themes to new system
+  if (savedTheme) {
+    if (savedTheme.includes('dark')) {
+      currentTheme = 'dark';
+    } else {
+      currentTheme = 'light';
+    }
   }
   applyTheme(currentTheme);
 }
 
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
-  if (themeSelect) {
-    themeSelect.value = theme;
-  }
   currentTheme = theme;
   localStorage.setItem('perth-traffic-theme', theme);
 
@@ -186,25 +187,378 @@ function getThemeColors() {
 }
 
 // ============================================================================
+// Map Auto-Pan & Highlight
+// ============================================================================
+
+// Site coordinates mapping (approximate locations based on street intersections)
+const siteCoordinates = {
+  // Mounts Bay Road sites
+  'Mounts Bay Rd @ Kings Park (Northbound)': [-31.97339, 115.82564],
+  'Mounts Bay Rd @ Kings Park (Southbound)': [-31.97339, 115.82564],
+  'Mounts Bay Rd @ Mill Point (Northbound)': [-31.968, 115.834],
+  'Mounts Bay Rd @ Mill Point (Southbound)': [-31.968, 115.834],
+  'Mounts Bay Rd @ Fraser Ave (Northbound)': [-31.965, 115.838],
+  'Mounts Bay Rd @ Fraser Ave (Southbound)': [-31.965, 115.838],
+  'Mounts Bay Rd @ Malcolm St (Northbound)': [-31.963231, 115.842311],
+  'Mounts Bay Rd @ Malcolm St (Southbound)': [-31.963231, 115.842311],
+
+  // Stirling Highway - Swanbourne
+  'Stirling Hwy @ Grant St (Northbound)': [-31.985, 115.763],
+  'Stirling Hwy @ Grant St (Southbound)': [-31.985, 115.763],
+  'Stirling Hwy @ Campbell Barracks (Northbound)': [-31.990, 115.762],
+  'Stirling Hwy @ Campbell Barracks (Southbound)': [-31.990, 115.762],
+  'Stirling Hwy @ Eric St (Northbound)': [-31.998, 115.762],
+  'Stirling Hwy @ Eric St (Southbound)': [-31.998, 115.762],
+
+  // Stirling Highway - Mosman Park
+  'Stirling Hwy @ Forrest St (Northbound)': [-32.008, 115.757],
+  'Stirling Hwy @ Forrest St (Southbound)': [-32.008, 115.757],
+  'Stirling Hwy @ Bay View Terrace (Northbound)': [-32.015, 115.755],
+  'Stirling Hwy @ Bay View Terrace (Southbound)': [-32.015, 115.755],
+  'Stirling Hwy @ McCabe St (Northbound)': [-32.025, 115.753],
+  'Stirling Hwy @ McCabe St (Southbound)': [-32.025, 115.753],
+  'Stirling Hwy @ Victoria St (Northbound)': [-32.035, 115.751],
+  'Stirling Hwy @ Victoria St (Southbound)': [-32.035, 115.751],
+
+  // Mitchell Freeway
+  'Narrows Interchange (Northbound)': [-31.9580, 115.8450],
+  'Narrows Interchange (Southbound)': [-31.9580, 115.8452],
+  'Malcolm Street (Northbound)': [-31.9540, 115.8470],
+  'Malcolm Street (Southbound)': [-31.9540, 115.8472],
+  'Loftus Street (Northbound)': [-31.9500, 115.8480],
+  'Loftus Street (Southbound)': [-31.9500, 115.8482],
+  'Newcastle/Roe Street (Northbound)': [-31.9450, 115.8510],
+  'Newcastle/Roe Street (Southbound)': [-31.9450, 115.8512],
+  'Charles Street (Northbound)': [-31.9400, 115.8530],
+  'Charles Street (Southbound)': [-31.9400, 115.8532],
+  'Vincent Street (Northbound)': [-31.9350, 115.8540],
+  'Vincent Street (Southbound)': [-31.9350, 115.8542],
+  'Powis Street (Northbound)': [-31.9300, 115.8520],
+  'Powis Street (Southbound)': [-31.9300, 115.8522],
+  'Hutton Street (Northbound)': [-31.9200, 115.8500],
+  'Hutton Street (Southbound)': [-31.9200, 115.8502],
+  'Scarborough Beach Road (Northbound)': [-31.9100, 115.8480],
+  'Scarborough Beach Road (Southbound)': [-31.9100, 115.8482],
+
+  // Kwinana Freeway
+  'Narrows South (Northbound)': [-31.9620, 115.8460],
+  'Narrows South (Southbound)': [-31.9620, 115.8462],
+  'Mill Point Road (Northbound)': [-31.9680, 115.8550],
+  'Mill Point Road (Southbound)': [-31.9680, 115.8552],
+  'South Terrace/Judd St (Northbound)': [-31.9780, 115.8620],
+  'South Terrace/Judd St (Southbound)': [-31.9780, 115.8622],
+  'Canning Highway (Northbound)': [-31.9950, 115.8600],
+  'Canning Highway (Southbound)': [-31.9950, 115.8602],
+  'Manning Road (Northbound)': [-32.0100, 115.8580],
+  'Manning Road (Southbound)': [-32.0100, 115.8582],
+  'Leach Highway (Northbound)': [-32.0220, 115.8560],
+  'Leach Highway (Southbound)': [-32.0220, 115.8562],
+};
+
+let highlightMarker = null;
+let routePulseAnimationInterval = null;
+
+function panToSite(siteName) {
+  if (!trafficMap || !siteName) return;
+
+  const coords = siteCoordinates[siteName];
+  if (!coords) {
+    console.warn(`No coordinates found for site: ${siteName}`);
+    return;
+  }
+
+  // Remove previous highlight marker if exists
+  if (highlightMarker) {
+    trafficMap.removeLayer(highlightMarker);
+    highlightMarker = null;
+  }
+
+  // Smooth flyTo animation
+  trafficMap.flyTo(coords, 15, {
+    duration: 1.5,
+    easeLinearity: 0.25
+  });
+
+  // Add pulsing highlight marker
+  setTimeout(() => {
+    const pulseIcon = L.divIcon({
+      className: 'pulse-marker',
+      html: `<div class="pulse-dot"></div><div class="pulse-ring"></div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+
+    highlightMarker = L.marker(coords, { icon: pulseIcon })
+      .addTo(trafficMap);
+
+    // Auto-remove highlight after 5 seconds
+    setTimeout(() => {
+      if (highlightMarker) {
+        trafficMap.removeLayer(highlightMarker);
+        highlightMarker = null;
+      }
+    }, 5000);
+  }, 1500); // Wait for flyTo animation to complete
+}
+
+// ============================================================================
+// Route Dot Heat Map Functions
+// ============================================================================
+
+/**
+ * Calculate distance between two lat/lng points in meters using Haversine formula
+ */
+function calculateDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371000; // Earth's radius in meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lng2 - lng1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
+}
+
+/**
+ * Interpolate points along a polyline at regular intervals
+ * @param {Array} waypoints - Array of L.LatLng objects
+ * @param {number} intervalMeters - Distance between dots in meters (default 100m)
+ * @returns {Array} Array of {lat, lng} points at regular intervals
+ */
+function interpolateDotsAlongRoute(waypoints, intervalMeters = 100) {
+  const dots = [];
+
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const start = waypoints[i];
+    const end = waypoints[i + 1];
+
+    const segmentDistance = calculateDistance(start.lat, start.lng, end.lat, end.lng);
+    const numDots = Math.floor(segmentDistance / intervalMeters);
+
+    // Add dots along this segment
+    for (let j = 0; j <= numDots; j++) {
+      const fraction = j / (numDots || 1);
+      const lat = start.lat + (end.lat - start.lat) * fraction;
+      const lng = start.lng + (end.lng - start.lng) * fraction;
+      dots.push({ lat, lng });
+    }
+  }
+
+  return dots;
+}
+
+// Highlight routes that contain the selected site
+function highlightRouteForSite(siteName) {
+  if (!trafficMap || !siteName) return;
+
+  // Iterate through all map layers to find route dots
+  trafficMap.eachLayer(layer => {
+    // Check if this layer is a route dot with corridor info
+    if (layer instanceof L.CircleMarker && layer._corridorInfo) {
+      const corridorInfo = layer._corridorInfo;
+
+      // Check if this site is part of this corridor
+      const isPartOfCorridor = corridorInfo.sites &&
+                               corridorInfo.sites.some(site => site.includes(siteName) || siteName.includes(site));
+
+      if (isPartOfCorridor) {
+        // Make highlighted dots larger and more prominent
+        layer.setStyle({
+          radius: 2.5,  // Half the previous size
+          fillOpacity: 0.9,
+          weight: 1
+        });
+      } else {
+        // Keep other dots small and subtle
+        layer.setStyle({
+          radius: 1.5,  // Half the previous size
+          fillOpacity: 0.6,
+          weight: 0.5
+        });
+      }
+    }
+  });
+}
+
+// Reset all routes to default style
+function resetRouteHighlighting() {
+  if (!trafficMap) return;
+
+  trafficMap.eachLayer(layer => {
+    if (layer instanceof L.CircleMarker && layer._corridorInfo) {
+      layer.setStyle({
+        radius: 1.5,  // Half the previous size
+        fillOpacity: 0.6,
+        weight: 0.5
+      });
+    }
+  });
+}
+
+// Animate pulsing wave along the highlighted route
+function animateRouteArrow(siteName) {
+  if (!trafficMap || !siteName) return;
+
+  // Clear previous animation
+  if (routePulseAnimationInterval) {
+    clearInterval(routePulseAnimationInterval);
+    routePulseAnimationInterval = null;
+  }
+
+  // Collect all dot layers from the highlighted corridor in order
+  const routeDotLayers = [];
+  trafficMap.eachLayer(layer => {
+    if (layer instanceof L.CircleMarker && layer._corridorInfo) {
+      const corridorInfo = layer._corridorInfo;
+      const isPartOfCorridor = corridorInfo.sites &&
+                               corridorInfo.sites.some(site => site.includes(siteName) || siteName.includes(site));
+
+      if (isPartOfCorridor) {
+        routeDotLayers.push(layer);
+      }
+    }
+  });
+
+  if (routeDotLayers.length < 2) return; // Need at least 2 points
+
+  // Create pulsing wave animation
+  let currentIndex = 0;
+
+  function pulseDot() {
+    if (currentIndex >= routeDotLayers.length) {
+      currentIndex = 0; // Loop back to start
+    }
+
+    const currentDot = routeDotLayers[currentIndex];
+
+    // Pulse this dot larger temporarily
+    currentDot.setStyle({
+      radius: 4,  // Larger pulse size
+      fillOpacity: 1.0,
+      weight: 1.5
+    });
+
+    // Reset it after a short delay
+    setTimeout(() => {
+      currentDot.setStyle({
+        radius: 2.5,  // Back to highlighted size
+        fillOpacity: 0.9,
+        weight: 1
+      });
+    }, 150);
+
+    currentIndex++;
+  }
+
+  // Initial pulse
+  pulseDot();
+
+  // Pulse dots in sequence every 100ms for smooth wave effect
+  routePulseAnimationInterval = setInterval(pulseDot, 100);
+}
+
+// ============================================================================
 // Map Management
 // ============================================================================
 
 function initMap() {
-  // Center on full CBD to Fremantle corridor (midpoint of all 3 stretches)
-  const center = [-31.995, 115.785]; // Centered on Swanbourne
+  // Center on Perth traffic corridor
+  const center = [-31.995, 115.785];
 
-  trafficMap = L.map('traffic-map').setView(center, 12); // Zoom 12 to show full corridor
+  trafficMap = L.map('traffic-map', {
+    center: center,
+    zoom: 12,
+    zoomControl: true,
+    attributionControl: true
+  });
 
-  // Use different tile layers based on theme
-  const isDark = currentTheme.includes('dark');
-  const tileUrl = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+  // Define multiple basemap layers
+  const baseMaps = {
+    'Street Map': L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom: 19,
+      subdomains: 'abcd'
+    }),
 
-  L.tileLayer(tileUrl, {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19
+    'Satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; <a href="https://www.esri.com/">Esri</a> | DigitalGlobe, GeoEye, Earthstar Geographics',
+      maxZoom: 19
+    }),
+
+    'Satellite + Labels': L.layerGroup([
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19
+      }),
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.esri.com/">Esri</a> | <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 19,
+        subdomains: 'abcd'
+      })
+    ]),
+
+    'Terrain': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://opentopomap.org">OpenTopoMap</a>',
+      maxZoom: 17
+    }),
+
+    'Dark Mode': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom: 19,
+      subdomains: 'abcd'
+    })
+  };
+
+  // Set default based on theme
+  const isDark = currentTheme === 'dark';
+  const defaultLayer = isDark ? baseMaps['Dark Mode'] : baseMaps['Satellite'];
+  defaultLayer.addTo(trafficMap);
+
+  // Add scale control (bottom left)
+  L.control.scale({
+    position: 'bottomleft',
+    imperial: false,
+    metric: true
   }).addTo(trafficMap);
+
+  // Store for theme switching and view control
+  trafficMap._baseMaps = baseMaps;
+  trafficMap._currentBaseLayer = defaultLayer;
+
+  // Set up map view selector buttons
+  const viewButtons = document.querySelectorAll('.map-view-btn');
+  const viewMap = {
+    'street': 'Street Map',
+    'satellite': 'Satellite',
+    'satellite-labels': 'Satellite + Labels',
+    'terrain': 'Terrain',
+    'dark': 'Dark Mode'
+  };
+
+  viewButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.dataset.view;
+      const layerName = viewMap[view];
+
+      if (trafficMap && baseMaps[layerName]) {
+        // Remove current base layer
+        if (trafficMap._currentBaseLayer) {
+          trafficMap.removeLayer(trafficMap._currentBaseLayer);
+        }
+
+        // Add new base layer
+        baseMaps[layerName].addTo(trafficMap);
+        trafficMap._currentBaseLayer = baseMaps[layerName];
+
+        // Update active button
+        viewButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+    });
+  });
 }
 
 // ============================================================================
@@ -298,23 +652,60 @@ function updateMapMarkers(sites) {
   siteMarkers = {};
   roadPolylines = [];
 
-  // Define all 3 corridor stretches
+  // Define all corridor stretches (arterial + freeway)
   const corridors = [
+    // Arterial Roads
     {
       name: 'Mounts Bay Road',
       shortName: 'Mounts Bay Rd',
       filter: 'Mounts Bay Rd',
-      start: L.latLng(-31.97339, 115.82564),  // Crawley
-      end: L.latLng(-31.963231, 115.842311),  // Point Lewis
-      label: 'Crawley → Point Lewis'
+      start: L.latLng(-31.97339, 115.82564),  // Crawley (Kings Park)
+      end: L.latLng(-31.963231, 115.842311),  // Point Lewis (Malcolm St)
+      label: 'Crawley → Point Lewis',
+      waypoints: [
+        // EXACT coordinates from OpenStreetMap (sampled for performance)
+        L.latLng(-31.9728911, 115.8265899),
+        L.latLng(-31.9726546, 115.8274435),
+        L.latLng(-31.9724305, 115.8289419),
+        L.latLng(-31.9722547, 115.8308715),
+        L.latLng(-31.9719219, 115.8321438),
+        L.latLng(-31.9715072, 115.8331964),
+        L.latLng(-31.9710934, 115.8336485),
+        L.latLng(-31.9704117, 115.8340935),
+        L.latLng(-31.9701018, 115.8345177),
+        L.latLng(-31.9696950, 115.8357989),
+        L.latLng(-31.9693711, 115.8365875),
+        L.latLng(-31.9689912, 115.8371631),
+        L.latLng(-31.9684943, 115.8377125),
+        L.latLng(-31.9678280, 115.8383774),
+        L.latLng(-31.9668462, 115.8390952),
+        L.latLng(-31.9662305, 115.8395033),
+        L.latLng(-31.9653717, 115.8398791)
+      ]
     },
     {
       name: 'Stirling Highway - Swanbourne',
       shortName: 'Swanbourne',
-      filter: 'Stirling Hwy @ Grant St|Stirling Hwy @ Campbell Barracks|Stirling Hwy @ Eric St',
-      start: L.latLng(-31.985, 115.763),  // Grant St
+      filter: 'Stirling Hwy @ Campbell Barracks|Stirling Hwy @ Eric St',
+      start: L.latLng(-31.990, 115.762),  // Campbell Barracks
       end: L.latLng(-31.998, 115.762),    // Eric St
-      label: 'Grant St → Eric St'
+      label: 'Campbell Barracks → Eric St',
+      waypoints: [
+        // EXACT coordinates from OpenStreetMap (sampled for performance)
+        L.latLng(-31.9900419, 115.7619476),
+        L.latLng(-31.9906974, 115.7619281),
+        L.latLng(-31.9911854, 115.7619154),
+        L.latLng(-31.9918138, 115.7619067),
+        L.latLng(-31.9926278, 115.7619101),
+        L.latLng(-31.9933467, 115.7619175),
+        L.latLng(-31.9940649, 115.7619276),
+        L.latLng(-31.9946888, 115.7619375),
+        L.latLng(-31.9952177, 115.7619449),
+        L.latLng(-31.9959354, 115.7619566),
+        L.latLng(-31.9967473, 115.7619727),
+        L.latLng(-31.9973699, 115.7619839),
+        L.latLng(-31.9980904, 115.7619976)
+      ]
     },
     {
       name: 'Stirling Highway - Mosman Park',
@@ -322,7 +713,46 @@ function updateMapMarkers(sites) {
       filter: 'Stirling Hwy @ Forrest St|Stirling Hwy @ Bay View|Stirling Hwy @ McCabe|Stirling Hwy @ Victoria',
       start: L.latLng(-32.008, 115.757),  // Forrest St
       end: L.latLng(-32.035, 115.751),    // Victoria St
-      label: 'Forrest St → Victoria St'
+      label: 'Forrest St → Victoria St',
+      waypoints: [
+        L.latLng(-32.011, 115.756),  // Between Forrest and Bay View
+        L.latLng(-32.015, 115.755),  // Bay View Terrace
+        L.latLng(-32.020, 115.754),  // Between Bay View and McCabe
+        L.latLng(-32.025, 115.753),  // McCabe St
+        L.latLng(-32.030, 115.752)   // Between McCabe and Victoria
+      ]
+    },
+    // Freeways
+    {
+      name: 'Mitchell Freeway',
+      shortName: 'Mitchell Fwy',
+      filter: 'Narrows Interchange|Malcolm Street|Loftus Street|Newcastle/Roe Street|Charles Street|Vincent Street|Powis Street|Hutton Street|Scarborough Beach Road',
+      start: L.latLng(-31.9580, 115.8450),  // Narrows Interchange
+      end: L.latLng(-31.9100, 115.8480),    // Scarborough Beach Rd
+      label: 'Narrows → Scarborough',
+      waypoints: [
+        L.latLng(-31.9540, 115.8470),  // Malcolm St
+        L.latLng(-31.9500, 115.8480),  // Loftus St
+        L.latLng(-31.9450, 115.8510),  // Newcastle/Roe St
+        L.latLng(-31.9400, 115.8530),  // Charles St
+        L.latLng(-31.9350, 115.8540),  // Vincent St
+        L.latLng(-31.9300, 115.8520),  // Powis St
+        L.latLng(-31.9200, 115.8500)   // Hutton St
+      ]
+    },
+    {
+      name: 'Kwinana Freeway',
+      shortName: 'Kwinana Fwy',
+      filter: 'Narrows South|Mill Point Road|South Terrace/Judd St|Canning Highway|Manning Road|Leach Highway',
+      start: L.latLng(-31.9620, 115.8460),  // Narrows South
+      end: L.latLng(-32.0220, 115.8560),    // Leach Highway
+      label: 'Narrows → Leach Hwy',
+      waypoints: [
+        L.latLng(-31.9680, 115.8550),  // Mill Point Rd
+        L.latLng(-31.9780, 115.8620),  // South Terrace/Judd St
+        L.latLng(-31.9950, 115.8600),  // Canning Hwy
+        L.latLng(-32.0100, 115.8580)   // Manning Rd
+      ]
     }
   ];
 
@@ -351,77 +781,79 @@ function updateMapMarkers(sites) {
       const startCoord = L.latLng(corridor.start.lat + offset, corridor.start.lng);
       const endCoord = L.latLng(corridor.end.lat + offset, corridor.end.lng);
 
-      const routingControl = L.Routing.control({
-        waypoints: [startCoord, endCoord],
-        router: L.Routing.osrmv1({
-          serviceUrl: 'https://router.project-osrm.org/route/v1'
-        }),
-        lineOptions: {
-          styles: [{
-            color: color,
-            weight: 5,
-            opacity: 0.8
-          }]
-        },
-        createMarker: () => null,
-        addWaypoints: false,
-        routeWhileDragging: false,
-        fitSelectedRoutes: false,
-        show: false,
-        collapsible: false
-      }).addTo(trafficMap);
+      // Build waypoints array: start + intermediate waypoints + end
+      const allWaypoints = [
+        startCoord,
+        ...corridor.waypoints.map(wp => L.latLng(wp.lat + offset, wp.lng)),
+        endCoord
+      ];
 
-      roadPolylines.push(routingControl);
+      // Interpolate dots every 100 meters along the route
+      const dotPositions = interpolateDotsAlongRoute(allWaypoints, 100);
 
-      // Add popup to route line
-      const routeId = `${corridor.shortName}-${direction}`;
-      routingControl.on('routesfound', function(e) {
-        setTimeout(() => {
-          trafficMap.eachLayer(layer => {
-            if (layer instanceof L.Polyline && layer.options.color === color) {
-              // Only bind if not already bound (avoid duplicates)
-              if (!layer._routePopupBound) {
-                layer.bindPopup(`
-                  <div style="font-family: sans-serif;">
-                    <strong>${corridor.name} (${direction.substring(0, 2)})</strong><br>
-                    <span style="color: #666;">${corridor.label}</span><br>
-                    <span style="color: #666;">Avg Flow: ${avgTraffic} veh/hr</span><br>
-                    <span style="color: #666;">Est. Speed: ${estimatedSpeed} km/h</span><br>
-                    <span style="color: #666;">Level: ${trafficLevel}</span>
-                  </div>
-                `);
-                layer._routePopupBound = true;
-              }
-            }
-          });
-        }, 200);
+      // Create circle markers for each dot position
+      dotPositions.forEach((dotPos, index) => {
+        const dot = L.circleMarker([dotPos.lat, dotPos.lng], {
+          radius: 1.5,  // Half the previous size
+          fillColor: color,
+          color: color,
+          weight: 0.5,
+          opacity: 0.8,
+          fillOpacity: 0.7
+        }).addTo(trafficMap);
+
+        // Store metadata for highlighting
+        dot._corridorInfo = {
+          name: corridor.name,
+          shortName: corridor.shortName,
+          direction: direction,
+          sites: corridorSites.map(s => s.name),
+          color: color,
+          avgTraffic: avgTraffic
+        };
+
+        // Add popup to dot (only show on first and last dots to avoid clutter)
+        if (index === 0 || index === dotPositions.length - 1) {
+          dot.bindPopup(`
+            <div style="font-family: sans-serif;">
+              <strong>${corridor.name} (${direction.substring(0, 2)})</strong><br>
+              <span style="color: #666;">${corridor.label}</span><br>
+              <span style="color: #666;">Avg Flow: ${avgTraffic} veh/hr</span><br>
+              <span style="color: #666;">Est. Speed: ${estimatedSpeed} km/h</span><br>
+              <span style="color: #666;">Level: ${trafficLevel}</span>
+            </div>
+          `);
+        }
+
+        roadPolylines.push(dot);
       });
     });
   });
 
-  // Monitoring site dots removed - showing only route lines for cleaner visualization
+  // Route visualization: colored dots every 100m showing traffic heat map
 }
 
-function updateMapTiles() {
-  if (!trafficMap) return;
 
-  // Remove old tiles
+function updateMapTiles() {
+  if (!trafficMap || !trafficMap._baseMaps) return;
+
+  // Remove all base layers
   trafficMap.eachLayer((layer) => {
-    if (layer instanceof L.TileLayer) {
-      trafficMap.removeLayer(layer);
-    }
+    // Check if layer is one of the base maps
+    Object.values(trafficMap._baseMaps).forEach(baseLayer => {
+      if (layer === baseLayer || (layer._layers && baseLayer._layers === layer._layers)) {
+        trafficMap.removeLayer(layer);
+      }
+    });
   });
 
-  // Add new tiles based on theme
-  const isDark = currentTheme.includes('dark');
-  const tileUrl = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+  // Add appropriate base layer based on theme
+  const isDark = currentTheme === 'dark';
+  const newBaseLayer = isDark ? trafficMap._baseMaps['Dark Mode'] : trafficMap._baseMaps['Street Map'];
 
-  L.tileLayer(tileUrl, {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19
-  }).addTo(trafficMap);
+  if (newBaseLayer) {
+    newBaseLayer.addTo(trafficMap);
+  }
 }
 
 // ============================================================================
@@ -843,6 +1275,9 @@ async function switchNetwork(network) {
     }
   }
 
+  // Reset route highlighting when switching networks
+  resetRouteHighlighting();
+
   // Reload sites for selected network
   await loadSitesForNetwork(network);
 }
@@ -889,7 +1324,6 @@ async function init() {
   // Initialize DOM elements
   siteSelect = document.getElementById('site-select');
   periodSelect = document.getElementById('period-select');
-  themeSelect = document.getElementById('theme-select');
   refreshBtn = document.getElementById('refresh-btn');
   statusIndicator = document.querySelector('.status-indicator');
   statusText = document.querySelector('.status-text');
@@ -921,6 +1355,10 @@ async function init() {
   // Load initial data
   await loadDashboard();
 
+  // Highlight routes for initial site
+  highlightRouteForSite(currentSite);
+  animateRouteArrow(currentSite);
+
   // Setup event listeners
   // Network tabs
   document.querySelectorAll('.network-tab').forEach(tab => {
@@ -932,6 +1370,9 @@ async function init() {
 
   siteSelect.addEventListener('change', async (e) => {
     currentSite = e.target.value;
+    panToSite(currentSite); // Pan map to selected site
+    highlightRouteForSite(currentSite); // Highlight routes containing this site
+    animateRouteArrow(currentSite); // Animate arrow along route
     await loadDashboard();
   });
 
@@ -940,35 +1381,21 @@ async function init() {
     await loadDashboard();
   });
 
-  themeSelect.addEventListener('change', (e) => {
-    applyTheme(e.target.value);
-  });
+  // Desktop theme toggle button
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(newTheme);
+    });
+  }
 
-  // Mobile theme FAB and menu
+  // Mobile theme FAB (same toggle behavior)
   const themeFab = document.getElementById('theme-fab');
-  const themeMenu = document.getElementById('theme-menu');
-  const themeOptions = document.querySelectorAll('.theme-option');
-
-  if (themeFab && themeMenu) {
-    // Toggle theme menu
+  if (themeFab) {
     themeFab.addEventListener('click', () => {
-      themeMenu.classList.toggle('open');
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!themeFab.contains(e.target) && !themeMenu.contains(e.target)) {
-        themeMenu.classList.remove('open');
-      }
-    });
-
-    // Handle theme selection from mobile menu
-    themeOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        const theme = option.dataset.theme;
-        applyTheme(theme);
-        themeMenu.classList.remove('open');
-      });
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(newTheme);
     });
   }
 

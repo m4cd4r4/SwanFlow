@@ -1,18 +1,19 @@
 services:
   - type: web
-    name: perth-traffic-watch-api
+    name: perth-traffic-watch
     runtime: node
     region: oregon
     plan: free
-    buildCommand: cd backend/api && npm install && node scripts/init-freeway-sites.js
-    startCommand: cd backend/api && npm start
+    rootDir: backend/api
+    buildCommand: npm install && node scripts/init-freeway-sites.js
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: API_KEY
         generateValue: true
       - key: PORT
-        value: 3000
+        value: 10000
       - key: SIMULATE_FREEWAY
         value: true
     healthCheckPath: /health
