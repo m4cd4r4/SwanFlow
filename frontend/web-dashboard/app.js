@@ -13,13 +13,20 @@ const REFRESH_INTERVAL = 60000; // 60 seconds
 let currentSite = null;
 let currentPeriod = '24h';
 let currentTheme = 'light';
-let currentNetwork = 'arterial'; // 'arterial', 'freeway', or 'all'
+let currentNetwork = 'arterial'; // 'arterial', 'freeway', 'all', or 'terminal'
 let refreshTimer = null;
 let trafficChart = null;
 let trafficMap = null;
 let siteMarkers = {};
 let roadPolylines = []; // Array to store road segment polylines (now stores dot markers)
 let allSitesData = [];
+
+// Terminal state
+let terminalInterval = null;
+let terminalPaused = false;
+let terminalLineCount = 0;
+let terminalUpdateCount = 0;
+let terminalLastSecond = Date.now();
 
 // DOM Elements (will be initialized after DOM loads)
 let siteSelect;
@@ -1260,6 +1267,32 @@ async function switchNetwork(network) {
     }
   });
 
+  // Show/hide terminal container
+  const terminalContainer = document.getElementById('terminal-container');
+  const mainContent = document.querySelectorAll('.controls, .map-stats-row, .flow-container, .chart-container, .table-container');
+
+  if (network === 'terminal') {
+    // Show terminal, hide main content
+    if (terminalContainer) terminalContainer.style.display = 'block';
+    mainContent.forEach(el => el.style.display = 'none');
+    startTerminal();
+
+    // Update network info
+    const networkInfo = document.getElementById('network-info');
+    if (networkInfo) {
+      const infoText = networkInfo.querySelector('p');
+      if (infoText) {
+        infoText.textContent = 'Live simulation feed showing real-time traffic data generation';
+      }
+    }
+    return;
+  } else {
+    // Hide terminal, show main content
+    if (terminalContainer) terminalContainer.style.display = 'none';
+    mainContent.forEach(el => el.style.display = '');
+    stopTerminal();
+  }
+
   // Update network info text
   const networkInfo = document.getElementById('network-info');
   if (networkInfo) {
@@ -1315,6 +1348,196 @@ async function loadSitesForNetwork(network) {
 }
 
 // ============================================================================
+// Live Terminal Feed
+// ============================================================================
+
+// Simulated site data for terminal output
+const terminalSites = {
+  arterial: [
+    { name: 'Mounts Bay Rd @ Kings Park', direction: 'NB', baseFlow: 450 },
+    { name: 'Mounts Bay Rd @ Kings Park', direction: 'SB', baseFlow: 420 },
+    { name: 'Mounts Bay Rd @ Mill Point', direction: 'NB', baseFlow: 380 },
+    { name: 'Mounts Bay Rd @ Mill Point', direction: 'SB', baseFlow: 350 },
+    { name: 'Mounts Bay Rd @ Fraser Ave', direction: 'NB', baseFlow: 400 },
+    { name: 'Mounts Bay Rd @ Fraser Ave', direction: 'SB', baseFlow: 380 },
+    { name: 'Mounts Bay Rd @ Malcolm St', direction: 'NB', baseFlow: 320 },
+    { name: 'Mounts Bay Rd @ Malcolm St', direction: 'SB', baseFlow: 340 },
+    { name: 'Stirling Hwy @ Campbell Barracks', direction: 'NB', baseFlow: 280 },
+    { name: 'Stirling Hwy @ Campbell Barracks', direction: 'SB', baseFlow: 260 },
+    { name: 'Stirling Hwy @ Eric St', direction: 'NB', baseFlow: 300 },
+    { name: 'Stirling Hwy @ Eric St', direction: 'SB', baseFlow: 290 },
+    { name: 'Stirling Hwy @ Forrest St', direction: 'NB', baseFlow: 310 },
+    { name: 'Stirling Hwy @ Forrest St', direction: 'SB', baseFlow: 305 },
+    { name: 'Stirling Hwy @ Bay View Terrace', direction: 'NB', baseFlow: 295 },
+    { name: 'Stirling Hwy @ Bay View Terrace', direction: 'SB', baseFlow: 280 },
+  ],
+  freeway: [
+    { name: 'Mitchell Fwy @ Narrows', direction: 'NB', baseFlow: 2800 },
+    { name: 'Mitchell Fwy @ Narrows', direction: 'SB', baseFlow: 2650 },
+    { name: 'Mitchell Fwy @ Malcolm St', direction: 'NB', baseFlow: 2400 },
+    { name: 'Mitchell Fwy @ Malcolm St', direction: 'SB', baseFlow: 2350 },
+    { name: 'Mitchell Fwy @ Loftus St', direction: 'NB', baseFlow: 2200 },
+    { name: 'Mitchell Fwy @ Loftus St', direction: 'SB', baseFlow: 2100 },
+    { name: 'Mitchell Fwy @ Vincent St', direction: 'NB', baseFlow: 1900 },
+    { name: 'Mitchell Fwy @ Vincent St', direction: 'SB', baseFlow: 1850 },
+    { name: 'Kwinana Fwy @ Narrows South', direction: 'NB', baseFlow: 2600 },
+    { name: 'Kwinana Fwy @ Narrows South', direction: 'SB', baseFlow: 2500 },
+    { name: 'Kwinana Fwy @ Canning Hwy', direction: 'NB', baseFlow: 2100 },
+    { name: 'Kwinana Fwy @ Canning Hwy', direction: 'SB', baseFlow: 2000 },
+    { name: 'Kwinana Fwy @ Leach Hwy', direction: 'NB', baseFlow: 1800 },
+    { name: 'Kwinana Fwy @ Leach Hwy', direction: 'SB', baseFlow: 1750 },
+  ]
+};
+
+function getTimestamp() {
+  const now = new Date();
+  return now.toTimeString().split(' ')[0];
+}
+
+function getRandomVariation(base, percent = 15) {
+  const variation = base * (percent / 100);
+  return Math.round(base + (Math.random() * variation * 2 - variation));
+}
+
+function getTrafficStatus(flow, isFreeway) {
+  const threshold = isFreeway ? 2000 : 400;
+  if (flow > threshold * 1.2) return { status: 'HEAVY', class: 'status-heavy' };
+  if (flow > threshold * 0.9) return { status: 'MODERATE', class: 'status-moderate' };
+  if (flow < threshold * 0.5) return { status: 'LIGHT', class: 'status-normal' };
+  return { status: 'NORMAL', class: 'status-normal' };
+}
+
+function generateTerminalLine() {
+  // Randomly choose arterial or freeway
+  const isFreeway = Math.random() > 0.5;
+  const sites = isFreeway ? terminalSites.freeway : terminalSites.arterial;
+  const site = sites[Math.floor(Math.random() * sites.length)];
+
+  const flow = getRandomVariation(site.baseFlow);
+  const speed = isFreeway
+    ? getRandomVariation(95, 10)
+    : getRandomVariation(55, 20);
+  const { status, class: statusClass } = getTrafficStatus(flow, isFreeway);
+
+  const timestamp = `<span class="timestamp">[${getTimestamp()}]</span>`;
+  const siteSpan = isFreeway
+    ? `<span class="freeway-name">${site.name} (${site.direction})</span>`
+    : `<span class="site-name">${site.name} (${site.direction})</span>`;
+  const flowSpan = `<span class="count">${flow} veh/hr</span>`;
+  const speedSpan = `<span class="speed">${speed} km/h</span>`;
+  const statusSpan = `<span class="${statusClass}">${status}</span>`;
+
+  const lineClass = isFreeway ? 'freeway' : 'arterial';
+  const prefix = isFreeway ? '[FREEWAY]' : '[ARTERIAL]';
+
+  return `<div class="terminal-line ${lineClass}">${timestamp} ${prefix} ${siteSpan} | ${flowSpan} | ${speedSpan} | ${statusSpan}</div>`;
+}
+
+function addTerminalLine(html) {
+  const output = document.getElementById('terminal-output');
+  if (!output) return;
+
+  output.insertAdjacentHTML('beforeend', html);
+  terminalLineCount++;
+  terminalUpdateCount++;
+
+  // Update line count
+  const linesEl = document.getElementById('terminal-lines');
+  if (linesEl) linesEl.textContent = terminalLineCount;
+
+  // Auto-scroll to bottom
+  output.scrollTop = output.scrollHeight;
+
+  // Limit lines to prevent memory issues
+  const maxLines = 500;
+  while (output.children.length > maxLines) {
+    output.removeChild(output.firstChild);
+  }
+}
+
+function updateTerminalRate() {
+  const now = Date.now();
+  if (now - terminalLastSecond >= 1000) {
+    const rateEl = document.getElementById('terminal-rate');
+    if (rateEl) rateEl.textContent = terminalUpdateCount;
+    terminalUpdateCount = 0;
+    terminalLastSecond = now;
+  }
+}
+
+function startTerminal() {
+  if (terminalInterval) return; // Already running
+
+  const output = document.getElementById('terminal-output');
+  if (output) {
+    // Add startup messages
+    addTerminalLine('<div class="terminal-line system">[SYSTEM] Connected to Perth Traffic Watch simulator</div>');
+    addTerminalLine('<div class="terminal-line system">[SYSTEM] Monitoring 22 arterial sites + 30 freeway sites</div>');
+    addTerminalLine('<div class="terminal-line system">[SYSTEM] Starting live data feed...</div>');
+    addTerminalLine('<div class="terminal-line detection">[SIMULATOR] Data generation active</div>');
+  }
+
+  // Start generating lines
+  terminalInterval = setInterval(() => {
+    if (!terminalPaused) {
+      // Generate 1-3 lines per interval for realistic effect
+      const lineCount = Math.floor(Math.random() * 3) + 1;
+      for (let i = 0; i < lineCount; i++) {
+        addTerminalLine(generateTerminalLine());
+      }
+      updateTerminalRate();
+    }
+  }, 500); // Update every 500ms
+
+  // Update status
+  const statusEl = document.getElementById('terminal-status');
+  if (statusEl) {
+    statusEl.textContent = '● LIVE';
+    statusEl.className = 'status-active';
+  }
+}
+
+function stopTerminal() {
+  if (terminalInterval) {
+    clearInterval(terminalInterval);
+    terminalInterval = null;
+  }
+}
+
+function toggleTerminalPause() {
+  terminalPaused = !terminalPaused;
+
+  const pauseBtn = document.getElementById('terminal-pause');
+  const statusEl = document.getElementById('terminal-status');
+
+  if (pauseBtn) {
+    pauseBtn.textContent = terminalPaused ? '▶️ Resume' : '⏸️ Pause';
+    pauseBtn.classList.toggle('paused', terminalPaused);
+  }
+
+  if (statusEl) {
+    statusEl.textContent = terminalPaused ? '⏸ PAUSED' : '● LIVE';
+    statusEl.className = terminalPaused ? 'status-paused' : 'status-active';
+  }
+
+  if (!terminalPaused) {
+    addTerminalLine('<div class="terminal-line system">[SYSTEM] Feed resumed</div>');
+  } else {
+    addTerminalLine('<div class="terminal-line warning">[SYSTEM] Feed paused</div>');
+  }
+}
+
+function clearTerminal() {
+  const output = document.getElementById('terminal-output');
+  if (output) {
+    output.innerHTML = '<div class="terminal-line system">[SYSTEM] Terminal cleared</div>';
+    terminalLineCount = 1;
+    const linesEl = document.getElementById('terminal-lines');
+    if (linesEl) linesEl.textContent = '1';
+  }
+}
+
+// ============================================================================
 // Initialization
 // ============================================================================
 
@@ -1367,6 +1590,17 @@ async function init() {
       await switchNetwork(network);
     });
   });
+
+  // Terminal button event listeners
+  const terminalPauseBtn = document.getElementById('terminal-pause');
+  if (terminalPauseBtn) {
+    terminalPauseBtn.addEventListener('click', toggleTerminalPause);
+  }
+
+  const terminalClearBtn = document.getElementById('terminal-clear');
+  if (terminalClearBtn) {
+    terminalClearBtn.addEventListener('click', clearTerminal);
+  }
 
   siteSelect.addEventListener('change', async (e) => {
     currentSite = e.target.value;
