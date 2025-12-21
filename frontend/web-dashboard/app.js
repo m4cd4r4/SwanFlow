@@ -5,7 +5,7 @@
 // Configuration
 const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'  // Local dev: separate frontend server
-  : 'https://perth-traffic-watch.onrender.com';  // Production: Render backend API
+  : 'http://45.77.233.102/traffic';  // Production: Vultr Sydney VPS (24/7 operation)
 
 const REFRESH_INTERVAL = 60000; // 60 seconds
 
