@@ -52,7 +52,7 @@
       </div>
     </header>
 
-    <!-- Network Selector (Arterial vs Freeway) -->
+    <!-- Network Selector (Arterial vs Freeway vs Live Feed) -->
     <div class="network-selector">
       <div class="network-tabs">
         <button type="button" class="network-tab active" data-network="arterial">
@@ -70,9 +70,40 @@
           <span class="tab-label">All Perth</span>
           <span class="tab-count" id="all-count">52</span>
         </button>
+        <button type="button" class="network-tab" data-network="terminal">
+          <span class="tab-icon">💻</span>
+          <span class="tab-label">Live Feed</span>
+          <span class="tab-count live-indicator">●</span>
+        </button>
       </div>
       <div class="network-info" id="network-info">
         <p>Monitoring arterial roads: Mounts Bay Road & Stirling Highway</p>
+      </div>
+    </div>
+
+    <!-- Live Terminal Feed (hidden by default) -->
+    <div class="terminal-container" id="terminal-container" style="display: none;">
+      <div class="terminal-header">
+        <div class="terminal-title">
+          <span class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </span>
+          <span>Perth Traffic Watch - Live Simulator Feed</span>
+        </div>
+        <div class="terminal-controls">
+          <button type="button" id="terminal-pause" class="terminal-btn">⏸️ Pause</button>
+          <button type="button" id="terminal-clear" class="terminal-btn">🗑️ Clear</button>
+        </div>
+      </div>
+      <div class="terminal-body" id="terminal-output">
+        <div class="terminal-line system">[SYSTEM] Connecting to Perth Traffic Watch simulator...</div>
+      </div>
+      <div class="terminal-stats">
+        <span>Lines: <strong id="terminal-lines">1</strong></span>
+        <span>Updates/sec: <strong id="terminal-rate">0</strong></span>
+        <span>Status: <strong id="terminal-status" class="status-active">● LIVE</strong></span>
       </div>
     </div>
 

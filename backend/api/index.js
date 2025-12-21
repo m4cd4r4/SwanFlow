@@ -128,7 +128,18 @@ if (siteCount.count === 0) {
 // ============================================================================
 // Middleware
 // ============================================================================
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://unpkg.com", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", "https://router.project-osrm.org"]
+    }
+  }
+}));
 app.use(cors());
 app.use(morgan('combined'));
 app.use(express.json());
