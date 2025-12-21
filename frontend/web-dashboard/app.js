@@ -3,7 +3,7 @@
  */
 
 // Configuration
-const API_BASE = 'https://swanflow.com.au/traffic/api';  // SwanFlow Traffic API
+const API_BASE = 'https://api.swanflow.com.au/traffic/api';  // SwanFlow Traffic API
 const ROUTE_ID = 'mounts-bay';
 const REFRESH_INTERVAL = 60000;  // 60 seconds
 
