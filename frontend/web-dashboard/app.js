@@ -483,6 +483,9 @@ function initMap() {
     attributionControl: true
   });
 
+  // Expose to window for debugging/testing
+  window.trafficMap = trafficMap;
+
   // Define multiple basemap layers
   const baseMaps = {
     'Street Map': L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -1186,10 +1189,10 @@ function updateDetectionsTable(detections) {
 // ============================================================================
 
 async function loadAllSitesData() {
-  // Fetch stats for all sites
-  const sites = await fetchSites();
-  const sitesWithStats = await Promise.all(
-    sites.map(async (site) => {
+  // Fetch stats for arterial sites
+  const arterialSites = await fetchSites();
+  const arterialWithStats = await Promise.all(
+    arterialSites.map(async (site) => {
       const stats = await fetchStats(site.name, '1h');
       return {
         ...site,
@@ -1199,14 +1202,38 @@ async function loadAllSitesData() {
     })
   );
 
-  allSitesData = sitesWithStats;
+  // Fetch freeway live data (includes hour_count)
+  let freewayWithStats = [];
+  try {
+    const freewayRes = await fetch(`${API_BASE_URL}/api/freeway/live`);
+    const freewayData = await freewayRes.json();
+    if (freewayData.success && freewayData.corridors) {
+      // Flatten all freeway sites from both corridors
+      const mitchellSites = freewayData.corridors.mitchell?.sites || [];
+      const kwinanaSites = freewayData.corridors.kwinana?.sites || [];
+      freewayWithStats = [...mitchellSites, ...kwinanaSites].map(site => ({
+        ...site,
+        current_hourly: site.hour_count || 0,  // Map hour_count to current_hourly
+        avg_confidence: 0.85  // Freeway confidence is typically high
+      }));
+    }
+  } catch (error) {
+    console.error('Error fetching freeway live data:', error);
+  }
+
+  // Combine arterial and freeway sites
+  const allSites = [...arterialWithStats, ...freewayWithStats];
+  allSitesData = allSites;
+  window.allSitesData = allSites;  // Expose for debugging/testing
+
+  console.log(`Loaded ${arterialWithStats.length} arterial + ${freewayWithStats.length} freeway = ${allSites.length} total sites`);
 
   // Update map, flow, and hero status card
   if (trafficMap) {
-    updateMapMarkers(sitesWithStats);
-    updateFlowCorridor(sitesWithStats);
+    updateMapMarkers(allSites);
+    updateFlowCorridor(arterialWithStats);  // Flow corridor only uses arterial
   }
-  updateHeroStatusCard(sitesWithStats);
+  updateHeroStatusCard(arterialWithStats);  // Hero card uses arterial corridor
 }
 
 async function loadDashboard() {
