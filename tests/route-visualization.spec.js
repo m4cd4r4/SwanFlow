@@ -180,11 +180,12 @@ test.describe('Route Visualization', () => {
 
     console.log('Corridor names on map:', corridorNames);
 
-    // Should have all 4 corridor types
-    expect(corridorNames).toContain('Stirling Hwy / Mounts Bay Rd');  // Extended to Winthrop Ave
-    expect(corridorNames).toContain('Stirling Highway - Mosman Park');
+    // Should have all 5 corridor types
+    expect(corridorNames).toContain('Stirling Hwy / Mounts Bay Rd');            // Phase 1: Winthrop Ave → Malcolm St
+    expect(corridorNames).toContain('Stirling Highway - Claremont/Cottesloe');  // Phase 2: Claremont Quarter → Eric St
+    expect(corridorNames).toContain('Stirling Highway - Mosman Park');          // Forrest St → Victoria St
     expect(corridorNames).toContain('Mitchell Freeway');
     expect(corridorNames).toContain('Kwinana Freeway');
-    expect(corridorNames.length).toBe(4);
+    expect(corridorNames.length).toBe(5);
   });
 });

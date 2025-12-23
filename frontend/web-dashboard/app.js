@@ -215,6 +215,14 @@ const siteCoordinates = {
   'Mounts Bay Rd @ Malcolm St (Northbound)': [-31.963231, 115.842311],
   'Mounts Bay Rd @ Malcolm St (Southbound)': [-31.963231, 115.842311],
 
+  // Stirling Highway - Claremont to Cottesloe (Phase 2)
+  'Stirling Hwy @ Stirling Rd (Northbound)': [-31.982, 115.780],   // Bunnings/Claremont Quarter
+  'Stirling Hwy @ Stirling Rd (Southbound)': [-31.982, 115.780],
+  'Stirling Hwy @ Jarrad St (Northbound)': [-31.990, 115.770],     // School zone
+  'Stirling Hwy @ Jarrad St (Southbound)': [-31.990, 115.770],
+  'Stirling Hwy @ Eric St (Northbound)': [-31.994, 115.765],       // Cottesloe
+  'Stirling Hwy @ Eric St (Southbound)': [-31.994, 115.765],
+
   // Stirling Highway - Mosman Park
   'Stirling Hwy @ Forrest St (Northbound)': [-32.008, 115.757],
   'Stirling Hwy @ Forrest St (Southbound)': [-32.008, 115.757],
@@ -696,6 +704,25 @@ function updateMapMarkers(sites) {
         L.latLng(-31.9668462, 115.8390952),
         L.latLng(-31.9662305, 115.8395033),
         L.latLng(-31.9653717, 115.8398791)
+      ]
+    },
+    {
+      name: 'Stirling Highway - Claremont/Cottesloe',
+      shortName: 'Claremont',
+      filter: 'Stirling Hwy @ Stirling Rd|Stirling Hwy @ Jarrad St|Stirling Hwy @ Eric St',
+      start: L.latLng(-31.982, 115.780),   // Stirling Rd (Bunnings/Claremont Quarter)
+      end: L.latLng(-31.994, 115.765),     // Eric St, Cottesloe
+      label: 'Claremont Quarter → Eric St',
+      waypoints: [
+        // Commercial zone (Bunnings, Claremont Quarter)
+        L.latLng(-31.984, 115.778),   // South of Stirling Rd
+        L.latLng(-31.986, 115.775),   // Approaching school zone
+        // School zone (Christ Church, MLC area)
+        L.latLng(-31.988, 115.772),   // North of Jarrad St
+        L.latLng(-31.990, 115.770),   // Jarrad St intersection
+        L.latLng(-31.992, 115.768),   // South of Jarrad St
+        // Approaching Eric St
+        L.latLng(-31.993, 115.766)    // Near Eric St
       ]
     },
     {
@@ -1374,6 +1401,14 @@ const terminalSites = {
     { name: 'Mounts Bay Rd @ Fraser Ave', direction: 'SB', baseFlow: 380 },
     { name: 'Mounts Bay Rd @ Malcolm St', direction: 'NB', baseFlow: 320 },
     { name: 'Mounts Bay Rd @ Malcolm St', direction: 'SB', baseFlow: 340 },
+    // Claremont-Cottesloe (Phase 2)
+    { name: 'Stirling Hwy @ Stirling Rd', direction: 'NB', baseFlow: 380, zone: 'commercial' },  // Bunnings/Claremont Quarter
+    { name: 'Stirling Hwy @ Stirling Rd', direction: 'SB', baseFlow: 360, zone: 'commercial' },
+    { name: 'Stirling Hwy @ Jarrad St', direction: 'NB', baseFlow: 350, zone: 'school' },        // School zone
+    { name: 'Stirling Hwy @ Jarrad St', direction: 'SB', baseFlow: 340, zone: 'school' },
+    { name: 'Stirling Hwy @ Eric St', direction: 'NB', baseFlow: 320 },
+    { name: 'Stirling Hwy @ Eric St', direction: 'SB', baseFlow: 310 },
+    // Mosman Park
     { name: 'Stirling Hwy @ Forrest St', direction: 'NB', baseFlow: 310 },
     { name: 'Stirling Hwy @ Forrest St', direction: 'SB', baseFlow: 305 },
     { name: 'Stirling Hwy @ Bay View Terrace', direction: 'NB', baseFlow: 295 },
