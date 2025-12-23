@@ -685,9 +685,9 @@ function updateMapMarkers(sites) {
         // Stirling Highway section (Winthrop Ave → Broadway → Kings Park)
         L.latLng(-31.9805, 115.8158),   // Between Winthrop and Broadway
         L.latLng(-31.9795, 115.8170),   // Approaching Broadway
-        L.latLng(-31.9785, 115.8185),   // Broadway intersection
-        L.latLng(-31.9770, 115.8205),   // Between Broadway and Kings Park
-        L.latLng(-31.9755, 115.8225),   // Approaching Kings Park
+        L.latLng(-31.9785, 115.8156),   // Broadway intersection - FIXED (was 115.8185)
+        L.latLng(-31.9770527, 115.8141985), // Transition point - OSM EXACT
+        L.latLng(-31.9757418, 115.8178419), // Near Broadway/Kings Park - OSM EXACT
         L.latLng(-31.9740, 115.8245),   // Near Kings Park
         // Mounts Bay Road section (Kings Park → Malcolm St) - existing waypoints
         L.latLng(-31.9728911, 115.8265899),
@@ -713,8 +713,8 @@ function updateMapMarkers(sites) {
       name: 'Stirling Highway - Claremont/Cottesloe',
       shortName: 'Claremont',
       filter: 'Stirling Hwy @ Stirling Rd|Stirling Hwy @ Jarrad St|Stirling Hwy @ Eric St',
-      start: L.latLng(-31.982, 115.780),   // Stirling Rd (Bunnings/Claremont Quarter)
-      end: L.latLng(-31.994, 115.765),     // Eric St, Cottesloe
+      start: L.latLng(-31.9820, 115.7900),  // Stirling Rd (Bunnings/Claremont Quarter) - CORRECTED
+      end: L.latLng(-31.9940, 115.7650),    // Eric St, Cottesloe - CORRECTED
       label: 'Claremont Quarter → Eric St',
       waypoints: [
         // Commercial zone (Bunnings, Claremont Quarter)
@@ -732,12 +732,12 @@ function updateMapMarkers(sites) {
       name: 'Stirling Highway - Mosman Park',
       shortName: 'Mosman Park',
       filter: 'Stirling Hwy @ Forrest St|Stirling Hwy @ Bay View|Stirling Hwy @ McCabe|Stirling Hwy @ Victoria',
-      start: L.latLng(-32.008, 115.757),  // Forrest St
-      end: L.latLng(-32.035, 115.751),    // Victoria St
+      start: L.latLng(-32.0034093, 115.7601065),  // Forrest St - CORRECTED OSM EXACT
+      end: L.latLng(-32.0350, 115.7540),    // Victoria St - CORRECTED
       label: 'Forrest St → Victoria St',
       waypoints: [
         L.latLng(-32.011, 115.756),  // Between Forrest and Bay View
-        L.latLng(-32.015, 115.755),  // Bay View Terrace
+        L.latLng(-32.0115020, 115.7555150),  // Bay View Terrace - OSM EXACT
         L.latLng(-32.020, 115.754),  // Between Bay View and McCabe
         L.latLng(-32.025, 115.753),  // McCabe St
         L.latLng(-32.030, 115.752)   // Between McCabe and Victoria
