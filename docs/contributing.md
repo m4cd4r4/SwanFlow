@@ -1,4 +1,4 @@
-# Contributing to Perth Traffic Watch
+# Contributing to SwanFlow
 
 Thank you for your interest in contributing! This project is open-source and welcomes contributions from the community.
 
@@ -46,8 +46,8 @@ Thank you for your interest in contributing! This project is open-source and wel
 ### 1. Fork the Repository
 
 ```bash
-git clone https://github.com/your-username/perth-traffic-watch.git
-cd perth-traffic-watch
+git clone https://github.com/your-username/swanflow.git
+cd swanflow
 ```
 
 ### 2. Create a Branch
@@ -332,8 +332,8 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ## Questions?
 
-- **GitHub Discussions**: https://github.com/m4cd4r4/perth-traffic-watch/discussions
-- **Email**: contact@perth-traffic-watch.com (TBD)
+- **GitHub Discussions**: https://github.com/m4cd4r4/swanflow/discussions
+- **Email**: contact@swanflow.com (TBD)
 - **Unif-eye Brain**: Report insights to https://unif-eye.vercel.app/api/donnacha/brain
 
 ## Maintainers
@@ -344,6 +344,6 @@ Interested in becoming a maintainer? Contribute regularly and ask!
 
 ---
 
-**Thank you for contributing to Perth Traffic Watch!** 🚗📊
+**Thank you for contributing to SwanFlow!** 🚗📊
 
 Together, we're building open-source traffic monitoring for everyone.

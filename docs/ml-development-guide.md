@@ -17,7 +17,7 @@ Perfect for counting vehicles crossing a line!
 
 1. Go to [https://studio.edgeimpulse.com](https://studio.edgeimpulse.com)
 2. Sign up (free tier is sufficient)
-3. Create a new project: "Perth Traffic Watch - Vehicle Detection"
+3. Create a new project: "SwanFlow - Vehicle Detection"
 
 ## Step 2: Data Collection
 
@@ -140,7 +140,7 @@ Download the ZIP file.
 3. In `vehicle_counter.cpp`, uncomment Edge Impulse code
 4. Include the header:
    ```cpp
-   #include <perth-traffic-watch_inferencing.h>
+   #include <swanflow_inferencing.h>
    ```
 5. Update inference code (see comments in `vehicle_counter.cpp`)
 
@@ -195,7 +195,7 @@ Target: >70% accuracy in real-world conditions
 
 As you improve your model:
 
-1. Create new Edge Impulse project: "Perth Traffic Watch v2"
+1. Create new Edge Impulse project: "SwanFlow v2"
 2. Copy dataset from v1
 3. Add new training data
 4. Retrain and compare accuracy

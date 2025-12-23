@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perth Traffic Watch - Real-time Vehicle Monitoring</title>
+  <title>SwanFlow - Real-time Vehicle Monitoring</title>
 
   <!-- Google Fonts - Distinctive Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,7 @@
     <header>
       <div class="header-content">
         <div>
-          <h1>Perth Traffic Watch</h1>
+          <h1>SwanFlow</h1>
           <p class="subtitle">Real-time vehicle detection using Edge AI</p>
         </div>
         <div class="theme-toggle">
@@ -90,7 +90,7 @@
             <span class="dot yellow"></span>
             <span class="dot green"></span>
           </span>
-          <span>Perth Traffic Watch - Live Simulator Feed</span>
+          <span>SwanFlow - Live Simulator Feed</span>
         </div>
         <div class="terminal-controls">
           <button type="button" id="terminal-pause" class="terminal-btn">⏸️ Pause</button>
@@ -98,7 +98,7 @@
         </div>
       </div>
       <div class="terminal-body" id="terminal-output">
-        <div class="terminal-line system">[SYSTEM] Connecting to Perth Traffic Watch simulator...</div>
+        <div class="terminal-line system">[SYSTEM] Connecting to SwanFlow simulator...</div>
       </div>
       <div class="terminal-stats">
         <span>Lines: <strong id="terminal-lines">1</strong></span>
@@ -141,12 +141,18 @@
       <div class="map-container">
         <div class="map-header">
           <h2>Live Traffic Map</h2>
-          <div class="map-view-selector">
-            <button type="button" class="map-view-btn" data-view="street">Street</button>
-            <button type="button" class="map-view-btn active" data-view="satellite">Satellite</button>
-            <button type="button" class="map-view-btn" data-view="satellite-labels">Satellite + Labels</button>
-            <button type="button" class="map-view-btn" data-view="terrain">Terrain</button>
-            <button type="button" class="map-view-btn" data-view="dark">Dark</button>
+          <div class="map-controls">
+            <div class="map-view-selector">
+              <button type="button" class="map-view-btn" data-view="street">Street</button>
+              <button type="button" class="map-view-btn active" data-view="satellite">Satellite</button>
+              <button type="button" class="map-view-btn" data-view="satellite-labels">Satellite + Labels</button>
+              <button type="button" class="map-view-btn" data-view="terrain">Terrain</button>
+              <button type="button" class="map-view-btn" data-view="dark">Dark</button>
+            </div>
+            <button type="button" id="fullscreen-btn" class="fullscreen-btn" aria-label="Toggle fullscreen map" title="Toggle fullscreen">
+              <span class="fullscreen-icon-expand">⛶</span>
+              <span class="fullscreen-icon-collapse">⛶</span>
+            </button>
           </div>
         </div>
         <div
@@ -183,96 +189,11 @@
       </div>
     </div>
 
-    <!-- Traffic Flow Corridor -->
-    <div class="flow-container">
-      <h2>Mounts Bay Road Traffic Flow</h2>
-      <div class="flow-corridor">
-        <div class="flow-site" id="flow-site-1">
-          <div class="site-name">Kings Park</div>
-          <div class="flow-arrows">
-            <div class="flow-direction northbound">
-              <span class="arrow">↑</span>
-              <span class="label">NB</span>
-              <span class="count" id="flow-nb-1">-</span>
-              <span class="speed" id="speed-nb-1">-</span>
-            </div>
-            <div class="flow-direction southbound">
-              <span class="arrow">↓</span>
-              <span class="label">SB</span>
-              <span class="count" id="flow-sb-1">-</span>
-              <span class="speed" id="speed-sb-1">-</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flow-connector">
-          <div class="connector-line northbound" id="connector-nb-1"></div>
-          <div class="connector-line southbound" id="connector-sb-1"></div>
-        </div>
-
-        <div class="flow-site" id="flow-site-2">
-          <div class="site-name">Mill Point</div>
-          <div class="flow-arrows">
-            <div class="flow-direction northbound">
-              <span class="arrow">↑</span>
-              <span class="label">NB</span>
-              <span class="count" id="flow-nb-2">-</span>
-              <span class="speed" id="speed-nb-2">-</span>
-            </div>
-            <div class="flow-direction southbound">
-              <span class="arrow">↓</span>
-              <span class="label">SB</span>
-              <span class="count" id="flow-sb-2">-</span>
-              <span class="speed" id="speed-sb-2">-</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flow-connector">
-          <div class="connector-line northbound" id="connector-nb-2"></div>
-          <div class="connector-line southbound" id="connector-sb-2"></div>
-        </div>
-
-        <div class="flow-site" id="flow-site-3">
-          <div class="site-name">Fraser Ave</div>
-          <div class="flow-arrows">
-            <div class="flow-direction northbound">
-              <span class="arrow">↑</span>
-              <span class="label">NB</span>
-              <span class="count" id="flow-nb-3">-</span>
-              <span class="speed" id="speed-nb-3">-</span>
-            </div>
-            <div class="flow-direction southbound">
-              <span class="arrow">↓</span>
-              <span class="label">SB</span>
-              <span class="count" id="flow-sb-3">-</span>
-              <span class="speed" id="speed-sb-3">-</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flow-connector">
-          <div class="connector-line northbound" id="connector-nb-3"></div>
-          <div class="connector-line southbound" id="connector-sb-3"></div>
-        </div>
-
-        <div class="flow-site" id="flow-site-4">
-          <div class="site-name">Malcolm St</div>
-          <div class="flow-arrows">
-            <div class="flow-direction northbound">
-              <span class="arrow">↑</span>
-              <span class="label">NB</span>
-              <span class="count" id="flow-nb-4">-</span>
-              <span class="speed" id="speed-nb-4">-</span>
-            </div>
-            <div class="flow-direction southbound">
-              <span class="arrow">↓</span>
-              <span class="label">SB</span>
-              <span class="count" id="flow-sb-4">-</span>
-              <span class="speed" id="speed-sb-4">-</span>
-            </div>
-          </div>
-        </div>
+    <!-- Traffic Flow Corridor (Dynamically rendered based on network selection) -->
+    <div class="flow-container" id="flow-container">
+      <h2 id="flow-title">Mounts Bay Road Traffic Flow</h2>
+      <div class="flow-corridor" id="flow-corridor">
+        <!-- Flow sites will be dynamically rendered -->
       </div>
       <div class="flow-legend">
         <span class="legend-item"><span class="legend-color low"></span> Flowing: 55-65 km/h (at speed limit)</span>

@@ -1,5 +1,5 @@
 /**
- * Perth Traffic Watch - Vehicle Counter Implementation
+ * SwanFlow - Vehicle Counter Implementation
  */
 
 #include "vehicle_counter.h"

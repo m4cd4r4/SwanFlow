@@ -1,6 +1,6 @@
 # Academic Paper Plan
 
-**Perth Traffic Watch - Research Publication Roadmap**
+**SwanFlow - Research Publication Roadmap**
 
 > **Status**: Planning only - content to be developed on home workstation with academic research tools
 
@@ -12,7 +12,7 @@
 
 2. *"$143 vs $500 Million: Citizen Science Approaches to Urban Traffic Monitoring Using Low-Cost Edge AI"*
 
-3. *"Open Traffic Data Advocacy Through Citizen Infrastructure: A Case Study of Perth Traffic Watch"*
+3. *"Open Traffic Data Advocacy Through Citizen Infrastructure: A Case Study of SwanFlow"*
 
 4. *"Unique Feature Detection: A Privacy-Preserving Approach to Ground-Truth Speed Measurement in Urban Traffic Monitoring"*
 
@@ -189,7 +189,7 @@
 
 > **Source Document**: [Main Roads API Investigation](./mainroads-api-investigation.md)
 
-### 7. Case Study: Perth Traffic Watch (~1,000 words)
+### 7. Case Study: SwanFlow (~1,000 words)
 - 7.1 Deployment context
   - CBD to Fremantle corridor
   - Stirling Highway monitoring sites
@@ -294,7 +294,7 @@
 ### GitHub Repository Structure
 
 ```
-perth-traffic-watch/
+swanflow/
 ├── firmware/           # ESP32 code (MIT licence)
 ├── backend/            # Express API (MIT licence)
 ├── frontend/           # Dashboard (MIT licence)

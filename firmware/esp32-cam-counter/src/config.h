@@ -1,5 +1,5 @@
 /**
- * Perth Traffic Watch - Configuration
+ * SwanFlow - Configuration
  *
  * All configuration parameters for the ESP32-CAM vehicle counter
  */

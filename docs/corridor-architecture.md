@@ -1,6 +1,6 @@
 # CBD to Fremantle Corridor Architecture
 
-**Perth Traffic Watch - Technical Implementation Guide**
+**SwanFlow - Technical Implementation Guide**
 
 ---
 
@@ -382,7 +382,7 @@ Camera Frame (320x240) → FOMO Model → Bounding Boxes
 
 ### GDPR/Privacy Considerations
 
-**Perth Traffic Watch is privacy-first by design**:
+**SwanFlow is privacy-first by design**:
 - ✅ Low-resolution cameras (no plate/face recognition)
 - ✅ No audio recording
 - ✅ No tracking of individual vehicles

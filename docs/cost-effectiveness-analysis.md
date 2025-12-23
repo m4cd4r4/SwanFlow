@@ -1,16 +1,16 @@
 # Cost-Effectiveness Analysis: Citizen vs. Government Traffic Monitoring
 
-**Perth Traffic Watch - Advocacy Document**
+**SwanFlow - Advocacy Document**
 
 ---
 
 ## Executive Summary
 
-This document compares the cost-effectiveness of Perth Traffic Watch's citizen-led, open-source approach against government-operated traffic monitoring infrastructure in Western Australia.
+This document compares the cost-effectiveness of SwanFlow's citizen-led, open-source approach against government-operated traffic monitoring infrastructure in Western Australia.
 
 ### Key Finding
 
-| Metric | Perth Traffic Watch | Main Roads WA Smart Freeway |
+| Metric | SwanFlow | Main Roads WA Smart Freeway |
 |--------|--------------------|-----------------------------|
 | **Cost per monitoring site** | ~$143 AUD | ~$50,000+ AUD |
 | **Total system cost** | ~$4,500 (30 sites) | $209.6M+ (Mitchell alone) |
@@ -61,7 +61,7 @@ Even accounting for gantries and control systems, individual sensor costs are es
 
 ---
 
-## Perth Traffic Watch Costs
+## SwanFlow Costs
 
 ### Hardware Cost Per Site
 
@@ -92,7 +92,7 @@ Even accounting for gantries and control systems, individual sensor costs are es
 
 ### Cost Comparison
 
-| Metric | Perth Traffic Watch | Main Roads Smart Freeway | Ratio |
+| Metric | SwanFlow | Main Roads Smart Freeway | Ratio |
 |--------|--------------------|--------------------------|---------:|
 | Per-site hardware | $143 | $50,000+ | **350:1** |
 | 30-site deployment | $4,500 | $1.5M+ | **333:1** |
@@ -118,7 +118,7 @@ Even accounting for gantries and control systems, individual sensor costs are es
 
 > Main Roads WA has 1,400+ real-time sensors collecting data 24/7, but this data is **not accessible to the public** via any functional API.
 
-### Perth Traffic Watch Data
+### SwanFlow Data
 
 | Data Type | Availability | Format | Status |
 |-----------|--------------|--------|--------|
@@ -128,7 +128,7 @@ Even accounting for gantries and control systems, individual sensor costs are es
 | Speed estimates | Open | JSON API | Functional |
 | Site locations | Open | GeoJSON | Functional |
 
-**Key Difference**: 100% of Perth Traffic Watch data is open and accessible via functional APIs.
+**Key Difference**: 100% of SwanFlow data is open and accessible via functional APIs.
 
 ---
 
@@ -214,7 +214,7 @@ Louisville, KY even [published their analysis methods as open source](https://me
 
 ---
 
-## Perth Traffic Watch Value Proposition
+## SwanFlow Value Proposition
 
 ### What We Demonstrate
 
@@ -277,7 +277,7 @@ Public ROI = Public Benefit / Public Investment
            = Poor
 ```
 
-### Citizen Approach (Perth Traffic Watch)
+### Citizen Approach (SwanFlow)
 
 **Investment**: $4,500 (full freeway corridor)
 **Public Data Access**: 100% open
@@ -344,7 +344,7 @@ This cost-effectiveness analysis could form the basis of a peer-reviewed academi
 2. **Introduction**: Smart city monitoring, open data movement
 3. **Literature Review**: Traffic monitoring technologies, open data initiatives
 4. **Methodology**: Cost analysis framework, data accessibility assessment
-5. **Case Study**: Perth Traffic Watch vs. Main Roads WA
+5. **Case Study**: SwanFlow vs. Main Roads WA
 6. **Technical Implementation**: Edge AI, low-cost hardware, open-source stack
 7. **Results**: 350:1 cost advantage, functional vs. broken APIs
 8. **Discussion**: Policy implications, scalability
@@ -362,13 +362,13 @@ This cost-effectiveness analysis could form the basis of a peer-reviewed academi
 
 ## Conclusion
 
-Perth Traffic Watch demonstrates that citizen-led, open-source traffic monitoring can provide valuable insights at a fraction of the cost of government infrastructure. While Main Roads WA has invested over $500 million in Smart Freeway technology, their public data APIs remain broken or non-existent.
+SwanFlow demonstrates that citizen-led, open-source traffic monitoring can provide valuable insights at a fraction of the cost of government infrastructure. While Main Roads WA has invested over $500 million in Smart Freeway technology, their public data APIs remain broken or non-existent.
 
 **The question is not whether citizen monitoring can replace government infrastructure** - it cannot, and should not. The question is: **why isn't the data from that $500 million investment accessible to the public who funded it?**
 
 Every day, 160,000+ vehicles cross the Narrows Bridge. Every day, 1,400+ sensors collect data about their movement. And every day, that data remains locked away while the official "open data" API has been offline for over a year.
 
-Perth Traffic Watch is both a functional alternative and a call to action. We've shown it can be done for $143 per site. Now it's time for Main Roads WA to show what can be done with $500 million.
+SwanFlow is both a functional alternative and a call to action. We've shown it can be done for $143 per site. Now it's time for Main Roads WA to show what can be done with $500 million.
 
 ---
 
@@ -391,7 +391,7 @@ Perth Traffic Watch is both a functional alternative and a call to action. We've
 |-------|-------|
 | **Version** | 1.0 |
 | **Created** | 2025-12-19 |
-| **Author** | Perth Traffic Watch Contributors |
+| **Author** | SwanFlow Contributors |
 | **License** | CC-BY 4.0 |
 | **Status** | Advocacy Document |
 

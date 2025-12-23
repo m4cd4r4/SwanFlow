@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 
 (async () => {
-  console.log('\n🚦 Perth Traffic Watch - Site Testing\n');
+  console.log('\n🚦 SwanFlow - Site Testing\n');
   console.log('Testing all 22 monitoring sites...\n');
 
   const browser = await chromium.launch({ headless: false }); // Set to true for headless
@@ -135,7 +135,7 @@ const fs = require('fs');
     console.log('📄 Detailed report saved: site-test-report.json\n');
 
     // Generate markdown report
-    let markdown = '# Perth Traffic Watch - Site Test Report\n\n';
+    let markdown = '# SwanFlow - Site Test Report\n\n';
     markdown += `**Generated**: ${new Date().toLocaleString()}\n\n`;
     markdown += `**Total Sites**: ${siteOptions.length}\n`;
     markdown += `**Passed**: ${results.filter(r => r.status.includes('PASS')).length}\n\n`;

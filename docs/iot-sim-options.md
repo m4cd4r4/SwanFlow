@@ -1,6 +1,6 @@
 # IoT SIM Card Options (Australia)
 
-Comparison of M2M/IoT SIM providers for the SIM7000A LTE modem in Perth Traffic Watch.
+Comparison of M2M/IoT SIM providers for the SIM7000A LTE modem in SwanFlow.
 
 ## Requirements
 
@@ -146,7 +146,7 @@ Password: (leave empty)
 
 ## Data Usage Estimates
 
-### Perth Traffic Watch (Single ESP32-CAM)
+### SwanFlow (Single ESP32-CAM)
 
 **Assumptions**:
 - 1 upload per minute
@@ -217,7 +217,7 @@ Example: 5 devices, 500MB each
 - **Option A**: 5x individual 500MB SIMs = $15-25/month
 - **Option B**: 1x pooled 2.5GB plan = $10-12/month (savings!)
 
-## Recommendation for Perth Traffic Watch
+## Recommendation for SwanFlow
 
 **Phase 1 (Single Device Testing)**:
 - **Primary**: m2msim.com.au - 1GB plan ($5-8/month)

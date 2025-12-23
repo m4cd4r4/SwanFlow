@@ -1,5 +1,5 @@
 /**
- * Perth Traffic Watch - Main Loop
+ * SwanFlow - Main Loop
  *
  * ESP32-CAM + SIM7000A vehicle counter using Edge Impulse FOMO
  *
@@ -137,7 +137,7 @@ void setup() {
   delay(1000);
 
   Serial.println("\n\n=================================");
-  Serial.println("Perth Traffic Watch - FOMO Counter");
+  Serial.println("SwanFlow - FOMO Counter");
   Serial.println("=================================\n");
 
   bootTime = millis();

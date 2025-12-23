@@ -2,7 +2,7 @@
 const { defineConfig, devices } = require('@playwright/test');
 
 /**
- * Perth Traffic Watch - Playwright Test Configuration
+ * SwanFlow - Playwright Test Configuration
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({

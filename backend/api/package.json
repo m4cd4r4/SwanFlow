@@ -1,7 +1,7 @@
 {
-  "name": "perth-traffic-watch-api",
+  "name": "swanflow-api",
   "version": "1.0.0",
-  "description": "Backend API for Perth Traffic Watch - FOMO vehicle detection system",
+  "description": "Backend API for SwanFlow - FOMO vehicle detection system",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

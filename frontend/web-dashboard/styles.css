@@ -1,5 +1,5 @@
 /**
- * Perth Traffic Watch - Dashboard Styles
+ * SwanFlow - Dashboard Styles
  * Modern light/dark theme system
  */
 
@@ -792,6 +792,76 @@ header h1 {
   border-radius: 2px;
 }
 
+/* Multi-corridor layout for freeway and all views */
+.flow-corridor-section {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.flow-corridor-section:last-child {
+  margin-bottom: 0;
+}
+
+.corridor-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+  padding-left: 0.5rem;
+  border-left: 3px solid var(--primary);
+}
+
+.flow-corridor-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0.5rem;
+}
+
+.corridor-separator {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  margin: 0.5rem 0;
+}
+
+/* Adjust flow-corridor for multi-corridor mode */
+.flow-corridor:has(.flow-corridor-section) {
+  flex-direction: column;
+  padding: 1rem;
+  gap: 0;
+}
+
+/* Compact site cards when multiple corridors are shown */
+.flow-corridor-section .flow-site {
+  min-width: 110px;
+  padding: 0.75rem;
+}
+
+.flow-corridor-section .site-name {
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.flow-corridor-section .flow-direction .arrow {
+  font-size: 1.5rem;
+}
+
+.flow-corridor-section .flow-direction .count {
+  font-size: 0.95rem;
+}
+
+.flow-corridor-section .flow-direction .speed {
+  font-size: 0.7rem;
+}
+
+.flow-corridor-section .flow-connector {
+  min-width: 40px;
+}
+
 .legend-color.low {
   background: #10b981;
 }
@@ -1015,6 +1085,141 @@ footer {
   outline-offset: 2px;
 }
 
+/* Map Controls Container */
+.map-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ============================================================================
+   Fullscreen Button & Mode
+   ============================================================================ */
+
+.fullscreen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.fullscreen-btn:hover {
+  border-color: var(--primary);
+  background: var(--bg-secondary);
+  transform: scale(1.05);
+}
+
+.fullscreen-btn:active {
+  transform: scale(0.95);
+}
+
+.fullscreen-btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Show/hide icons based on fullscreen state */
+.fullscreen-icon-collapse {
+  display: none;
+}
+
+.map-container.fullscreen .fullscreen-icon-expand {
+  display: none;
+}
+
+.map-container.fullscreen .fullscreen-icon-collapse {
+  display: block;
+  transform: rotate(45deg);
+}
+
+/* Fullscreen Map Mode */
+.map-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-container.fullscreen .map-header {
+  padding: 1rem 1.5rem;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.map-container.fullscreen #traffic-map {
+  flex: 1;
+  height: auto !important;
+  border-radius: 0;
+  border: none;
+}
+
+/* Fullscreen button style when in fullscreen mode */
+.map-container.fullscreen .fullscreen-btn {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+
+.map-container.fullscreen .fullscreen-btn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+/* Hide body scroll when map is fullscreen */
+body.map-fullscreen {
+  overflow: hidden;
+}
+
+/* Fullscreen transition animation */
+.map-container {
+  transition: all 0.3s ease;
+}
+
+/* Keyboard hint for exiting fullscreen */
+.map-container.fullscreen::after {
+  content: 'Press ESC to exit fullscreen';
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  animation: fadeInOut 3s ease forwards;
+  z-index: 10000;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ============================================================================
    Mobile Floating Theme Button
    ============================================================================ */
@@ -1143,6 +1348,29 @@ footer {
 
   .flow-legend {
     flex-wrap: wrap;
+  }
+
+  /* Multi-corridor responsive */
+  .flow-corridor-section {
+    padding: 0.75rem;
+  }
+
+  .flow-corridor-inner {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+  }
+
+  .flow-corridor-section .flow-connector {
+    flex-direction: row;
+    width: 100%;
+    min-width: auto;
+    padding: 0.25rem 0;
+  }
+
+  .corridor-label {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
   }
 
   table {

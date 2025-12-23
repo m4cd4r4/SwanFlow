@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 
 /**
- * Perth Traffic Watch - Route Visualization E2E Tests
+ * SwanFlow - Route Visualization E2E Tests
  * Tests that all corridors (Stirling Highway, Mitchell Freeway, Kwinana Freeway)
  * display proper dotted line visualizations on the map
  */
@@ -181,9 +181,9 @@ test.describe('Route Visualization', () => {
     console.log('Corridor names on map:', corridorNames);
 
     // Should have all 5 corridor types
-    expect(corridorNames).toContain('Mounts Bay Road');
-    expect(corridorNames).toContain('Stirling Highway - Swanbourne');
-    expect(corridorNames).toContain('Stirling Highway - Mosman Park');
+    expect(corridorNames).toContain('Stirling Hwy / Mounts Bay Rd');            // Phase 1: Winthrop Ave → Malcolm St
+    expect(corridorNames).toContain('Stirling Highway - Claremont/Cottesloe');  // Phase 2: Claremont Quarter → Eric St
+    expect(corridorNames).toContain('Stirling Highway - Mosman Park');          // Forrest St → Victoria St
     expect(corridorNames).toContain('Mitchell Freeway');
     expect(corridorNames).toContain('Kwinana Freeway');
     expect(corridorNames.length).toBe(5);

@@ -1,6 +1,6 @@
 # Bill of Materials
 
-## Perth Traffic Watch - FOMO Vehicle Detection System
+## SwanFlow - FOMO Vehicle Detection System
 
 ### ESP32-CAM Components (Per Unit)
 

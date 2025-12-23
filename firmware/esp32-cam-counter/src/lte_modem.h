@@ -1,5 +1,5 @@
 /**
- * Perth Traffic Watch - LTE Modem Interface
+ * SwanFlow - LTE Modem Interface
  *
  * Handles SIM7000A LTE modem communication
  */

@@ -1,6 +1,6 @@
 # Legal Considerations
 
-Legal and privacy considerations for deploying Perth Traffic Watch in public spaces.
+Legal and privacy considerations for deploying SwanFlow in public spaces.
 
 ## Disclaimer
 
@@ -28,7 +28,7 @@ In Western Australia, the **Surveillance Devices Act 2016** regulates the use of
 - Recording where there's a "reasonable expectation of privacy" (e.g., inside homes) is illegal
 - Vehicle registration plates are considered public information
 
-**Perth Traffic Watch compliance**:
+**SwanFlow compliance**:
 - ✅ Recording vehicles on public roads (legal)
 - ✅ No audio recording
 - ✅ No identifiable faces (QVGA resolution too low)
@@ -53,7 +53,7 @@ Installing equipment in public spaces (footpaths, road reserves) may require:
 
 ### What We Collect
 
-Perth Traffic Watch collects:
+SwanFlow collects:
 - Vehicle detection events (timestamp, count, confidence)
 - Occasional images (for validation/debugging)
 - Device telemetry (uptime, signal strength)
@@ -92,7 +92,7 @@ for traffic analysis purposes.
 No personal information is collected.
 Images are not stored.
 
-For inquiries: contact@perth-traffic-watch.com
+For inquiries: contact@swanflow.com
 ```
 
 ## Intellectual Property
@@ -133,7 +133,7 @@ Consider:
 
 ### Data Accuracy
 
-Perth Traffic Watch is for **informational purposes only**. Do not use for:
+SwanFlow is for **informational purposes only**. Do not use for:
 - Legal evidence (court proceedings)
 - Traffic enforcement
 - Safety-critical applications
@@ -165,7 +165,7 @@ If using data for research (university projects, publications):
 
 ### Hobby vs. Business
 
-**Hobby** (Perth Traffic Watch Phase 1-3):
+**Hobby** (SwanFlow Phase 1-3):
 - Personal interest
 - Not-for-profit
 - Limited data collection
@@ -222,7 +222,7 @@ If deploying outside Australia:
 ## Example Privacy Policy (If Required)
 
 ```markdown
-# Privacy Policy - Perth Traffic Watch
+# Privacy Policy - SwanFlow
 
 **Effective Date**: [Date]
 
@@ -252,11 +252,11 @@ If deploying outside Australia:
 - Aggregate statistics may be published publicly
 
 ## Your Rights
-- Request data deletion: contact@perth-traffic-watch.com
+- Request data deletion: contact@swanflow.com
 - Opt-out: (not applicable - public space monitoring)
 
 ## Contact
-Email: contact@perth-traffic-watch.com
+Email: contact@swanflow.com
 ```
 
 ## Useful Resources

@@ -1,6 +1,6 @@
 # Site Survey Checklist
 
-Use this checklist when evaluating potential installation sites for Perth Traffic Watch cameras.
+Use this checklist when evaluating potential installation sites for SwanFlow cameras.
 
 ## General Information
 

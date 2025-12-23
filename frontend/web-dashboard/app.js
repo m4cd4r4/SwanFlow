@@ -1,11 +1,11 @@
 /**
- * Perth Traffic Watch - Dashboard JavaScript
+ * SwanFlow - Dashboard JavaScript
  */
 
 // Configuration
 const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'  // Local dev: separate frontend server
-  : 'https://swanflow.com.au/traffic';  // Production: SwanFlow.com.au (Vultr Sydney VPS)
+  : 'https://swanflow.onrender.com';  // Production: Render backend API
 
 const REFRESH_INTERVAL = 60000; // 60 seconds
 
@@ -27,6 +27,9 @@ let terminalPaused = false;
 let terminalLineCount = 0;
 let terminalUpdateCount = 0;
 let terminalLastSecond = Date.now();
+
+// Fullscreen state
+let isMapFullscreen = false;
 
 // DOM Elements (will be initialized after DOM loads)
 let siteSelect;
@@ -145,7 +148,7 @@ async function fetchRecentDetections(site, limit = 20) {
 // ============================================================================
 
 function loadTheme() {
-  const savedTheme = localStorage.getItem('perth-traffic-theme');
+  const savedTheme = localStorage.getItem('swanflow-theme');
   // Migrate old themes to new system
   if (savedTheme) {
     if (savedTheme.includes('dark')) {
@@ -160,7 +163,7 @@ function loadTheme() {
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   currentTheme = theme;
-  localStorage.setItem('perth-traffic-theme', theme);
+  localStorage.setItem('swanflow-theme', theme);
 
   // Update chart colors if chart exists
   if (trafficChart) {
@@ -199,6 +202,12 @@ function getThemeColors() {
 
 // Site coordinates mapping (approximate locations based on street intersections)
 const siteCoordinates = {
+  // Stirling Highway - Nedlands (Winthrop Ave extension)
+  'Stirling Hwy @ Winthrop Ave (Northbound)': [-31.9812, 115.8148],
+  'Stirling Hwy @ Winthrop Ave (Southbound)': [-31.9812, 115.8148],
+  'Stirling Hwy @ Broadway (Northbound)': [-31.9785, 115.8185],
+  'Stirling Hwy @ Broadway (Southbound)': [-31.9785, 115.8185],
+
   // Mounts Bay Road sites
   'Mounts Bay Rd @ Kings Park (Northbound)': [-31.97339, 115.82564],
   'Mounts Bay Rd @ Kings Park (Southbound)': [-31.97339, 115.82564],
@@ -209,13 +218,13 @@ const siteCoordinates = {
   'Mounts Bay Rd @ Malcolm St (Northbound)': [-31.963231, 115.842311],
   'Mounts Bay Rd @ Malcolm St (Southbound)': [-31.963231, 115.842311],
 
-  // Stirling Highway - Swanbourne
-  'Stirling Hwy @ Grant St (Northbound)': [-31.985, 115.763],
-  'Stirling Hwy @ Grant St (Southbound)': [-31.985, 115.763],
-  'Stirling Hwy @ Campbell Barracks (Northbound)': [-31.990, 115.762],
-  'Stirling Hwy @ Campbell Barracks (Southbound)': [-31.990, 115.762],
-  'Stirling Hwy @ Eric St (Northbound)': [-31.998, 115.762],
-  'Stirling Hwy @ Eric St (Southbound)': [-31.998, 115.762],
+  // Stirling Highway - Claremont to Cottesloe (Phase 2)
+  'Stirling Hwy @ Stirling Rd (Northbound)': [-31.982, 115.780],   // Bunnings/Claremont Quarter
+  'Stirling Hwy @ Stirling Rd (Southbound)': [-31.982, 115.780],
+  'Stirling Hwy @ Jarrad St (Northbound)': [-31.990, 115.770],     // School zone
+  'Stirling Hwy @ Jarrad St (Southbound)': [-31.990, 115.770],
+  'Stirling Hwy @ Eric St (Northbound)': [-31.994, 115.765],       // Cottesloe
+  'Stirling Hwy @ Eric St (Southbound)': [-31.994, 115.765],
 
   // Stirling Highway - Mosman Park
   'Stirling Hwy @ Forrest St (Northbound)': [-32.008, 115.757],
@@ -473,7 +482,7 @@ function animateRouteArrow(siteName) {
 // ============================================================================
 
 function initMap() {
-  // Center on Perth traffic corridor
+  // Center on SwanFlow traffic corridor
   const center = [-31.995, 115.785];
 
   trafficMap = L.map('traffic-map', {
@@ -666,14 +675,21 @@ function updateMapMarkers(sites) {
   const corridors = [
     // Arterial Roads
     {
-      name: 'Mounts Bay Road',
-      shortName: 'Mounts Bay Rd',
-      filter: 'Mounts Bay Rd',
-      start: L.latLng(-31.97339, 115.82564),  // Crawley (Kings Park)
-      end: L.latLng(-31.963231, 115.842311),  // Point Lewis (Malcolm St)
-      label: 'Crawley → Point Lewis',
+      name: 'Stirling Hwy / Mounts Bay Rd',
+      shortName: 'Nedlands-City',
+      filter: 'Stirling Hwy @ Winthrop|Stirling Hwy @ Broadway|Mounts Bay Rd',
+      start: L.latLng(-31.9812, 115.8148),     // Winthrop Ave, Nedlands (near SCGH/UWA)
+      end: L.latLng(-31.963231, 115.842311),   // Point Lewis (Malcolm St)
+      label: 'Winthrop Ave → Point Lewis',
       waypoints: [
-        // EXACT coordinates from OpenStreetMap (sampled for performance)
+        // Stirling Highway section (Winthrop Ave → Broadway → Kings Park)
+        L.latLng(-31.9805, 115.8158),   // Between Winthrop and Broadway
+        L.latLng(-31.9795, 115.8170),   // Approaching Broadway
+        L.latLng(-31.9785, 115.8185),   // Broadway intersection
+        L.latLng(-31.9770, 115.8205),   // Between Broadway and Kings Park
+        L.latLng(-31.9755, 115.8225),   // Approaching Kings Park
+        L.latLng(-31.9740, 115.8245),   // Near Kings Park
+        // Mounts Bay Road section (Kings Park → Malcolm St) - existing waypoints
         L.latLng(-31.9728911, 115.8265899),
         L.latLng(-31.9726546, 115.8274435),
         L.latLng(-31.9724305, 115.8289419),
@@ -694,27 +710,22 @@ function updateMapMarkers(sites) {
       ]
     },
     {
-      name: 'Stirling Highway - Swanbourne',
-      shortName: 'Swanbourne',
-      filter: 'Stirling Hwy @ Campbell Barracks|Stirling Hwy @ Eric St',
-      start: L.latLng(-31.990, 115.762),  // Campbell Barracks
-      end: L.latLng(-31.998, 115.762),    // Eric St
-      label: 'Campbell Barracks → Eric St',
+      name: 'Stirling Highway - Claremont/Cottesloe',
+      shortName: 'Claremont',
+      filter: 'Stirling Hwy @ Stirling Rd|Stirling Hwy @ Jarrad St|Stirling Hwy @ Eric St',
+      start: L.latLng(-31.982, 115.780),   // Stirling Rd (Bunnings/Claremont Quarter)
+      end: L.latLng(-31.994, 115.765),     // Eric St, Cottesloe
+      label: 'Claremont Quarter → Eric St',
       waypoints: [
-        // EXACT coordinates from OpenStreetMap (sampled for performance)
-        L.latLng(-31.9900419, 115.7619476),
-        L.latLng(-31.9906974, 115.7619281),
-        L.latLng(-31.9911854, 115.7619154),
-        L.latLng(-31.9918138, 115.7619067),
-        L.latLng(-31.9926278, 115.7619101),
-        L.latLng(-31.9933467, 115.7619175),
-        L.latLng(-31.9940649, 115.7619276),
-        L.latLng(-31.9946888, 115.7619375),
-        L.latLng(-31.9952177, 115.7619449),
-        L.latLng(-31.9959354, 115.7619566),
-        L.latLng(-31.9967473, 115.7619727),
-        L.latLng(-31.9973699, 115.7619839),
-        L.latLng(-31.9980904, 115.7619976)
+        // Commercial zone (Bunnings, Claremont Quarter)
+        L.latLng(-31.984, 115.778),   // South of Stirling Rd
+        L.latLng(-31.986, 115.775),   // Approaching school zone
+        // School zone (Christ Church, MLC area)
+        L.latLng(-31.988, 115.772),   // North of Jarrad St
+        L.latLng(-31.990, 115.770),   // Jarrad St intersection
+        L.latLng(-31.992, 115.768),   // South of Jarrad St
+        // Approaching Eric St
+        L.latLng(-31.993, 115.766)    // Near Eric St
       ]
     },
     {
@@ -844,6 +855,38 @@ function updateMapMarkers(sites) {
 }
 
 
+// ============================================================================
+// Map Fullscreen Toggle
+// ============================================================================
+
+function toggleMapFullscreen() {
+  const mapContainer = document.querySelector('.map-container');
+  if (!mapContainer) return;
+
+  isMapFullscreen = !isMapFullscreen;
+
+  if (isMapFullscreen) {
+    mapContainer.classList.add('fullscreen');
+    document.body.classList.add('map-fullscreen');
+  } else {
+    mapContainer.classList.remove('fullscreen');
+    document.body.classList.remove('map-fullscreen');
+  }
+
+  // Invalidate map size after transition to ensure proper rendering
+  setTimeout(() => {
+    if (trafficMap) {
+      trafficMap.invalidateSize();
+    }
+  }, 350); // Wait for CSS transition to complete
+}
+
+function exitMapFullscreen() {
+  if (isMapFullscreen) {
+    toggleMapFullscreen();
+  }
+}
+
 function updateMapTiles() {
   if (!trafficMap || !trafficMap._baseMaps) return;
 
@@ -870,18 +913,185 @@ function updateMapTiles() {
 // Traffic Flow Visualization
 // ============================================================================
 
+// Flow corridor configurations for different network types
+const flowCorridorConfigs = {
+  arterial: {
+    title: 'Mounts Bay Road Traffic Flow',
+    sites: [
+      { id: 1, name: 'Kings Park', sitePrefix: 'Mounts Bay Rd @ Kings Park' },
+      { id: 2, name: 'Mill Point', sitePrefix: 'Mounts Bay Rd @ Mill Point' },
+      { id: 3, name: 'Fraser Ave', sitePrefix: 'Mounts Bay Rd @ Fraser Ave' },
+      { id: 4, name: 'Malcolm St', sitePrefix: 'Mounts Bay Rd @ Malcolm St' }
+    ]
+  },
+  freeway: {
+    title: 'Perth Freeway Traffic Flow',
+    corridors: [
+      {
+        name: 'Mitchell Freeway',
+        sites: [
+          { id: 1, name: 'Narrows', sitePrefix: 'Narrows Interchange' },
+          { id: 2, name: 'Loftus St', sitePrefix: 'Loftus Street' },
+          { id: 3, name: 'Vincent St', sitePrefix: 'Vincent Street' },
+          { id: 4, name: 'Scarborough', sitePrefix: 'Scarborough Beach Road' }
+        ]
+      },
+      {
+        name: 'Kwinana Freeway',
+        sites: [
+          { id: 5, name: 'Narrows S', sitePrefix: 'Narrows South' },
+          { id: 6, name: 'Canning Hwy', sitePrefix: 'Canning Highway' },
+          { id: 7, name: 'Manning Rd', sitePrefix: 'Manning Road' },
+          { id: 8, name: 'Leach Hwy', sitePrefix: 'Leach Highway' }
+        ]
+      }
+    ]
+  },
+  all: {
+    title: 'All Perth Traffic Flow',
+    corridors: [
+      {
+        name: 'Arterial: Mounts Bay Rd',
+        sites: [
+          { id: 1, name: 'Kings Park', sitePrefix: 'Mounts Bay Rd @ Kings Park' },
+          { id: 2, name: 'Malcolm St', sitePrefix: 'Mounts Bay Rd @ Malcolm St' }
+        ]
+      },
+      {
+        name: 'Mitchell Freeway',
+        sites: [
+          { id: 3, name: 'Narrows', sitePrefix: 'Narrows Interchange' },
+          { id: 4, name: 'Scarborough', sitePrefix: 'Scarborough Beach Road' }
+        ]
+      },
+      {
+        name: 'Kwinana Freeway',
+        sites: [
+          { id: 5, name: 'Narrows S', sitePrefix: 'Narrows South' },
+          { id: 6, name: 'Leach Hwy', sitePrefix: 'Leach Highway' }
+        ]
+      }
+    ]
+  }
+};
+
+/**
+ * Renders a single flow site card
+ */
+function renderFlowSiteHTML(site) {
+  return `
+    <div class="flow-site" id="flow-site-${site.id}">
+      <div class="site-name">${site.name}</div>
+      <div class="flow-arrows">
+        <div class="flow-direction northbound">
+          <span class="arrow">↑</span>
+          <span class="label">NB</span>
+          <span class="count" id="flow-nb-${site.id}">-</span>
+          <span class="speed" id="speed-nb-${site.id}">-</span>
+        </div>
+        <div class="flow-direction southbound">
+          <span class="arrow">↓</span>
+          <span class="label">SB</span>
+          <span class="count" id="flow-sb-${site.id}">-</span>
+          <span class="speed" id="speed-sb-${site.id}">-</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Renders a connector between flow sites
+ */
+function renderConnectorHTML(siteId) {
+  return `
+    <div class="flow-connector">
+      <div class="connector-line northbound" id="connector-nb-${siteId}"></div>
+      <div class="connector-line southbound" id="connector-sb-${siteId}"></div>
+    </div>
+  `;
+}
+
+/**
+ * Renders the flow corridor based on the current network
+ */
+function renderFlowCorridor(network) {
+  const config = flowCorridorConfigs[network] || flowCorridorConfigs.arterial;
+  const titleEl = document.getElementById('flow-title');
+  const corridorEl = document.getElementById('flow-corridor');
+
+  if (!corridorEl) return;
+
+  // Update title
+  if (titleEl) {
+    titleEl.textContent = config.title;
+  }
+
+  let html = '';
+
+  if (network === 'arterial') {
+    // Simple single corridor for arterial
+    config.sites.forEach((site, index) => {
+      html += renderFlowSiteHTML(site);
+      if (index < config.sites.length - 1) {
+        html += renderConnectorHTML(site.id);
+      }
+    });
+  } else {
+    // Multi-corridor layout for freeway and all
+    config.corridors.forEach((corridor, corridorIndex) => {
+      html += `<div class="flow-corridor-section">`;
+      html += `<div class="corridor-label">${corridor.name}</div>`;
+      html += `<div class="flow-corridor-inner">`;
+
+      corridor.sites.forEach((site, siteIndex) => {
+        html += renderFlowSiteHTML(site);
+        if (siteIndex < corridor.sites.length - 1) {
+          html += renderConnectorHTML(site.id);
+        }
+      });
+
+      html += `</div></div>`;
+
+      // Add separator between corridors (except for last)
+      if (corridorIndex < config.corridors.length - 1) {
+        html += `<div class="corridor-separator"></div>`;
+      }
+    });
+  }
+
+  corridorEl.innerHTML = html;
+}
+
+/**
+ * Gets the flow map for the current network configuration
+ */
+function getFlowMapForNetwork(network) {
+  const config = flowCorridorConfigs[network] || flowCorridorConfigs.arterial;
+  const flowMap = {};
+
+  if (network === 'arterial') {
+    config.sites.forEach(site => {
+      flowMap[`${site.sitePrefix} (Northbound)`] = { id: site.id, dir: 'nb' };
+      flowMap[`${site.sitePrefix} (Southbound)`] = { id: site.id, dir: 'sb' };
+    });
+  } else {
+    config.corridors.forEach(corridor => {
+      corridor.sites.forEach(site => {
+        flowMap[`${site.sitePrefix} (Northbound)`] = { id: site.id, dir: 'nb' };
+        flowMap[`${site.sitePrefix} (Southbound)`] = { id: site.id, dir: 'sb' };
+      });
+    });
+  }
+
+  return flowMap;
+}
+
 function updateFlowCorridor(sites) {
-  // Map of site names to flow IDs
-  const flowMap = {
-    'Mounts Bay Rd @ Kings Park (Northbound)': { id: 1, dir: 'nb' },
-    'Mounts Bay Rd @ Kings Park (Southbound)': { id: 1, dir: 'sb' },
-    'Mounts Bay Rd @ Mill Point (Northbound)': { id: 2, dir: 'nb' },
-    'Mounts Bay Rd @ Mill Point (Southbound)': { id: 2, dir: 'sb' },
-    'Mounts Bay Rd @ Fraser Ave (Northbound)': { id: 3, dir: 'nb' },
-    'Mounts Bay Rd @ Fraser Ave (Southbound)': { id: 3, dir: 'sb' },
-    'Mounts Bay Rd @ Malcolm St (Northbound)': { id: 4, dir: 'nb' },
-    'Mounts Bay Rd @ Malcolm St (Southbound)': { id: 4, dir: 'sb' }
-  };
+  const flowMap = getFlowMapForNetwork(currentNetwork);
+  const config = flowCorridorConfigs[currentNetwork] || flowCorridorConfigs.arterial;
+  const maxSiteId = currentNetwork === 'arterial' ? 4 :
+                    currentNetwork === 'freeway' ? 8 : 6;
 
   sites.forEach(site => {
     const mapping = flowMap[site.name];
@@ -921,7 +1131,7 @@ function updateFlowCorridor(sites) {
       }
     }
 
-    if (connectorEl && mapping.id < 4) {
+    if (connectorEl && mapping.id < maxSiteId) {
       const hourlyCount = Math.round(site.current_hourly || 0);
       const color = getTrafficColor(hourlyCount);
 
@@ -1069,11 +1279,7 @@ function updateStatsCards(stats) {
 
   // Calculate time since last update
   if (stats.last_seen) {
-    // Server returns UTC time, ensure it's parsed as UTC
-    const timestamp = stats.last_seen.includes('Z') || stats.last_seen.includes('+')
-      ? stats.last_seen
-      : stats.last_seen.replace(' ', 'T') + 'Z';
-    const lastSeen = new Date(timestamp);
+    const lastSeen = new Date(stats.last_seen);
     const now = new Date();
     const diffMinutes = Math.floor((now - lastSeen) / 60000);
 
@@ -1098,16 +1304,10 @@ function updateStatsCards(stats) {
 function updateChart(hourlyData) {
   const ctx = document.getElementById('traffic-chart').getContext('2d');
 
-  // Extract labels and data - convert UTC to Perth time (AWST)
+  // Extract labels and data
   const labels = hourlyData.map(d => {
-    // Server returns UTC time, append 'Z' if not present to parse as UTC
-    const timestamp = d.hour.includes('Z') || d.hour.includes('+') ? d.hour : d.hour.replace(' ', 'T') + 'Z';
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      hour12: true,
-      timeZone: 'Australia/Perth'
-    });
+    const date = new Date(d.hour);
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
   });
 
   const counts = hourlyData.map(d => Math.round(d.avg_count));
@@ -1168,8 +1368,7 @@ function updateDetectionsTable(detections) {
   }
 
   tbody.innerHTML = detections.map(d => {
-    // Server returns UTC time without timezone indicator, so append 'Z' to parse as UTC
-    const date = new Date(d.created_at.replace(' ', 'T') + 'Z');
+    const date = new Date(d.created_at);
     const timeStr = date.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -1242,9 +1441,20 @@ async function loadAllSitesData() {
   // Update map, flow, and hero status card
   if (trafficMap) {
     updateMapMarkers(allSites);
-    updateFlowCorridor(arterialWithStats);  // Flow corridor only uses arterial
+
+    // Update flow corridor based on current network
+    if (currentNetwork === 'arterial') {
+      updateFlowCorridor(arterialWithStats);
+    } else if (currentNetwork === 'freeway') {
+      updateFlowCorridor(freewayWithStats);
+    } else {
+      // For 'all' network, pass combined sites
+      updateFlowCorridor([...arterialWithStats, ...freewayWithStats]);
+    }
   }
-  updateHeroStatusCard(arterialWithStats);  // Hero card uses arterial corridor
+
+  // Hero card uses arterial corridor for now (main commute route)
+  updateHeroStatusCard(arterialWithStats);
 }
 
 async function loadDashboard() {
@@ -1341,10 +1551,13 @@ async function switchNetwork(network) {
       } else if (network === 'freeway') {
         infoText.textContent = 'Monitoring freeways: Mitchell Freeway (18 sites) & Kwinana Freeway (12 sites)';
       } else {
-        infoText.textContent = 'Unified Perth traffic view: All arterial roads and freeways (52 monitoring sites)';
+        infoText.textContent = 'Unified SwanFlow traffic view: All arterial roads and freeways (52 monitoring sites)';
       }
     }
   }
+
+  // Render the appropriate flow corridor for the selected network
+  renderFlowCorridor(network);
 
   // Reset route highlighting when switching networks
   resetRouteHighlighting();
@@ -1392,6 +1605,10 @@ async function loadSitesForNetwork(network) {
 // Simulated site data for terminal output
 const terminalSites = {
   arterial: [
+    { name: 'Stirling Hwy @ Winthrop Ave', direction: 'NB', baseFlow: 480 },  // High traffic - SCGH/UWA
+    { name: 'Stirling Hwy @ Winthrop Ave', direction: 'SB', baseFlow: 460 },
+    { name: 'Stirling Hwy @ Broadway', direction: 'NB', baseFlow: 440 },
+    { name: 'Stirling Hwy @ Broadway', direction: 'SB', baseFlow: 450 },
     { name: 'Mounts Bay Rd @ Kings Park', direction: 'NB', baseFlow: 450 },
     { name: 'Mounts Bay Rd @ Kings Park', direction: 'SB', baseFlow: 420 },
     { name: 'Mounts Bay Rd @ Mill Point', direction: 'NB', baseFlow: 380 },
@@ -1400,10 +1617,14 @@ const terminalSites = {
     { name: 'Mounts Bay Rd @ Fraser Ave', direction: 'SB', baseFlow: 380 },
     { name: 'Mounts Bay Rd @ Malcolm St', direction: 'NB', baseFlow: 320 },
     { name: 'Mounts Bay Rd @ Malcolm St', direction: 'SB', baseFlow: 340 },
-    { name: 'Stirling Hwy @ Campbell Barracks', direction: 'NB', baseFlow: 280 },
-    { name: 'Stirling Hwy @ Campbell Barracks', direction: 'SB', baseFlow: 260 },
-    { name: 'Stirling Hwy @ Eric St', direction: 'NB', baseFlow: 300 },
-    { name: 'Stirling Hwy @ Eric St', direction: 'SB', baseFlow: 290 },
+    // Claremont-Cottesloe (Phase 2)
+    { name: 'Stirling Hwy @ Stirling Rd', direction: 'NB', baseFlow: 380, zone: 'commercial' },  // Bunnings/Claremont Quarter
+    { name: 'Stirling Hwy @ Stirling Rd', direction: 'SB', baseFlow: 360, zone: 'commercial' },
+    { name: 'Stirling Hwy @ Jarrad St', direction: 'NB', baseFlow: 350, zone: 'school' },        // School zone
+    { name: 'Stirling Hwy @ Jarrad St', direction: 'SB', baseFlow: 340, zone: 'school' },
+    { name: 'Stirling Hwy @ Eric St', direction: 'NB', baseFlow: 320 },
+    { name: 'Stirling Hwy @ Eric St', direction: 'SB', baseFlow: 310 },
+    // Mosman Park
     { name: 'Stirling Hwy @ Forrest St', direction: 'NB', baseFlow: 310 },
     { name: 'Stirling Hwy @ Forrest St', direction: 'SB', baseFlow: 305 },
     { name: 'Stirling Hwy @ Bay View Terrace', direction: 'NB', baseFlow: 295 },
@@ -1428,54 +1649,8 @@ const terminalSites = {
 };
 
 function getTimestamp() {
-  // Get Perth time (AWST = UTC+8)
   const now = new Date();
-  return now.toLocaleTimeString('en-AU', { timeZone: 'Australia/Perth', hour12: false });
-}
-
-/**
- * Get time-of-day traffic multiplier based on Perth local time
- * Realistic traffic patterns for Perth arterial/freeway roads
- */
-function getTimeOfDayMultiplier() {
-  const now = new Date();
-  // Get current hour in Perth time
-  const perthHour = parseInt(now.toLocaleString('en-AU', {
-    timeZone: 'Australia/Perth',
-    hour: 'numeric',
-    hour12: false
-  }));
-
-  // Traffic multipliers by hour (base 1.0 = average traffic)
-  // Based on typical Perth traffic patterns
-  const hourlyMultipliers = {
-    0: 0.15,   // Midnight - very light
-    1: 0.10,   // 1 AM - minimal
-    2: 0.08,   // 2 AM - minimal
-    3: 0.08,   // 3 AM - minimal
-    4: 0.12,   // 4 AM - early risers
-    5: 0.25,   // 5 AM - shift workers
-    6: 0.50,   // 6 AM - building up
-    7: 0.85,   // 7 AM - morning rush starting
-    8: 1.20,   // 8 AM - peak morning rush
-    9: 1.00,   // 9 AM - still busy
-    10: 0.75,  // 10 AM - mid-morning
-    11: 0.70,  // 11 AM - moderate
-    12: 0.80,  // 12 PM - lunch traffic
-    13: 0.75,  // 1 PM - post-lunch
-    14: 0.70,  // 2 PM - afternoon lull
-    15: 0.85,  // 3 PM - school pickups
-    16: 1.10,  // 4 PM - evening rush starting
-    17: 1.25,  // 5 PM - peak evening rush
-    18: 1.00,  // 6 PM - still busy
-    19: 0.70,  // 7 PM - winding down
-    20: 0.50,  // 8 PM - evening
-    21: 0.40,  // 9 PM - quiet
-    22: 0.30,  // 10 PM - light
-    23: 0.20   // 11 PM - very light
-  };
-
-  return hourlyMultipliers[perthHour] || 0.5;
+  return now.toTimeString().split(' ')[0];
 }
 
 function getRandomVariation(base, percent = 15) {
@@ -1497,16 +1672,10 @@ function generateTerminalLine() {
   const sites = isFreeway ? terminalSites.freeway : terminalSites.arterial;
   const site = sites[Math.floor(Math.random() * sites.length)];
 
-  // Apply time-of-day traffic pattern (8 PM = 50% of peak traffic)
-  const timeMultiplier = getTimeOfDayMultiplier();
-  const adjustedBaseFlow = Math.round(site.baseFlow * timeMultiplier);
-  const flow = getRandomVariation(adjustedBaseFlow);
-
-  // Speed inversely related to traffic volume
-  const baseSpeed = isFreeway ? 100 : 60;
-  const congestionFactor = Math.min(1, flow / (isFreeway ? 2500 : 400));
-  const speedReduction = congestionFactor * (isFreeway ? 40 : 30);
-  const speed = Math.round(baseSpeed - speedReduction + (Math.random() * 10 - 5));
+  const flow = getRandomVariation(site.baseFlow);
+  const speed = isFreeway
+    ? getRandomVariation(95, 10)
+    : getRandomVariation(55, 20);
   const { status, class: statusClass } = getTrafficStatus(flow, isFreeway);
 
   const timestamp = `<span class="timestamp">[${getTimestamp()}]</span>`;
@@ -1561,7 +1730,7 @@ function startTerminal() {
   const output = document.getElementById('terminal-output');
   if (output) {
     // Add startup messages
-    addTerminalLine('<div class="terminal-line system">[SYSTEM] Connected to Perth Traffic Watch simulator</div>');
+    addTerminalLine('<div class="terminal-line system">[SYSTEM] Connected to SwanFlow simulator</div>');
     addTerminalLine('<div class="terminal-line system">[SYSTEM] Monitoring 22 arterial sites + 30 freeway sites</div>');
     addTerminalLine('<div class="terminal-line system">[SYSTEM] Starting live data feed...</div>');
     addTerminalLine('<div class="terminal-line detection">[SIMULATOR] Data generation active</div>');
@@ -1632,7 +1801,7 @@ function clearTerminal() {
 // ============================================================================
 
 async function init() {
-  console.log('Initializing Perth Traffic Watch Dashboard...');
+  console.log('Initializing SwanFlow Dashboard...');
 
   // Initialize DOM elements
   siteSelect = document.getElementById('site-select');
@@ -1646,6 +1815,9 @@ async function init() {
 
   // Initialize map
   initMap();
+
+  // Render initial flow corridor (arterial by default)
+  renderFlowCorridor(currentNetwork);
 
   // Load sites
   const sites = await fetchSites();
@@ -1673,6 +1845,19 @@ async function init() {
   animateRouteArrow(currentSite);
 
   // Setup event listeners
+  // Fullscreen button
+  const fullscreenBtn = document.getElementById('fullscreen-btn');
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', toggleMapFullscreen);
+  }
+
+  // ESC key to exit fullscreen
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isMapFullscreen) {
+      exitMapFullscreen();
+    }
+  });
+
   // Network tabs
   document.querySelectorAll('.network-tab').forEach(tab => {
     tab.addEventListener('click', async () => {

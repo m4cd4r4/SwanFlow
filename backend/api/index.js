@@ -1,5 +1,5 @@
 /**
- * Perth Traffic Watch - Express API
+ * SwanFlow - Express API
  *
  * Receives vehicle detection data from ESP32-CAM units
  * and serves data to web dashboard
@@ -65,7 +65,11 @@ if (siteCount.count === 0) {
 
   // Site definitions (matching live-simulator.js)
   const sites = [
-    // Mounts Bay Road (Crawley → Point Lewis) - PoC
+    // Stirling Highway / Mounts Bay Road (Winthrop Ave → Point Lewis) - PoC Phase 1
+    { name: 'Stirling Hwy @ Winthrop Ave (Northbound)', description: 'Stirling Highway at Winthrop Avenue, Nedlands (near SCGH/UWA)' },
+    { name: 'Stirling Hwy @ Winthrop Ave (Southbound)', description: 'Stirling Highway at Winthrop Avenue, Nedlands (near SCGH/UWA)' },
+    { name: 'Stirling Hwy @ Broadway (Northbound)', description: 'Stirling Highway at Broadway, Nedlands' },
+    { name: 'Stirling Hwy @ Broadway (Southbound)', description: 'Stirling Highway at Broadway, Nedlands' },
     { name: 'Mounts Bay Rd @ Kings Park (Northbound)', description: 'Mounts Bay Road near Kings Park' },
     { name: 'Mounts Bay Rd @ Kings Park (Southbound)', description: 'Mounts Bay Road near Kings Park' },
     { name: 'Mounts Bay Rd @ Mill Point (Northbound)', description: 'Mounts Bay Road at Mill Point' },
@@ -75,13 +79,13 @@ if (siteCount.count === 0) {
     { name: 'Mounts Bay Rd @ Malcolm St (Northbound)', description: 'Mounts Bay Road at Malcolm Street' },
     { name: 'Mounts Bay Rd @ Malcolm St (Southbound)', description: 'Mounts Bay Road at Malcolm Street' },
 
-    // Stirling Hwy - Swanbourne (Grant St → Eric St) - Phase 1
-    { name: 'Stirling Hwy @ Grant St (Northbound)', description: 'Stirling Highway at Grant Street, Swanbourne' },
-    { name: 'Stirling Hwy @ Grant St (Southbound)', description: 'Stirling Highway at Grant Street, Swanbourne' },
-    { name: 'Stirling Hwy @ Campbell Barracks (Northbound)', description: 'Stirling Highway near Campbell Barracks' },
-    { name: 'Stirling Hwy @ Campbell Barracks (Southbound)', description: 'Stirling Highway near Campbell Barracks' },
-    { name: 'Stirling Hwy @ Eric St (Northbound)', description: 'Stirling Highway at Eric Street' },
-    { name: 'Stirling Hwy @ Eric St (Southbound)', description: 'Stirling Highway at Eric Street' },
+    // Stirling Hwy - Claremont to Cottesloe (Stirling Rd → Eric St) - Phase 2
+    { name: 'Stirling Hwy @ Stirling Rd (Northbound)', description: 'Stirling Highway at Stirling Road, Claremont (Bunnings/Claremont Quarter)' },
+    { name: 'Stirling Hwy @ Stirling Rd (Southbound)', description: 'Stirling Highway at Stirling Road, Claremont (Bunnings/Claremont Quarter)' },
+    { name: 'Stirling Hwy @ Jarrad St (Northbound)', description: 'Stirling Highway at Jarrad Street, Cottesloe (school zone)' },
+    { name: 'Stirling Hwy @ Jarrad St (Southbound)', description: 'Stirling Highway at Jarrad Street, Cottesloe (school zone)' },
+    { name: 'Stirling Hwy @ Eric St (Northbound)', description: 'Stirling Highway at Eric Street, Cottesloe' },
+    { name: 'Stirling Hwy @ Eric St (Southbound)', description: 'Stirling Highway at Eric Street, Cottesloe' },
 
     // Stirling Hwy - Mosman Park (Forrest St → Victoria St) - Phase 1
     { name: 'Stirling Hwy @ Forrest St (Northbound)', description: 'Stirling Highway at Forrest Street, Mosman Park' },
@@ -602,7 +606,7 @@ app.get('*', (req, res) => {
 // ============================================================================
 app.listen(PORT, () => {
   console.log(`\n=================================`);
-  console.log(`Perth Traffic Watch API`);
+  console.log(`SwanFlow API`);
   console.log(`=================================`);
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);

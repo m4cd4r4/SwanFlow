@@ -1,12 +1,12 @@
 # Freeway Traffic Simulation & Expansion Plan
 
-**Perth Traffic Watch - Aspirational Phase: Mitchell & Kwinana Freeway Corridor**
+**SwanFlow - Aspirational Phase: Mitchell & Kwinana Freeway Corridor**
 
 ---
 
 ## Executive Summary
 
-This document outlines an ambitious expansion of Perth Traffic Watch from arterial road monitoring (60 km/h corridors) to **high-speed freeway monitoring** (100+ km/h) covering the Mitchell Freeway (north) and Kwinana Freeway (south), centred on the **Narrows Bridge**.
+This document outlines an ambitious expansion of SwanFlow from arterial road monitoring (60 km/h corridors) to **high-speed freeway monitoring** (100+ km/h) covering the Mitchell Freeway (north) and Kwinana Freeway (south), centred on the **Narrows Bridge**.
 
 ### Vision Statement
 
@@ -25,7 +25,7 @@ This document outlines an ambitious expansion of Perth Traffic Watch from arteri
 
 Western Australia's Main Roads operates over **1,400 sensors** on the Smart Freeway system alone, collecting vast amounts of real-time traffic data. This data remains largely inaccessible to the public, researchers, and innovators despite being funded by taxpayers.
 
-**Perth Traffic Watch aims to demonstrate**:
+**SwanFlow aims to demonstrate**:
 - Citizen engineering can approximate government sensor capabilities
 - Novel algorithms (like UFD) could enhance existing infrastructure
 - Open data would enable innovation that benefits everyone
@@ -865,7 +865,7 @@ Main Roads WA operates:
 | **Education** | Students and hobbyists can learn from real traffic data |
 | **Engagement** | Citizens become active participants in urban planning |
 
-### Perth Traffic Watch as Proof of Concept
+### SwanFlow as Proof of Concept
 
 This project demonstrates:
 
@@ -1005,7 +1005,7 @@ module.exports = {
 
 ## Cost Comparison
 
-### Perth Traffic Watch (Citizen Approach)
+### SwanFlow (Citizen Approach)
 
 | Component | Cost (AUD) | Notes |
 |-----------|------------|-------|
@@ -1094,7 +1094,7 @@ This isn't about replacing Main Roads - it's about demonstrating that:
 | **Version** | 1.0 |
 | **Status** | Aspirational Phase - Planning |
 | **Created** | 2025-12-19 |
-| **Author** | Perth Traffic Watch Contributors |
+| **Author** | SwanFlow Contributors |
 | **License** | MIT (same as project) |
 
 ---
@@ -1109,4 +1109,4 @@ This isn't about replacing Main Roads - it's about demonstrating that:
 
 ---
 
-*This document represents the aspirational vision for Perth Traffic Watch's freeway expansion. It is designed to demonstrate technical feasibility, advocate for open traffic data, and provide a roadmap for future development.*
+*This document represents the aspirational vision for SwanFlow's freeway expansion. It is designed to demonstrate technical feasibility, advocate for open traffic data, and provide a roadmap for future development.*

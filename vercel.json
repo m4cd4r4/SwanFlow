@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "perth-traffic-watch",
+  "name": "swanflow",
   "builds": [
     {
       "src": "frontend/web-dashboard/**",

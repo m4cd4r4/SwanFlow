@@ -1,4 +1,4 @@
-# Backend API - Perth Traffic Watch
+# Backend API - SwanFlow
 
 Express.js API for receiving vehicle detection data from ESP32-CAM units and serving data to the web dashboard.
 

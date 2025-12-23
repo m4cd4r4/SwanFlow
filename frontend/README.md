@@ -1,4 +1,4 @@
-# Frontend - Perth Traffic Watch Dashboard
+# Frontend - SwanFlow Dashboard
 
 Real-time web dashboard for visualizing vehicle detection data from ESP32-CAM units.
 

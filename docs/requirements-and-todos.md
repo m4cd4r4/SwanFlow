@@ -1,6 +1,6 @@
 # Requirements and TODOs
 
-Project requirements, development roadmap, and task tracking for Perth Traffic Watch.
+Project requirements, development roadmap, and task tracking for SwanFlow.
 
 ## Project Goals
 
@@ -251,7 +251,7 @@ Project requirements, development roadmap, and task tracking for Perth Traffic W
 
 ### Vision
 
-Expand Perth Traffic Watch from arterial road monitoring to high-speed freeway corridors, covering Mitchell Freeway (north) and Kwinana Freeway (south) within 5km of the Narrows Bridge.
+Expand SwanFlow from arterial road monitoring to high-speed freeway corridors, covering Mitchell Freeway (north) and Kwinana Freeway (south) within 5km of the Narrows Bridge.
 
 ### Key Components
 

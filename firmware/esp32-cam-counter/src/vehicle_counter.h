@@ -1,5 +1,5 @@
 /**
- * Perth Traffic Watch - Vehicle Counter
+ * SwanFlow - Vehicle Counter
  *
  * Handles FOMO inference, vehicle counting, and statistics
  */

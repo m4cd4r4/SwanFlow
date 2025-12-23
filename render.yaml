@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: perth-traffic-watch
+    name: swanflow
     runtime: node
     region: oregon
     plan: free

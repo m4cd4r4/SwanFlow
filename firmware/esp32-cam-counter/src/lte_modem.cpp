@@ -1,5 +1,5 @@
 /**
- * Perth Traffic Watch - LTE Modem Implementation
+ * SwanFlow - LTE Modem Implementation
  */
 
 #include "lte_modem.h"

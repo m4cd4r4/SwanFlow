@@ -1,4 +1,4 @@
-# Perth Traffic Watch
+# SwanFlow
 
 **Open-source vehicle detection system using Edge AI, ESP32-CAM, and FOMO (Faster Objects, More Objects)**
 
@@ -10,11 +10,11 @@ Monitor traffic flow in real-time using affordable IoT hardware and machine lear
 
 ---
 
-## The $143 vs $500 Million Question
+## The $143 vs $50,000 Question
 
 Main Roads Western Australia has invested over **$500 million** in Smart Freeway infrastructure with **1,400+ sensors** collecting real-time traffic data. Yet their public APIs have been **offline since August 2023** with no restoration timeline.
 
-Perth Traffic Watch demonstrates that **citizen-led monitoring can provide functional, open traffic data for ~$143 per site** — a 350:1 cost advantage.
+SwanFlow demonstrates that **citizen-led monitoring can provide functional, open traffic data for ~$143 per site** — a 350:1 cost advantage.
 
 > **This project is both a technical proof-of-concept and an advocacy tool for open traffic data.**
 
@@ -23,9 +23,9 @@ Perth Traffic Watch demonstrates that **citizen-led monitoring can provide funct
 
 ---
 
-## What is Perth Traffic Watch?
+## What is SwanFlow?
 
-Perth Traffic Watch is a DIY traffic monitoring system that:
+SwanFlow is a DIY traffic monitoring system that:
 
 - **Monitors 6 km corridor** from CBD to Fremantle (3 stretches)
 - **24 monitoring sites** with bidirectional tracking (Northbound/Southbound)
@@ -53,7 +53,7 @@ Perfect for:
 
 ## Dashboard Preview
 
-![Perth Traffic Watch Dashboard - Cottesloe Dark Theme](frontend/web-dashboard/screenshot-cottesloe-dark.png)
+![SwanFlow Dashboard - Cottesloe Dark Theme](frontend/web-dashboard/screenshot-cottesloe-dark.png)
 
 **Real-time traffic monitoring dashboard featuring:**
 - **Full Corridor Visualisation** - CBD to Fremantle (3 stretches, 6 km)
@@ -196,7 +196,7 @@ Dashboard accessible at [http://localhost:8080](http://localhost:8080)
 ## Repository Structure
 
 ```
-perth-traffic-watch/
+swanflow/
 ├── hardware/
 │   ├── bom.md                    # Bill of materials
 │   └── shopping-lists.md         # AliExpress + Bunnings orders
@@ -388,9 +388,9 @@ Dashboard → Fetch API → Chart.js → User
 
 ## Cost Breakdown
 
-### Perth Traffic Watch vs Government Infrastructure
+### SwanFlow vs Government Infrastructure
 
-| Metric | Perth Traffic Watch | Main Roads WA Smart Freeway |
+| Metric | SwanFlow | Main Roads WA Smart Freeway |
 |--------|--------------------|-----------------------------|
 | **Per-site cost** | ~$143 | ~$50,000+ |
 | **30-site deployment** | ~$4,500 | ~$1.5M+ |
@@ -517,7 +517,7 @@ Validate with manual counts.
 
 ### Q: What about privacy?
 
-**A**: Perth Traffic Watch:
+**A**: SwanFlow:
 - Uses low-resolution images (QVGA 320x240)
 - No facial recognition
 - No number plate recognition

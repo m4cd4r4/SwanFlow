@@ -1,6 +1,6 @@
 # Main Roads WA Traffic Data: Public Access Investigation
 
-**Perth Traffic Watch - Research Document**
+**SwanFlow - Research Document**
 
 > **Purpose**: Objective documentation of public traffic data availability, API service status, and internal data utilisation at Main Roads Western Australia.
 
@@ -293,7 +293,7 @@ The following questions remain unanswered based on publicly available informatio
 
 ## Section 7: Recommendations
 
-### 7.1 For Perth Traffic Watch Project
+### 7.1 For SwanFlow Project
 
 1. **Document this investigation** in project materials ✓
 2. **Reference in academic paper** as case study of open data gaps
@@ -351,7 +351,7 @@ The following questions remain unanswered based on publicly available informatio
 | **Version** | 1.0 |
 | **Created** | 2025-12-19 |
 | **Methodology** | Desktop research, official sources |
-| **Author** | Perth Traffic Watch Contributors |
+| **Author** | SwanFlow Contributors |
 | **Status** | Research Document |
 | **Next Review** | Check API status monthly |
 
