@@ -141,12 +141,18 @@
       <div class="map-container">
         <div class="map-header">
           <h2>Live Traffic Map</h2>
-          <div class="map-view-selector">
-            <button type="button" class="map-view-btn" data-view="street">Street</button>
-            <button type="button" class="map-view-btn active" data-view="satellite">Satellite</button>
-            <button type="button" class="map-view-btn" data-view="satellite-labels">Satellite + Labels</button>
-            <button type="button" class="map-view-btn" data-view="terrain">Terrain</button>
-            <button type="button" class="map-view-btn" data-view="dark">Dark</button>
+          <div class="map-controls">
+            <div class="map-view-selector">
+              <button type="button" class="map-view-btn" data-view="street">Street</button>
+              <button type="button" class="map-view-btn active" data-view="satellite">Satellite</button>
+              <button type="button" class="map-view-btn" data-view="satellite-labels">Satellite + Labels</button>
+              <button type="button" class="map-view-btn" data-view="terrain">Terrain</button>
+              <button type="button" class="map-view-btn" data-view="dark">Dark</button>
+            </div>
+            <button type="button" id="fullscreen-btn" class="fullscreen-btn" aria-label="Toggle fullscreen map" title="Toggle fullscreen">
+              <span class="fullscreen-icon-expand">⛶</span>
+              <span class="fullscreen-icon-collapse">⛶</span>
+            </button>
           </div>
         </div>
         <div

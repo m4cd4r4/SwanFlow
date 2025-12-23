@@ -1015,6 +1015,141 @@ footer {
   outline-offset: 2px;
 }
 
+/* Map Controls Container */
+.map-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ============================================================================
+   Fullscreen Button & Mode
+   ============================================================================ */
+
+.fullscreen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.fullscreen-btn:hover {
+  border-color: var(--primary);
+  background: var(--bg-secondary);
+  transform: scale(1.05);
+}
+
+.fullscreen-btn:active {
+  transform: scale(0.95);
+}
+
+.fullscreen-btn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Show/hide icons based on fullscreen state */
+.fullscreen-icon-collapse {
+  display: none;
+}
+
+.map-container.fullscreen .fullscreen-icon-expand {
+  display: none;
+}
+
+.map-container.fullscreen .fullscreen-icon-collapse {
+  display: block;
+  transform: rotate(45deg);
+}
+
+/* Fullscreen Map Mode */
+.map-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-container.fullscreen .map-header {
+  padding: 1rem 1.5rem;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.map-container.fullscreen #traffic-map {
+  flex: 1;
+  height: auto !important;
+  border-radius: 0;
+  border: none;
+}
+
+/* Fullscreen button style when in fullscreen mode */
+.map-container.fullscreen .fullscreen-btn {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+
+.map-container.fullscreen .fullscreen-btn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+/* Hide body scroll when map is fullscreen */
+body.map-fullscreen {
+  overflow: hidden;
+}
+
+/* Fullscreen transition animation */
+.map-container {
+  transition: all 0.3s ease;
+}
+
+/* Keyboard hint for exiting fullscreen */
+.map-container.fullscreen::after {
+  content: 'Press ESC to exit fullscreen';
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  animation: fadeInOut 3s ease forwards;
+  z-index: 10000;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ============================================================================
    Mobile Floating Theme Button
    ============================================================================ */

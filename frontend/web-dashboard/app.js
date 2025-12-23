@@ -28,6 +28,9 @@ let terminalLineCount = 0;
 let terminalUpdateCount = 0;
 let terminalLastSecond = Date.now();
 
+// Fullscreen state
+let isMapFullscreen = false;
+
 // DOM Elements (will be initialized after DOM loads)
 let siteSelect;
 let periodSelect;
@@ -844,6 +847,38 @@ function updateMapMarkers(sites) {
 }
 
 
+// ============================================================================
+// Map Fullscreen Toggle
+// ============================================================================
+
+function toggleMapFullscreen() {
+  const mapContainer = document.querySelector('.map-container');
+  if (!mapContainer) return;
+
+  isMapFullscreen = !isMapFullscreen;
+
+  if (isMapFullscreen) {
+    mapContainer.classList.add('fullscreen');
+    document.body.classList.add('map-fullscreen');
+  } else {
+    mapContainer.classList.remove('fullscreen');
+    document.body.classList.remove('map-fullscreen');
+  }
+
+  // Invalidate map size after transition to ensure proper rendering
+  setTimeout(() => {
+    if (trafficMap) {
+      trafficMap.invalidateSize();
+    }
+  }, 350); // Wait for CSS transition to complete
+}
+
+function exitMapFullscreen() {
+  if (isMapFullscreen) {
+    toggleMapFullscreen();
+  }
+}
+
 function updateMapTiles() {
   if (!trafficMap || !trafficMap._baseMaps) return;
 
@@ -1610,6 +1645,19 @@ async function init() {
   animateRouteArrow(currentSite);
 
   // Setup event listeners
+  // Fullscreen button
+  const fullscreenBtn = document.getElementById('fullscreen-btn');
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', toggleMapFullscreen);
+  }
+
+  // ESC key to exit fullscreen
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isMapFullscreen) {
+      exitMapFullscreen();
+    }
+  });
+
   // Network tabs
   document.querySelectorAll('.network-tab').forEach(tab => {
     tab.addEventListener('click', async () => {
