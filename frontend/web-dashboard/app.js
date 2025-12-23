@@ -5,7 +5,7 @@
 // Configuration
 const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'  // Local dev: separate frontend server
-  : 'https://swanflow.onrender.com';  // Production: Render backend API
+  : 'https://45.77.233.102/traffic';  // Production: Vultr Sydney VPS API
 
 const REFRESH_INTERVAL = 60000; // 60 seconds
 
