@@ -57,6 +57,15 @@ const directionModifiers = {
   SB: { morning: 0.7, evening: 1.3 }
 };
 
+// Get current hour in Perth timezone (AWST, UTC+8)
+function getPerthHour() {
+  return parseInt(new Date().toLocaleString('en-AU', {
+    timeZone: 'Australia/Perth',
+    hour: 'numeric',
+    hour12: false
+  }));
+}
+
 function getVehicleCount(hour, site) {
   const baseRate = trafficPatterns[hour];
   let count = baseRate * site.multiplier;
@@ -78,14 +87,14 @@ function getVehicleCount(hour, site) {
 }
 
 function getConfidence() {
-  const hour = new Date().getHours();
+  const hour = getPerthHour();
   const isDay = hour >= 6 && hour <= 20;
   return isDay ? 0.75 + Math.random() * 0.20 : 0.60 + Math.random() * 0.20;
 }
 
 function simulateTrafficUpdate() {
   const now = Date.now();
-  const hour = new Date().getHours();
+  const hour = getPerthHour();
 
   const insertDetection = db.prepare(`
     INSERT INTO detections (
