@@ -873,18 +873,185 @@ function updateMapTiles() {
 // Traffic Flow Visualization
 // ============================================================================
 
+// Flow corridor configurations for different network types
+const flowCorridorConfigs = {
+  arterial: {
+    title: 'Mounts Bay Road Traffic Flow',
+    sites: [
+      { id: 1, name: 'Kings Park', sitePrefix: 'Mounts Bay Rd @ Kings Park' },
+      { id: 2, name: 'Mill Point', sitePrefix: 'Mounts Bay Rd @ Mill Point' },
+      { id: 3, name: 'Fraser Ave', sitePrefix: 'Mounts Bay Rd @ Fraser Ave' },
+      { id: 4, name: 'Malcolm St', sitePrefix: 'Mounts Bay Rd @ Malcolm St' }
+    ]
+  },
+  freeway: {
+    title: 'Perth Freeway Traffic Flow',
+    corridors: [
+      {
+        name: 'Mitchell Freeway',
+        sites: [
+          { id: 1, name: 'Narrows', sitePrefix: 'Narrows Interchange' },
+          { id: 2, name: 'Loftus St', sitePrefix: 'Loftus Street' },
+          { id: 3, name: 'Vincent St', sitePrefix: 'Vincent Street' },
+          { id: 4, name: 'Scarborough', sitePrefix: 'Scarborough Beach Road' }
+        ]
+      },
+      {
+        name: 'Kwinana Freeway',
+        sites: [
+          { id: 5, name: 'Narrows S', sitePrefix: 'Narrows South' },
+          { id: 6, name: 'Canning Hwy', sitePrefix: 'Canning Highway' },
+          { id: 7, name: 'Manning Rd', sitePrefix: 'Manning Road' },
+          { id: 8, name: 'Leach Hwy', sitePrefix: 'Leach Highway' }
+        ]
+      }
+    ]
+  },
+  all: {
+    title: 'All Perth Traffic Flow',
+    corridors: [
+      {
+        name: 'Arterial: Mounts Bay Rd',
+        sites: [
+          { id: 1, name: 'Kings Park', sitePrefix: 'Mounts Bay Rd @ Kings Park' },
+          { id: 2, name: 'Malcolm St', sitePrefix: 'Mounts Bay Rd @ Malcolm St' }
+        ]
+      },
+      {
+        name: 'Mitchell Freeway',
+        sites: [
+          { id: 3, name: 'Narrows', sitePrefix: 'Narrows Interchange' },
+          { id: 4, name: 'Scarborough', sitePrefix: 'Scarborough Beach Road' }
+        ]
+      },
+      {
+        name: 'Kwinana Freeway',
+        sites: [
+          { id: 5, name: 'Narrows S', sitePrefix: 'Narrows South' },
+          { id: 6, name: 'Leach Hwy', sitePrefix: 'Leach Highway' }
+        ]
+      }
+    ]
+  }
+};
+
+/**
+ * Renders a single flow site card
+ */
+function renderFlowSiteHTML(site) {
+  return `
+    <div class="flow-site" id="flow-site-${site.id}">
+      <div class="site-name">${site.name}</div>
+      <div class="flow-arrows">
+        <div class="flow-direction northbound">
+          <span class="arrow">↑</span>
+          <span class="label">NB</span>
+          <span class="count" id="flow-nb-${site.id}">-</span>
+          <span class="speed" id="speed-nb-${site.id}">-</span>
+        </div>
+        <div class="flow-direction southbound">
+          <span class="arrow">↓</span>
+          <span class="label">SB</span>
+          <span class="count" id="flow-sb-${site.id}">-</span>
+          <span class="speed" id="speed-sb-${site.id}">-</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Renders a connector between flow sites
+ */
+function renderConnectorHTML(siteId) {
+  return `
+    <div class="flow-connector">
+      <div class="connector-line northbound" id="connector-nb-${siteId}"></div>
+      <div class="connector-line southbound" id="connector-sb-${siteId}"></div>
+    </div>
+  `;
+}
+
+/**
+ * Renders the flow corridor based on the current network
+ */
+function renderFlowCorridor(network) {
+  const config = flowCorridorConfigs[network] || flowCorridorConfigs.arterial;
+  const titleEl = document.getElementById('flow-title');
+  const corridorEl = document.getElementById('flow-corridor');
+
+  if (!corridorEl) return;
+
+  // Update title
+  if (titleEl) {
+    titleEl.textContent = config.title;
+  }
+
+  let html = '';
+
+  if (network === 'arterial') {
+    // Simple single corridor for arterial
+    config.sites.forEach((site, index) => {
+      html += renderFlowSiteHTML(site);
+      if (index < config.sites.length - 1) {
+        html += renderConnectorHTML(site.id);
+      }
+    });
+  } else {
+    // Multi-corridor layout for freeway and all
+    config.corridors.forEach((corridor, corridorIndex) => {
+      html += `<div class="flow-corridor-section">`;
+      html += `<div class="corridor-label">${corridor.name}</div>`;
+      html += `<div class="flow-corridor-inner">`;
+
+      corridor.sites.forEach((site, siteIndex) => {
+        html += renderFlowSiteHTML(site);
+        if (siteIndex < corridor.sites.length - 1) {
+          html += renderConnectorHTML(site.id);
+        }
+      });
+
+      html += `</div></div>`;
+
+      // Add separator between corridors (except for last)
+      if (corridorIndex < config.corridors.length - 1) {
+        html += `<div class="corridor-separator"></div>`;
+      }
+    });
+  }
+
+  corridorEl.innerHTML = html;
+}
+
+/**
+ * Gets the flow map for the current network configuration
+ */
+function getFlowMapForNetwork(network) {
+  const config = flowCorridorConfigs[network] || flowCorridorConfigs.arterial;
+  const flowMap = {};
+
+  if (network === 'arterial') {
+    config.sites.forEach(site => {
+      flowMap[`${site.sitePrefix} (Northbound)`] = { id: site.id, dir: 'nb' };
+      flowMap[`${site.sitePrefix} (Southbound)`] = { id: site.id, dir: 'sb' };
+    });
+  } else {
+    config.corridors.forEach(corridor => {
+      corridor.sites.forEach(site => {
+        flowMap[`${site.sitePrefix} (Northbound)`] = { id: site.id, dir: 'nb' };
+        flowMap[`${site.sitePrefix} (Southbound)`] = { id: site.id, dir: 'sb' };
+      });
+    });
+  }
+
+  return flowMap;
+}
+
 function updateFlowCorridor(sites) {
-  // Map of site names to flow IDs
-  const flowMap = {
-    'Mounts Bay Rd @ Kings Park (Northbound)': { id: 1, dir: 'nb' },
-    'Mounts Bay Rd @ Kings Park (Southbound)': { id: 1, dir: 'sb' },
-    'Mounts Bay Rd @ Mill Point (Northbound)': { id: 2, dir: 'nb' },
-    'Mounts Bay Rd @ Mill Point (Southbound)': { id: 2, dir: 'sb' },
-    'Mounts Bay Rd @ Fraser Ave (Northbound)': { id: 3, dir: 'nb' },
-    'Mounts Bay Rd @ Fraser Ave (Southbound)': { id: 3, dir: 'sb' },
-    'Mounts Bay Rd @ Malcolm St (Northbound)': { id: 4, dir: 'nb' },
-    'Mounts Bay Rd @ Malcolm St (Southbound)': { id: 4, dir: 'sb' }
-  };
+  const flowMap = getFlowMapForNetwork(currentNetwork);
+  const config = flowCorridorConfigs[currentNetwork] || flowCorridorConfigs.arterial;
+  const maxSiteId = currentNetwork === 'arterial' ? 4 :
+                    currentNetwork === 'freeway' ? 8 : 6;
 
   sites.forEach(site => {
     const mapping = flowMap[site.name];
@@ -924,7 +1091,7 @@ function updateFlowCorridor(sites) {
       }
     }
 
-    if (connectorEl && mapping.id < 4) {
+    if (connectorEl && mapping.id < maxSiteId) {
       const hourlyCount = Math.round(site.current_hourly || 0);
       const color = getTrafficColor(hourlyCount);
 
@@ -1234,9 +1401,20 @@ async function loadAllSitesData() {
   // Update map, flow, and hero status card
   if (trafficMap) {
     updateMapMarkers(allSites);
-    updateFlowCorridor(arterialWithStats);  // Flow corridor only uses arterial
+
+    // Update flow corridor based on current network
+    if (currentNetwork === 'arterial') {
+      updateFlowCorridor(arterialWithStats);
+    } else if (currentNetwork === 'freeway') {
+      updateFlowCorridor(freewayWithStats);
+    } else {
+      // For 'all' network, pass combined sites
+      updateFlowCorridor([...arterialWithStats, ...freewayWithStats]);
+    }
   }
-  updateHeroStatusCard(arterialWithStats);  // Hero card uses arterial corridor
+
+  // Hero card uses arterial corridor for now (main commute route)
+  updateHeroStatusCard(arterialWithStats);
 }
 
 async function loadDashboard() {
@@ -1337,6 +1515,9 @@ async function switchNetwork(network) {
       }
     }
   }
+
+  // Render the appropriate flow corridor for the selected network
+  renderFlowCorridor(network);
 
   // Reset route highlighting when switching networks
   resetRouteHighlighting();
@@ -1582,6 +1763,9 @@ async function init() {
 
   // Initialize map
   initMap();
+
+  // Render initial flow corridor (arterial by default)
+  renderFlowCorridor(currentNetwork);
 
   // Load sites
   const sites = await fetchSites();
