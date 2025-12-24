@@ -340,13 +340,7 @@ function animateCounter(elementId, fromValue, toValue) {
 
 // Site coordinates mapping (approximate locations based on street intersections)
 const siteCoordinates = {
-  // Stirling Highway - Nedlands (Winthrop Ave extension)
-  'Stirling Hwy @ Winthrop Ave (Northbound)': [-31.9812, 115.8148],
-  'Stirling Hwy @ Winthrop Ave (Southbound)': [-31.9812, 115.8148],
-  'Stirling Hwy @ Broadway (Northbound)': [-31.9785, 115.8185],
-  'Stirling Hwy @ Broadway (Southbound)': [-31.9785, 115.8185],
-
-  // Mounts Bay Road sites
+  // Mounts Bay Road sites (Kings Park to Point Lewis)
   'Mounts Bay Rd @ Kings Park (Northbound)': [-31.97339, 115.82564],
   'Mounts Bay Rd @ Kings Park (Southbound)': [-31.97339, 115.82564],
   'Mounts Bay Rd @ Mill Point (Northbound)': [-31.968, 115.834],
@@ -900,21 +894,16 @@ function updateMapMarkers(sites) {
     {
       name: 'Stirling Hwy / Mounts Bay Rd',
       shortName: 'Nedlands-City',
-      filter: 'Stirling Hwy @ Winthrop|Stirling Hwy @ Broadway|Mounts Bay Rd',
-      start: L.latLng(-31.9812, 115.8148),     // Winthrop Ave, Nedlands (near SCGH/UWA)
-      end: L.latLng(-31.963231, 115.842311),   // Point Lewis (Malcolm St)
-      label: 'Winthrop Ave → Point Lewis',
+      filter: 'Mounts Bay Rd',
+      start: L.latLng(-31.9755360, 115.8180240),  // Stirling Hwy meets Mounts Bay Rd
+      end: L.latLng(-31.963231, 115.842311),      // Point Lewis (Malcolm St)
+      label: 'Kings Park → Point Lewis',
       waypoints: [
-        // Stirling Highway section (Winthrop Ave → Broadway → Kings Park)
-        // CORRECTED: OSM-exact coordinates for pinpoint accuracy
-        L.latLng(-31.9805, 115.8150),   // Between Winthrop and Broadway
-        L.latLng(-31.9795, 115.8152),   // Approaching Broadway
-        L.latLng(-31.9785, 115.8156),   // Broadway intersection - FIXED (was 115.8185)
-        L.latLng(-31.9770527, 115.8141985), // Transition point - OSM EXACT
-        L.latLng(-31.9757418, 115.8178419), // Near Broadway/Kings Park - OSM EXACT
-        L.latLng(-31.9755360, 115.8180240), // Where Stirling Hwy meets Mounts Bay Rd - OSM EXACT
-        // Mounts Bay Road section (Kings Park → Malcolm St) - existing waypoints
-        L.latLng(-31.9728911, 115.8265899),
+        // Mounts Bay Road section ONLY (Kings Park → Malcolm St)
+        // Route starts where Stirling Hwy meets Mounts Bay Rd, heading east to CBD
+        L.latLng(-31.9755360, 115.8180240), // Start: Stirling Hwy meets Mounts Bay Rd
+        L.latLng(-31.9733899, 115.8256410), // Kings Park - CORRECTED OSM EXACT
+        L.latLng(-31.9728911, 115.8265899), // Along Mounts Bay Rd
         L.latLng(-31.9726546, 115.8274435),
         L.latLng(-31.9724305, 115.8289419),
         L.latLng(-31.9722547, 115.8308715),
