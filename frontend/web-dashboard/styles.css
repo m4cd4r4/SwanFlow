@@ -2167,3 +2167,187 @@ body.map-fullscreen {
     font-size: 1.25rem;
   }
 }
+
+/* ============================================================================
+   ULTRA COMPACT STAT CARDS FOR MOBILE
+   Added Dec 25, 2025
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Tighter 2x2 grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+    padding: 0.5rem;
+  }
+
+  /* Minimal padding stat cards */
+  .stat-card {
+    padding: 0.5rem;
+    border-radius: 6px;
+  }
+
+  /* Smaller label */
+  .stat-card h3 {
+    font-size: 0.6rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 0.3px;
+  }
+
+  /* Smaller value */
+  .stat-card .stat-value {
+    font-size: 1.25rem;
+    margin-bottom: 0.15rem;
+  }
+
+  /* Smaller subtitle */
+  .stat-card p,
+  .stat-card .stat-subtitle {
+    font-size: 0.55rem;
+  }
+}
+
+/* Even smaller on tiny screens */
+@media (max-width: 375px) {
+  .stats-grid {
+    gap: 0.3rem;
+    padding: 0.4rem;
+  }
+
+  .stat-card {
+    padding: 0.4rem;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .stat-card h3 {
+    font-size: 0.55rem;
+  }
+}
+
+/* ============================================================================
+   STATS OVERLAY ON MAP - Mobile
+   Positions stat cards as overlay on bottom-right of map
+   Added Dec 25, 2025
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Map container needs relative positioning for overlay */
+  .map-stats-row {
+    position: relative;
+    display: block;
+  }
+
+  .map-container {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Make map taller since stats will overlay */
+  #traffic-map {
+    height: 65vh;
+    min-height: 400px;
+  }
+
+  /* Stats overlay - positioned bottom-right on map */
+  .stats-grid {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    width: auto;
+    max-width: 45%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+    padding: 0;
+    background: transparent;
+    z-index: 1000;
+  }
+
+  /* Glassmorphism stat cards */
+  .stats-grid .stat-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+  }
+
+  /* Dark mode overlay cards */
+  [data-theme="dark"] .stats-grid .stat-card {
+    background: rgba(30, 30, 40, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Tighter text in overlay */
+  .stats-grid .stat-card h3 {
+    font-size: 0.5rem;
+    margin-bottom: 0.1rem;
+    opacity: 0.8;
+  }
+
+  .stats-grid .stat-card .stat-value {
+    font-size: 1rem;
+    line-height: 1.1;
+    margin-bottom: 0;
+  }
+
+  /* Hide subtitle in overlay to save space */
+  .stats-grid .stat-card .stat-label,
+  .stats-grid .stat-card p {
+    display: none;
+  }
+}
+
+/* Tiny screens - even more compact */
+@media (max-width: 375px) {
+  .stats-grid {
+    max-width: 40%;
+    gap: 0.25rem;
+  }
+
+  .stats-grid .stat-card {
+    padding: 0.25rem 0.4rem;
+  }
+
+  .stats-grid .stat-card .stat-value {
+    font-size: 0.9rem;
+  }
+}
+
+/* ============================================================================
+   FIX: Stats overlay using map-stats-row as position context
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Parent is the positioning context */
+  .map-stats-row {
+    position: relative !important;
+    display: block !important;
+    margin: 0 -1rem;
+  }
+
+  /* Map takes full width */
+  .map-stats-row .map-container {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Stats overlay positioned relative to map-stats-row */
+  .map-stats-row .stats-grid {
+    position: absolute !important;
+    bottom: 1rem !important;
+    right: 1rem !important;
+    left: auto !important;
+    top: auto !important;
+    width: auto !important;
+    max-width: 42% !important;
+    margin: 0 !important;
+    z-index: 1000 !important;
+  }
+}
