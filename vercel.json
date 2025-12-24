@@ -27,7 +27,7 @@
   ],
   "headers": [
     {
-      "source": "/(.*).html",
+      "source": "/(.*)\\.html",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
         { "key": "Pragma", "value": "no-cache" },
@@ -51,13 +51,13 @@
       ]
     },
     {
-      "source": "/(.*).css",
+      "source": "/(.*)\\.css",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
     },
     {
-      "source": "/(.*).js",
+      "source": "/(.*)\\.js",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
