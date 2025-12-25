@@ -2590,12 +2590,25 @@ async function switchNetwork(network) {
     el.style.animation = '';
   });
 
-  // Show/hide terminal container
+  // Show/hide terminal container and Main Roads container
   const terminalContainer = document.getElementById('terminal-container');
+  const mainroadsContainer = document.getElementById('mainroads-container');
   const mainContent = document.querySelectorAll('.controls, .map-stats-row, .flow-container, .chart-container, .table-container');
 
   if (network === 'terminal') {
-    // Show terminal, hide main content
+    // Show Main Roads live map AND terminal, hide main content
+    if (mainroadsContainer) {
+      mainroadsContainer.style.display = 'block';
+      // Lazy load the iframe only when shown
+      const iframe = document.getElementById('mainroads-iframe');
+      const loading = document.getElementById('mainroads-loading');
+      if (iframe && iframe.src === 'about:blank') {
+        iframe.src = iframe.dataset.src;
+        iframe.onload = () => {
+          if (loading) loading.style.display = 'none';
+        };
+      }
+    }
     if (terminalContainer) terminalContainer.style.display = 'block';
     mainContent.forEach(el => el.style.display = 'none');
     startTerminal();
@@ -2607,17 +2620,28 @@ async function switchNetwork(network) {
       setTimeout(() => {
         const infoText = networkInfo.querySelector('p');
         if (infoText) {
-          infoText.textContent = 'Live simulation feed showing real-time traffic data generation';
+          infoText.textContent = 'Main Roads WA live incident map + SwanFlow simulation feed';
         }
         networkInfo.classList.remove('transitioning');
       }, 150);
     }
+    // Fetch and display real Main Roads incidents
+    fetchMainRoadsIncidents().then(() => displayMainRoadsIncidents());
     return;
   } else {
-    // Hide terminal, show main content
+    // Hide terminal and Main Roads, show main content
     if (terminalContainer) terminalContainer.style.display = 'none';
+    if (mainroadsContainer) mainroadsContainer.style.display = 'none';
     mainContent.forEach(el => el.style.display = '');
     stopTerminal();
+
+    // Remove Main Roads styling from incident alerts and restore simulated data display
+    const alertsContainer = document.getElementById('incident-alerts');
+    if (alertsContainer) {
+      alertsContainer.classList.remove('mainroads-data');
+    }
+    // Restore simulated incident display
+    updateIncidentDisplay();
   }
 
   // Update network info text with smooth transition
@@ -3049,6 +3073,9 @@ async function init() {
   // Initialize historical trends and incident detection
   initTrendsAndAlerts();
 
+  // Initialize Main Roads WA real incident monitoring
+  initMainRoadsMonitoring();
+
   console.log('Dashboard initialized');
 }
 
@@ -3361,6 +3388,153 @@ function recordJourneyTime(corridor, time) {
     todayData.push({ hour, time, timestamp: now });
   }
 }
+
+// ============================================================================
+// MAIN ROADS WA - REAL INCIDENT DATA INTEGRATION
+// Uses the official ArcGIS REST API for live road incidents
+// ============================================================================
+
+// Store for real Main Roads WA incidents
+let mainroadsIncidents = [];
+let lastMainroadsUpdate = null;
+
+/**
+ * Fetch real incidents from Main Roads WA API
+ * Uses the ArcGIS FeatureServer REST API
+ */
+async function fetchMainRoadsIncidents() {
+  const API_URL = 'https://services2.arcgis.com/cHGEnmsJ165IBJRM/arcgis/rest/services/WebEoc_RoadIncidents/FeatureServer/1/query';
+
+  const params = new URLSearchParams({
+    where: "1=1",
+    outFields: "Location,IncidentTy,ClosureTyp,TrafficCon,TrafficImp,Road,Region,Suburb,EntryDate,UpdateDate,SeeMoreUrl",
+    returnGeometry: "true",
+    f: "json",
+    resultRecordCount: "50"
+  });
+
+  try {
+    const response = await fetch(`${API_URL}?${params}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+
+    if (data.features && data.features.length > 0) {
+      mainroadsIncidents = data.features.map(f => ({
+        id: f.attributes.GlobalID || f.attributes.Id,
+        location: f.attributes.Location || f.attributes.Road,
+        road: f.attributes.Road,
+        region: f.attributes.Region,
+        suburb: f.attributes.Suburb,
+        type: f.attributes.IncidentTy,
+        closureType: f.attributes.ClosureTyp,
+        trafficCondition: f.attributes.TrafficCon,
+        trafficImpact: f.attributes.TrafficImp,
+        entryDate: f.attributes.EntryDate,
+        updateDate: f.attributes.UpdateDate,
+        moreInfoUrl: f.attributes.SeeMoreUrl,
+        geometry: f.geometry ? { lat: f.geometry.y, lng: f.geometry.x } : null,
+        source: 'mainroads' // Mark as official data
+      }));
+
+      lastMainroadsUpdate = new Date();
+      console.log(`[MainRoads API] Fetched ${mainroadsIncidents.length} real incidents`);
+
+      // Update the incident display with real data when in Live Feed mode
+      if (currentNetwork === 'terminal') {
+        displayMainRoadsIncidents();
+      }
+    }
+
+    return mainroadsIncidents;
+  } catch (error) {
+    console.error('[MainRoads API] Error fetching incidents:', error);
+    return [];
+  }
+}
+
+/**
+ * Display real Main Roads WA incidents in the alerts section
+ */
+function displayMainRoadsIncidents() {
+  const alertsContainer = document.getElementById('incident-alerts');
+  const alertsList = document.getElementById('alerts-list');
+  const alertsCount = document.getElementById('alerts-count');
+
+  if (!alertsContainer || !alertsList) return;
+
+  // Filter for Perth metro area incidents (most relevant)
+  const perthIncidents = mainroadsIncidents.filter(inc =>
+    inc.region === 'Metropolitan' ||
+    inc.suburb?.toLowerCase().includes('perth') ||
+    ['South West', 'Metro'].some(r => inc.region?.includes(r))
+  ).slice(0, 5);
+
+  // All incidents if no Perth-specific ones
+  const displayIncidents = perthIncidents.length > 0 ? perthIncidents : mainroadsIncidents.slice(0, 5);
+
+  if (alertsCount) {
+    alertsCount.textContent = displayIncidents.length;
+  }
+
+  if (displayIncidents.length > 0) {
+    alertsContainer.classList.add('has-alerts');
+    alertsContainer.classList.add('mainroads-data'); // Mark as official data
+
+    alertsList.innerHTML = displayIncidents.map(incident => {
+      const severity = incident.closureType?.toLowerCase().includes('closed') ? 'severe' :
+                       incident.closureType?.toLowerCase().includes('caution') ? 'warning' : 'info';
+      const icon = severity === 'severe' ? '🚫' : severity === 'warning' ? '⚠️' : 'ℹ️';
+
+      return `
+        <div class="alert-item mainroads ${severity}">
+          <span class="alert-icon">${icon}</span>
+          <div class="alert-content">
+            <div class="alert-title">${incident.type || 'Incident'}</div>
+            <div class="alert-location">${incident.location || incident.road}</div>
+            <div class="alert-impact">${truncateText(incident.trafficImpact, 80)}</div>
+            <div class="alert-meta">
+              <span class="alert-source">🏛️ Main Roads WA</span>
+              ${incident.updateDate ? `<span class="alert-time">${incident.updateDate}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } else {
+    alertsContainer.classList.remove('has-alerts');
+    alertsList.innerHTML = `
+      <div class="no-alerts mainroads">
+        <span class="no-alerts-icon">✓</span>
+        <span>No major incidents reported by Main Roads WA</span>
+      </div>
+    `;
+  }
+}
+
+/**
+ * Truncate text to specified length
+ */
+function truncateText(text, maxLength) {
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+
+/**
+ * Initialize Main Roads WA incident monitoring
+ */
+function initMainRoadsMonitoring() {
+  // Fetch immediately
+  fetchMainRoadsIncidents();
+
+  // Refresh every 5 minutes (Main Roads updates aren't super frequent)
+  setInterval(fetchMainRoadsIncidents, 5 * 60 * 1000);
+}
+
+// ============================================================================
+// END MAIN ROADS WA INTEGRATION
+// ============================================================================
 
 /**
  * Detect traffic incidents based on speed anomalies

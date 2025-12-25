@@ -12,7 +12,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-  <link rel="stylesheet" href="styles.css?v=20251225-27">
+  <link rel="stylesheet" href="styles.css?v=20251225-29">
 </head>
 <body>
   <div class="container">
@@ -225,6 +225,59 @@
         <span>Lines: <strong id="terminal-lines">1</strong></span>
         <span>Updates/sec: <strong id="terminal-rate">0</strong></span>
         <span>Status: <strong id="terminal-status" class="status-active">● LIVE</strong></span>
+      </div>
+    </div>
+
+    <!-- Main Roads WA Live Traffic Map (hidden by default, controlled via CSS) -->
+    <div class="mainroads-container" id="mainroads-container">
+      <div class="mainroads-header">
+        <div class="mainroads-title">
+          <svg class="mainroads-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          <span>Main Roads Western Australia - Live Traffic</span>
+        </div>
+        <a href="https://travelmap.mainroads.wa.gov.au/" target="_blank" rel="noopener noreferrer" class="mainroads-external-link">
+          Open Full Map ↗
+        </a>
+      </div>
+      <div class="mainroads-disclaimer">
+        <svg class="disclaimer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <div class="disclaimer-content">
+          <strong>REAL LIVE DATA</strong> — Main Roads WA provides this excellent real-time incident map — great ROI for WA taxpayers!
+          SwanFlow aims to complement this by adding predictive analytics and historical journey time modelling.
+          <em>Note: The public traffic data API was discontinued in 2023, but archived data remains valuable for ML training.</em>
+        </div>
+      </div>
+      <div class="mainroads-iframe-wrapper">
+        <iframe
+          id="mainroads-iframe"
+          src="about:blank"
+          data-src="https://travelmap.mainroads.wa.gov.au/"
+          title="Main Roads WA Live Traffic Map"
+          loading="lazy"
+          allow="geolocation"
+          referrerpolicy="no-referrer">
+        </iframe>
+        <div class="mainroads-loading" id="mainroads-loading">
+          <div class="loading-spinner"></div>
+          <span>Loading Main Roads WA Traffic Map...</span>
+        </div>
+      </div>
+      <div class="mainroads-footer">
+        <span class="mainroads-source">Source: Main Roads Western Australia</span>
+        <span class="mainroads-update">Data updates in real-time</span>
+        <span class="mainroads-link">
+          <a href="https://catalogue.data.wa.gov.au/dataset/mrwa-webeoc-road-incidents" target="_blank" rel="noopener noreferrer">
+            View Incident Data API →
+          </a>
+        </span>
       </div>
     </div>
 
@@ -544,6 +597,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="app.js?v=20251225-27"></script>
+  <script src="app.js?v=20251225-29"></script>
 </body>
 </html>
