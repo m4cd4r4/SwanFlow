@@ -484,6 +484,26 @@
   font-weight: 600;
 }
 
+.section-text-small {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+.subsection-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 1.25rem 0 0.5rem 0;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.subsection-title:first-of-type {
+  margin-top: 0.5rem;
+}
+
 /* ============================================================================
    SPEC LISTS
    ============================================================================ */

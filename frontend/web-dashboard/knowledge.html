@@ -156,12 +156,15 @@ corridors: {
 
             <div class="content-section">
               <h3>Speed Estimation</h3>
-              <p class="section-text">Traffic speed is estimated using detection frequency patterns and historical calibration data. Higher detection rates typically correlate with slower traffic due to increased vehicle density.</p>
+              <p class="section-text">Traffic speed is estimated using detection frequency patterns and historical calibration data. Thresholds differ by road type based on posted speed limits.</p>
+
+              <h4 class="subsection-title">Arterial Roads (60 km/h limit)</h4>
+              <p class="section-text-small">Stirling Highway & Mounts Bay Road</p>
               <div class="status-legend">
                 <div class="status-item flowing">
                   <span class="status-dot"></span>
                   <span class="status-name">Flowing</span>
-                  <span class="status-speed">55-65 km/h</span>
+                  <span class="status-speed">50-60 km/h</span>
                 </div>
                 <div class="status-item moderate">
                   <span class="status-dot"></span>
@@ -171,12 +174,37 @@ corridors: {
                 <div class="status-item heavy">
                   <span class="status-dot"></span>
                   <span class="status-name">Heavy</span>
-                  <span class="status-speed">15-35 km/h</span>
+                  <span class="status-speed">15-30 km/h</span>
                 </div>
                 <div class="status-item gridlock">
                   <span class="status-dot"></span>
                   <span class="status-name">Gridlock</span>
-                  <span class="status-speed">5-20 km/h</span>
+                  <span class="status-speed">&lt;15 km/h</span>
+                </div>
+              </div>
+
+              <h4 class="subsection-title">Freeways (100 km/h limit)</h4>
+              <p class="section-text-small">Mitchell Freeway & Kwinana Freeway</p>
+              <div class="status-legend">
+                <div class="status-item flowing">
+                  <span class="status-dot"></span>
+                  <span class="status-name">Flowing</span>
+                  <span class="status-speed">80-100 km/h</span>
+                </div>
+                <div class="status-item moderate">
+                  <span class="status-dot"></span>
+                  <span class="status-name">Moderate</span>
+                  <span class="status-speed">50-80 km/h</span>
+                </div>
+                <div class="status-item heavy">
+                  <span class="status-dot"></span>
+                  <span class="status-name">Heavy</span>
+                  <span class="status-speed">25-50 km/h</span>
+                </div>
+                <div class="status-item gridlock">
+                  <span class="status-dot"></span>
+                  <span class="status-name">Gridlock</span>
+                  <span class="status-speed">&lt;25 km/h</span>
                 </div>
               </div>
             </div>

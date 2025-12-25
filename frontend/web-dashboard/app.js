@@ -1190,34 +1190,98 @@ function estimateSpeed(hourlyCount) {
 }
 
 /**
+ * Estimate speed for freeway traffic (100 km/h limit)
+ * Uses different flow-density relationship than arterials
+ * @param {number} hourlyCount - Vehicles per hour (flow rate)
+ * @returns {number} Estimated speed in km/h
+ */
+function estimateFreewaySpeed(hourlyCount) {
+  if (!hourlyCount || hourlyCount < 10) {
+    return 100; // Minimal traffic, freeway speed limit
+  }
+
+  // For 3-lane freeway with 100 km/h limit:
+  // Higher capacity, different flow-density curve
+
+  let density; // vehicles per km
+
+  if (hourlyCount < 300) {
+    // Very light: Flow at speed limit
+    density = hourlyCount / 100;
+  } else if (hourlyCount < 500) {
+    // Light: Flow ~400 veh/h at 90 km/h
+    density = hourlyCount / 90;
+  } else if (hourlyCount < 700) {
+    // Moderate: Flow ~600 veh/h at 70 km/h
+    density = hourlyCount / 70;
+  } else if (hourlyCount < 900) {
+    // Heavy: Flow ~800 veh/h at 45 km/h
+    density = hourlyCount / 45;
+  } else {
+    // Gridlock: Flow drops significantly
+    density = hourlyCount / 25 + (hourlyCount - 900) * 0.15;
+  }
+
+  // Calculate speed: Flow / Density
+  const calculatedSpeed = hourlyCount / density;
+
+  // Bound to realistic freeway range
+  return Math.max(10, Math.min(105, calculatedSpeed));
+}
+
+/**
  * Get color for traffic visualization based on estimated speed
  * Green = flowing at/near speed limit (good)
  * Red = heavy congestion (bad)
  *
  * @param {number} hourlyCount - Vehicles per hour
+ * @param {string} roadType - 'arterial' or 'freeway'
  * @returns {string} Hex color code
  */
-function getTrafficColor(hourlyCount) {
-  const speed = estimateSpeed(hourlyCount);
+function getTrafficColor(hourlyCount, roadType = 'arterial') {
+  const speed = roadType === 'freeway'
+    ? estimateFreewaySpeed(hourlyCount)
+    : estimateSpeed(hourlyCount);
 
-  if (speed >= 50) return '#10b981'; // Green - flowing at speed limit
-  if (speed >= 35) return '#f59e0b'; // Orange - moderate slowdown
-  if (speed >= 20) return '#ef4444'; // Red - heavy congestion
-  return '#991b1b'; // Dark red - gridlock
+  if (roadType === 'freeway') {
+    // Freeway thresholds (100 km/h limit)
+    if (speed >= 80) return '#10b981'; // Green - flowing
+    if (speed >= 50) return '#f59e0b'; // Orange - moderate
+    if (speed >= 25) return '#ef4444'; // Red - heavy
+    return '#991b1b'; // Dark red - gridlock
+  } else {
+    // Arterial thresholds (60 km/h limit)
+    if (speed >= 50) return '#10b981'; // Green - flowing
+    if (speed >= 30) return '#f59e0b'; // Orange - moderate
+    if (speed >= 15) return '#ef4444'; // Red - heavy
+    return '#991b1b'; // Dark red - gridlock
+  }
 }
 
 /**
  * Get traffic density level description
  * @param {number} hourlyCount - Vehicles per hour
+ * @param {string} roadType - 'arterial' or 'freeway'
  * @returns {string} Traffic level description
  */
-function getTrafficLevel(hourlyCount) {
-  const speed = estimateSpeed(hourlyCount);
+function getTrafficLevel(hourlyCount, roadType = 'arterial') {
+  const speed = roadType === 'freeway'
+    ? estimateFreewaySpeed(hourlyCount)
+    : estimateSpeed(hourlyCount);
 
-  if (speed >= 50) return 'Flowing';
-  if (speed >= 35) return 'Moderate';
-  if (speed >= 20) return 'Heavy';
-  return 'Gridlock';
+  if (roadType === 'freeway') {
+    // Freeway thresholds (100 km/h limit)
+    if (speed >= 80) return 'Flowing';
+    if (speed >= 50) return 'Moderate';
+    if (speed >= 25) return 'Heavy';
+    return 'Gridlock';
+  } else {
+    // Arterial thresholds (60 km/h limit)
+    if (speed >= 50) return 'Flowing';
+    if (speed >= 30) return 'Moderate';
+    if (speed >= 15) return 'Heavy';
+    return 'Gridlock';
+  }
 }
 
 // Flow animation state
@@ -1912,12 +1976,24 @@ const journeyCorridorConfigs = {
 
 /**
  * Get traffic status class from speed
+ * @param {number} speed - Speed in km/h
+ * @param {string} roadType - 'arterial' or 'freeway'
+ * @returns {string} Status class name
  */
-function getTrafficStatusClass(speed) {
-  if (speed >= 50) return 'flowing';
-  if (speed >= 35) return 'moderate';
-  if (speed >= 20) return 'heavy';
-  return 'gridlock';
+function getTrafficStatusClass(speed, roadType = 'arterial') {
+  if (roadType === 'freeway') {
+    // Freeway thresholds (100 km/h limit)
+    if (speed >= 80) return 'flowing';
+    if (speed >= 50) return 'moderate';
+    if (speed >= 25) return 'heavy';
+    return 'gridlock';
+  } else {
+    // Arterial thresholds (60 km/h limit)
+    if (speed >= 50) return 'flowing';
+    if (speed >= 30) return 'moderate';
+    if (speed >= 15) return 'heavy';
+    return 'gridlock';
+  }
 }
 
 /**
@@ -1930,9 +2006,10 @@ function calculateTravelTime(distanceKm, speedKmh) {
 
 /**
  * Render a single journey node (location point)
+ * @param {string} roadType - 'arterial' or 'freeway'
  */
-function renderJourneyNode(segment, speed) {
-  const statusClass = getTrafficStatusClass(speed);
+function renderJourneyNode(segment, speed, roadType = 'arterial') {
+  const statusClass = getTrafficStatusClass(speed, roadType);
   return `
     <div class="journey-node" id="journey-node-${segment.id}">
       <div class="journey-dot ${statusClass}"></div>
@@ -1944,9 +2021,10 @@ function renderJourneyNode(segment, speed) {
 
 /**
  * Render a journey connector line between nodes
+ * @param {string} roadType - 'arterial' or 'freeway'
  */
-function renderJourneyConnector(segmentId, speed, travelTime) {
-  const statusClass = getTrafficStatusClass(speed);
+function renderJourneyConnector(segmentId, speed, travelTime, roadType = 'arterial') {
+  const statusClass = getTrafficStatusClass(speed, roadType);
   return `
     <div class="journey-connector" id="journey-connector-${segmentId}">
       <div class="journey-line ${statusClass}"></div>
@@ -2008,6 +2086,9 @@ function updateJourneyTimelineForNetwork(sites, network, suffix = '') {
   const config = journeyCorridorConfigs[network];
   if (!config || !config.segments) return;
 
+  // Determine road type for threshold selection
+  const roadType = network === 'freeway' ? 'freeway' : 'arterial';
+
   // Build a map from site prefix to site data
   const siteDataMap = {};
   sites.forEach(site => {
@@ -2016,7 +2097,10 @@ function updateJourneyTimelineForNetwork(sites, network, suffix = '') {
       siteDataMap[baseName] = { speeds: [], counts: [] };
     }
     const hourlyCount = site.current_hourly || 0;
-    const speed = Math.round(estimateSpeed(hourlyCount));
+    // Use correct speed estimation based on road type
+    const speed = roadType === 'freeway'
+      ? Math.round(estimateFreewaySpeed(hourlyCount))
+      : Math.round(estimateSpeed(hourlyCount));
     siteDataMap[baseName].speeds.push(speed);
     siteDataMap[baseName].counts.push(hourlyCount);
   });
@@ -2036,7 +2120,7 @@ function updateJourneyTimelineForNetwork(sites, network, suffix = '') {
     overallSpeedSum += avgSpeed;
     speedCount++;
 
-    const statusClass = getTrafficStatusClass(avgSpeed);
+    const statusClass = getTrafficStatusClass(avgSpeed, roadType);
 
     // Update node
     const nodeEl = document.getElementById(`journey-node-${segment.id}`);
@@ -2086,14 +2170,22 @@ function updateJourneyTimelineForNetwork(sites, network, suffix = '') {
   }
 
   if (statusBadgeEl) {
-    const overallAvgSpeed = speedCount > 0 ? Math.round(overallSpeedSum / speedCount) : 55;
+    const overallAvgSpeed = speedCount > 0 ? Math.round(overallSpeedSum / speedCount) : (roadType === 'freeway' ? 90 : 55);
     let overallStatus;
-    if (overallAvgSpeed >= 50) overallStatus = 'Flowing';
-    else if (overallAvgSpeed >= 35) overallStatus = 'Moderate';
-    else if (overallAvgSpeed >= 20) overallStatus = 'Heavy';
-    else overallStatus = 'Gridlock';
+    // Use road-type appropriate thresholds
+    if (roadType === 'freeway') {
+      if (overallAvgSpeed >= 80) overallStatus = 'Flowing';
+      else if (overallAvgSpeed >= 50) overallStatus = 'Moderate';
+      else if (overallAvgSpeed >= 25) overallStatus = 'Heavy';
+      else overallStatus = 'Gridlock';
+    } else {
+      if (overallAvgSpeed >= 50) overallStatus = 'Flowing';
+      else if (overallAvgSpeed >= 30) overallStatus = 'Moderate';
+      else if (overallAvgSpeed >= 15) overallStatus = 'Heavy';
+      else overallStatus = 'Gridlock';
+    }
 
-    const statusClass = getTrafficStatusClass(overallAvgSpeed);
+    const statusClass = getTrafficStatusClass(overallAvgSpeed, roadType);
 
     statusBadgeEl.className = `journey-status-badge ${statusClass}`;
     const statusTextEl = statusBadgeEl.querySelector('.status-text');
@@ -2595,8 +2687,41 @@ async function switchNetwork(network) {
   const mainroadsContainer = document.getElementById('mainroads-container');
   const mainContent = document.querySelectorAll('.controls, .map-stats-row, .flow-container, .chart-container, .table-container');
 
-  if (network === 'terminal') {
-    // Show Main Roads live map AND terminal, hide main content
+  if (network === 'mainroads') {
+    // Show only Main Roads live map, hide terminal and main content
+    if (mainroadsContainer) {
+      mainroadsContainer.style.display = 'block';
+      // Lazy load the iframe only when shown
+      const iframe = document.getElementById('mainroads-iframe');
+      const loading = document.getElementById('mainroads-loading');
+      if (iframe && iframe.src === 'about:blank') {
+        iframe.src = iframe.dataset.src;
+        iframe.onload = () => {
+          if (loading) loading.style.display = 'none';
+        };
+      }
+    }
+    if (terminalContainer) terminalContainer.style.display = 'none';
+    mainContent.forEach(el => el.style.display = 'none');
+    stopTerminal();
+
+    // Update network info with transition
+    const networkInfo = document.getElementById('network-info');
+    if (networkInfo) {
+      networkInfo.classList.add('transitioning');
+      setTimeout(() => {
+        const infoText = networkInfo.querySelector('p');
+        if (infoText) {
+          infoText.textContent = 'Main Roads Western Australia - Official live traffic incident map';
+        }
+        networkInfo.classList.remove('transitioning');
+      }, 150);
+    }
+    // Fetch and display real Main Roads incidents
+    fetchMainRoadsIncidents().then(() => displayMainRoadsIncidents());
+    return;
+  } else if (network === 'terminal') {
+    // Show terminal AND Main Roads live map, hide main content
     if (mainroadsContainer) {
       mainroadsContainer.style.display = 'block';
       // Lazy load the iframe only when shown
