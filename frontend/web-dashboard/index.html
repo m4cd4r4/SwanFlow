@@ -12,7 +12,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-  <link rel="stylesheet" href="styles.css?v=20251225-04">
+  <link rel="stylesheet" href="styles.css?v=20251225-22">
 </head>
 <body>
   <div class="container">
@@ -65,38 +65,134 @@
         <span class="notice-badge">PoC v0.1</span>
       </div>
 
-      <!-- Hero Status Card - "Should I Drive Now?" -->
-      <div class="hero-status-card" id="section-hero">
-        <div class="hero-label">Perth CBD → Fremantle Corridor</div>
-        <div class="hero-metric" id="corridor-status">Loading...</div>
-        <div class="hero-speed">Average Speed: <span id="avg-speed-hero">--</span> km/h</div>
-        <div class="hero-recommendation" id="drive-recommendation">
-          <span class="rec-icon">⏱️</span>
+    </header>
+
+    <!-- ========================================
+         HERO DASHBOARD - Option A Layout
+         5-column grid: Map | Handle | Status | Handle | Stats
+         ======================================== -->
+    <div class="hero-dashboard" id="hero-dashboard">
+      <!-- Map Column -->
+      <div class="hero-map-column">
+        <div class="hero-map-controls">
+          <select id="route-select" aria-label="Select route to highlight" class="hero-route-select">
+            <option value="">All Routes</option>
+            <option value="stirling-highway">Stirling Highway (All)</option>
+            <option value="stirling-mounts-bay">Stirling Hwy / Mounts Bay Rd</option>
+            <option value="stirling-claremont">Stirling Hwy - Claremont</option>
+            <option value="stirling-mosman">Stirling Hwy - Mosman Park</option>
+            <option value="mitchell-freeway">Mitchell Freeway</option>
+            <option value="kwinana-freeway">Kwinana Freeway</option>
+          </select>
+          <div class="hero-map-view-btns">
+            <button type="button" class="map-view-btn active" data-view="street">Street</button>
+            <button type="button" class="map-view-btn" data-view="satellite">Satellite</button>
+            <button type="button" class="map-view-btn" data-view="dark">Dark</button>
+          </div>
+          <button type="button" id="live-toggle-btn" class="live-btn active" aria-label="Toggle live updates" title="Toggle real-time updates">
+            <span class="live-indicator" id="live-indicator"></span>
+            <span class="live-text" id="live-text">LIVE</span>
+          </button>
+          <button type="button" id="fullscreen-toggle-btn" class="fullscreen-btn" aria-label="Toggle fullscreen map" title="Toggle fullscreen map">
+            <svg class="fullscreen-icon expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            </svg>
+            <svg class="fullscreen-icon collapse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 14h6v6m10-10h-6V4m0 16h6v-6M4 10h6V4"/>
+            </svg>
+          </button>
+        </div>
+        <div id="traffic-map" role="img" aria-label="Live traffic map showing corridor routes with color-coded congestion levels"></div>
+      </div>
+
+      <!-- Resize Handle 1 -->
+      <div class="hero-resize-handle" title="Drag to resize"></div>
+
+      <!-- Status Column (Center) -->
+      <div class="hero-status-column" id="section-hero">
+        <div class="hero-status-label">Perth CBD → Fremantle Corridor</div>
+        <div class="hero-status-value" id="corridor-status">Loading...</div>
+        <div class="hero-status-speed">Average Speed: <span id="avg-speed-hero">--</span> km/h</div>
+        <div class="hero-status-recommendation" id="drive-recommendation">
+          <span class="rec-icon">✓</span>
           <span class="rec-text">Calculating...</span>
         </div>
       </div>
-    </header>
+
+      <!-- Resize Handle 2 -->
+      <div class="hero-resize-handle" title="Drag to resize"></div>
+
+      <!-- Stats Column (Right) -->
+      <div class="hero-stats-column" id="stats-column">
+        <div class="hero-stats-header">
+          <span class="hero-stats-title">Live Metrics</span>
+          <button type="button" class="hero-collapse-btn" id="collapse-stats-btn" title="Hide stats">◀</button>
+        </div>
+
+        <div class="hero-stat-card" role="group" aria-labelledby="stat-total-label">
+          <h3 id="stat-total-label">Total Vehicles</h3>
+          <div class="stat-value" id="total-count" aria-live="polite">-</div>
+          <div class="stat-label">Since deployment</div>
+        </div>
+
+        <div class="hero-stat-card" role="group" aria-labelledby="stat-hourly-label">
+          <h3 id="stat-hourly-label">Average Hourly</h3>
+          <div class="stat-value" id="avg-hourly" aria-live="polite">-</div>
+          <div class="stat-label">Vehicles per hour</div>
+        </div>
+
+        <div class="hero-stat-card" role="group" aria-labelledby="stat-confidence-label">
+          <h3 id="stat-confidence-label">Detection Confidence</h3>
+          <div class="stat-value" id="avg-confidence" aria-live="polite">-</div>
+          <div class="stat-label">Average accuracy</div>
+        </div>
+
+        <div class="hero-stat-card" role="group" aria-labelledby="stat-update-label">
+          <h3 id="stat-update-label">Last Update</h3>
+          <div class="stat-value" id="last-update" aria-live="polite">-</div>
+          <div class="stat-label">Time since last data</div>
+        </div>
+      </div>
+
+      <!-- Expand Button (shown when collapsed) -->
+      <button type="button" class="hero-expand-btn" id="expand-stats-btn" title="Show stats">▶</button>
+    </div>
 
     <!-- Network Selector (Arterial vs Freeway vs Live Feed) -->
     <div class="network-selector">
       <div class="network-tabs">
         <button type="button" class="network-tab active" data-network="arterial">
-          <span class="tab-icon">🚗</span>
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm10 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/>
+            <path d="M5 17H3v-4l2-3h6l4 3h4v4h-2m-8 0h4"/>
+            <path d="M6 10V7h4v3"/>
+          </svg>
           <span class="tab-label">Arterial Roads</span>
           <span class="tab-count" id="arterial-count">22</span>
         </button>
         <button type="button" class="network-tab" data-network="freeway">
-          <span class="tab-icon">🛣️</span>
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 19h16M4 5h16"/>
+            <path d="M7 5v14M12 5v14M17 5v14"/>
+            <path d="M4 12h16" stroke-dasharray="2 2"/>
+          </svg>
           <span class="tab-label">Freeways</span>
           <span class="tab-count" id="freeway-count">30</span>
         </button>
         <button type="button" class="network-tab" data-network="all">
-          <span class="tab-icon">🗺️</span>
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="10" r="3"/>
+            <path d="M12 21c-4-4-6-7-6-11a6 6 0 1 1 12 0c0 4-2 7-6 11Z"/>
+          </svg>
           <span class="tab-label">All Perth</span>
           <span class="tab-count" id="all-count">52</span>
         </button>
         <button type="button" class="network-tab" data-network="terminal">
-          <span class="tab-icon">💻</span>
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="12" rx="2"/>
+            <path d="M7 20h10M12 16v4"/>
+            <path d="M7 9l2 2-2 2M12 13h4"/>
+          </svg>
           <span class="tab-label">Live Feed</span>
           <span class="tab-count live-indicator">●</span>
         </button>
@@ -107,7 +203,7 @@
     </div>
 
     <!-- Live Terminal Feed (hidden by default) -->
-    <div class="terminal-container" id="terminal-container" style="display: none;">
+    <div class="terminal-container" id="terminal-container">
       <div class="terminal-header">
         <div class="terminal-title">
           <span class="terminal-dots">
@@ -160,89 +256,58 @@
       </button>
     </div>
 
-    <!-- Map and Stats Row -->
-    <div class="map-stats-row" id="section-map">
-      <!-- Live Map -->
-      <div class="map-container">
-        <div class="map-header">
-          <h2>Live Traffic Map</h2>
-          <div class="map-controls">
-            <div class="route-selector">
-              <label for="route-select">Route:</label>
-              <select id="route-select" aria-label="Select route to highlight">
-                <option value="">All Routes</option>
-                <option value="stirling-highway">Stirling Highway (All)</option>
-                <option value="stirling-mounts-bay">Stirling Hwy / Mounts Bay Rd</option>
-                <option value="stirling-claremont">Stirling Hwy - Claremont</option>
-                <option value="stirling-mosman">Stirling Hwy - Mosman Park</option>
-                <option value="mitchell-freeway">Mitchell Freeway</option>
-                <option value="kwinana-freeway">Kwinana Freeway</option>
-              </select>
-            </div>
-            <div class="live-toggle">
-              <button type="button" id="live-toggle-btn" class="live-btn" aria-label="Toggle live updates" title="Toggle real-time updates">
-                <span class="live-indicator" id="live-indicator"></span>
-                <span class="live-text" id="live-text">LIVE</span>
-              </button>
-            </div>
-            <div class="map-view-selector">
-              <button type="button" class="map-view-btn active" data-view="street">Street</button>
-              <button type="button" class="map-view-btn" data-view="satellite">Satellite</button>
-              <button type="button" class="map-view-btn" data-view="satellite-labels">Satellite + Labels</button>
-              <button type="button" class="map-view-btn" data-view="terrain">Terrain</button>
-              <button type="button" class="map-view-btn" data-view="dark">Dark</button>
-            </div>
-            <button type="button" id="fullscreen-btn" class="fullscreen-btn" aria-label="Toggle fullscreen map" title="Toggle fullscreen">
-              <span class="fullscreen-icon-expand">⛶</span>
-              <span class="fullscreen-icon-collapse">⛶</span>
-            </button>
+    <!-- Traffic Flow Journey Visualization - Two Column Layout -->
+    <div class="journey-grid" id="section-flow">
+      <!-- Arterial Roads Column (Left) -->
+      <div class="journey-container journey-arterial">
+        <h2 id="flow-title-arterial">Mounts Bay Road</h2>
+
+        <!-- Journey Timeline -->
+        <div class="journey-timeline" id="journey-timeline">
+          <!-- Dynamically rendered journey segments -->
+        </div>
+
+        <!-- Journey Summary -->
+        <div class="journey-summary" id="journey-summary">
+          <div class="journey-total">
+            <span class="journey-total-label">Total:</span>
+            <span class="journey-total-time" id="journey-total-time">~9 min</span>
+            <span class="journey-normal-time" id="journey-normal-time">(normally 7 min)</span>
+          </div>
+          <div class="journey-status-badge" id="journey-status-badge">
+            <span class="status-text">MODERATE</span>
           </div>
         </div>
-        <div
-          id="traffic-map"
-          role="img"
-          aria-label="Live traffic map showing corridor routes with color-coded congestion levels"></div>
       </div>
 
-      <!-- Stats Cards -->
-      <div class="stats-grid" role="region" aria-label="Traffic statistics">
-        <div class="stat-card" role="group" aria-labelledby="stat-total-label">
-          <h3 id="stat-total-label">Total Vehicles</h3>
-          <div class="stat-value" id="total-count" aria-live="polite">-</div>
-          <div class="stat-label">Since deployment</div>
+      <!-- Freeways Column (Right) -->
+      <div class="journey-container journey-freeway">
+        <h2 id="flow-title-freeway">Mitchell & Kwinana Freeways</h2>
+
+        <!-- Journey Timeline -->
+        <div class="journey-timeline" id="journey-timeline-freeway">
+          <!-- Dynamically rendered journey segments -->
         </div>
 
-        <div class="stat-card" role="group" aria-labelledby="stat-hourly-label">
-          <h3 id="stat-hourly-label">Average Hourly</h3>
-          <div class="stat-value" id="avg-hourly" aria-live="polite">-</div>
-          <div class="stat-label">Vehicles per hour</div>
-        </div>
-
-        <div class="stat-card" role="group" aria-labelledby="stat-confidence-label">
-          <h3 id="stat-confidence-label">Detection Confidence</h3>
-          <div class="stat-value" id="avg-confidence" aria-live="polite">-</div>
-          <div class="stat-label">Average accuracy</div>
-        </div>
-
-        <div class="stat-card" role="group" aria-labelledby="stat-update-label">
-          <h3 id="stat-update-label">Last Update</h3>
-          <div class="stat-value" id="last-update" aria-live="polite">-</div>
-          <div class="stat-label">Time since last data</div>
+        <!-- Journey Summary -->
+        <div class="journey-summary" id="journey-summary-freeway">
+          <div class="journey-total">
+            <span class="journey-total-label">Total:</span>
+            <span class="journey-total-time" id="journey-total-time-freeway">~15 min</span>
+            <span class="journey-normal-time" id="journey-normal-time-freeway">(normally 12 min)</span>
+          </div>
+          <div class="journey-status-badge" id="journey-status-badge-freeway">
+            <span class="status-text">FLOWING</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Traffic Flow Corridor (Dynamically rendered based on network selection) -->
-    <div class="flow-container" id="section-flow">
-      <h2 id="flow-title">Mounts Bay Road Traffic Flow</h2>
-      <div class="flow-corridor" id="flow-corridor">
-        <!-- Flow sites will be dynamically rendered -->
-      </div>
-      <div class="flow-legend">
-        <span class="legend-item"><span class="legend-color low"></span> Flowing: 55-65 km/h (at speed limit)</span>
-        <span class="legend-item"><span class="legend-color medium"></span> Moderate: 30-50 km/h (slowdown)</span>
-        <span class="legend-item"><span class="legend-color high"></span> Heavy: 15-35 km/h (congestion)</span>
-        <span class="legend-item"><span class="legend-color gridlock"></span> Gridlock: 5-20 km/h (crawling)</span>
+      <!-- Shared Legend (spans both columns) -->
+      <div class="journey-legend">
+        <span class="legend-item"><span class="legend-dot flowing"></span> Flowing</span>
+        <span class="legend-item"><span class="legend-dot moderate"></span> Moderate</span>
+        <span class="legend-item"><span class="legend-dot heavy"></span> Heavy</span>
+        <span class="legend-item"><span class="legend-dot gridlock"></span> Gridlock</span>
       </div>
     </div>
 
@@ -297,27 +362,45 @@
   <!-- Mobile Bottom Navigation -->
   <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Mobile navigation">
     <button type="button" class="nav-item active" data-section="hero">
-      <span class="nav-icon">🏠</span>
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 12l9-9 9 9"/>
+        <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/>
+      </svg>
       <span class="nav-label">Home</span>
     </button>
     <button type="button" class="nav-item" data-section="map">
-      <span class="nav-icon">🗺️</span>
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="10" r="3"/>
+        <path d="M12 21c-4-4-6-7-6-11a6 6 0 1 1 12 0c0 4-2 7-6 11Z"/>
+      </svg>
       <span class="nav-label">Map</span>
     </button>
     <button type="button" class="nav-item" data-section="flow">
-      <span class="nav-icon">🚗</span>
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm10 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/>
+        <path d="M5 17H3v-4l2-3h6l4 3h4v4h-2m-8 0h4"/>
+      </svg>
       <span class="nav-label">Flow</span>
     </button>
     <button type="button" class="nav-item" data-section="chart">
-      <span class="nav-icon">📊</span>
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 3v18h18"/>
+        <path d="M7 16v-4M11 16v-8M15 16v-5M19 16v-7"/>
+      </svg>
       <span class="nav-label">Stats</span>
     </button>
     <button type="button" class="nav-item" data-section="table">
-      <span class="nav-icon">📋</span>
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 9h18M3 15h18M9 3v18"/>
+      </svg>
       <span class="nav-label">Log</span>
     </button>
     <a href="knowledge.html" class="nav-item nav-link">
-      <span class="nav-icon">📚</span>
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M4 19V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-8-3-8 3Z"/>
+        <path d="M8 7h8M8 11h6"/>
+      </svg>
       <span class="nav-label">Learn</span>
     </a>
   </nav>
@@ -326,6 +409,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="app.js?v=20251225-07"></script>
+  <script src="app.js?v=20251225-22"></script>
 </body>
 </html>

@@ -595,49 +595,51 @@ const siteCoordinates = {
   'Stirling Hwy @ Victoria St (Northbound)': [-32.035, 115.751],
   'Stirling Hwy @ Victoria St (Southbound)': [-32.035, 115.751],
 
-  // Mitchell Freeway - site coordinates
-  'Mitchell Fwy @ Narrows (Northbound)': [-31.9580, 115.8450],
-  'Mitchell Fwy @ Narrows (Southbound)': [-31.9580, 115.8452],
-  'Mitchell Fwy @ Malcolm St (Northbound)': [-31.9540, 115.8470],
-  'Mitchell Fwy @ Malcolm St (Southbound)': [-31.9540, 115.8472],
-  'Mitchell Fwy @ Loftus St (Northbound)': [-31.9500, 115.8480],
-  'Mitchell Fwy @ Loftus St (Southbound)': [-31.9500, 115.8482],
-  'Mitchell Fwy @ Newcastle St (Northbound)': [-31.9450, 115.8510],
-  'Mitchell Fwy @ Newcastle St (Southbound)': [-31.9450, 115.8512],
-  'Mitchell Fwy @ Charles St (Northbound)': [-31.9400, 115.8530],
-  'Mitchell Fwy @ Charles St (Southbound)': [-31.9400, 115.8532],
-  'Mitchell Fwy @ Vincent St (Northbound)': [-31.9350, 115.8540],
-  'Mitchell Fwy @ Vincent St (Southbound)': [-31.9350, 115.8542],
-  'Mitchell Fwy @ Powis St (Northbound)': [-31.9300, 115.8520],
-  'Mitchell Fwy @ Powis St (Southbound)': [-31.9300, 115.8522],
-  'Mitchell Fwy @ Hutton St (Northbound)': [-31.9200, 115.8500],
-  'Mitchell Fwy @ Hutton St (Southbound)': [-31.9200, 115.8502],
-  'Mitchell Fwy @ Scarborough Beach Rd (Northbound)': [-31.9100, 115.8480],
-  'Mitchell Fwy @ Scarborough Beach Rd (Southbound)': [-31.9100, 115.8482],
+  // Mitchell Freeway - OSM-accurate site coordinates
+  // Freeway runs from Narrows (~-31.96) north to Karrinyup (~-31.90)
+  'Mitchell Fwy @ Narrows (Northbound)': [-31.9617, 115.8474],
+  'Mitchell Fwy @ Narrows (Southbound)': [-31.9617, 115.8472],
+  'Mitchell Fwy @ Malcolm St (Northbound)': [-31.9570, 115.8494],
+  'Mitchell Fwy @ Malcolm St (Southbound)': [-31.9570, 115.8492],
+  'Mitchell Fwy @ Loftus St (Northbound)': [-31.9527, 115.8483],
+  'Mitchell Fwy @ Loftus St (Southbound)': [-31.9527, 115.8485],
+  'Mitchell Fwy @ Newcastle St (Northbound)': [-31.9447, 115.8491],
+  'Mitchell Fwy @ Newcastle St (Southbound)': [-31.9447, 115.8489],
+  'Mitchell Fwy @ Charles St (Northbound)': [-31.9412, 115.8440],
+  'Mitchell Fwy @ Charles St (Southbound)': [-31.9412, 115.8438],
+  'Mitchell Fwy @ Vincent St (Northbound)': [-31.9379, 115.8390],
+  'Mitchell Fwy @ Vincent St (Southbound)': [-31.9379, 115.8388],
+  'Mitchell Fwy @ Powis St (Northbound)': [-31.9324, 115.8356],
+  'Mitchell Fwy @ Powis St (Southbound)': [-31.9324, 115.8354],
+  'Mitchell Fwy @ Hutton St (Northbound)': [-31.9261, 115.8303],
+  'Mitchell Fwy @ Hutton St (Southbound)': [-31.9261, 115.8301],
+  'Mitchell Fwy @ Scarborough Beach Rd (Northbound)': [-31.9139, 115.8228],
+  'Mitchell Fwy @ Scarborough Beach Rd (Southbound)': [-31.9139, 115.8226],
 
-  // Kwinana Freeway - site coordinates
-  'Kwinana Fwy @ Narrows South (Northbound)': [-31.9620, 115.8460],
-  'Kwinana Fwy @ Narrows South (Southbound)': [-31.9620, 115.8462],
-  'Kwinana Fwy @ Mill Point Rd (Northbound)': [-31.9680, 115.8550],
-  'Kwinana Fwy @ Mill Point Rd (Southbound)': [-31.9680, 115.8552],
-  'Kwinana Fwy @ South Tce (Northbound)': [-31.9780, 115.8620],
-  'Kwinana Fwy @ South Tce (Southbound)': [-31.9780, 115.8622],
-  'Kwinana Fwy @ Canning Hwy (Northbound)': [-31.9950, 115.8600],
-  'Kwinana Fwy @ Canning Hwy (Southbound)': [-31.9950, 115.8602],
-  'Kwinana Fwy @ Manning Rd (Northbound)': [-32.0100, 115.8580],
-  'Kwinana Fwy @ Manning Rd (Southbound)': [-32.0100, 115.8582],
-  'Kwinana Fwy @ Leach Hwy (Northbound)': [-32.0220, 115.8560],
-  'Kwinana Fwy @ Leach Hwy (Southbound)': [-32.0220, 115.8562],
+  // Kwinana Freeway - OSM-accurate site coordinates
+  // Freeway runs from Narrows (~-31.96) south to Murdoch (~-32.10)
+  'Kwinana Fwy @ Narrows South (Northbound)': [-31.9649, 115.8465],
+  'Kwinana Fwy @ Narrows South (Southbound)': [-31.9649, 115.8468],
+  'Kwinana Fwy @ Mill Point Rd (Northbound)': [-31.9715, 115.8476],
+  'Kwinana Fwy @ Mill Point Rd (Southbound)': [-31.9715, 115.8478],
+  'Kwinana Fwy @ South Tce (Northbound)': [-31.9761, 115.8483],
+  'Kwinana Fwy @ South Tce (Southbound)': [-31.9761, 115.8485],
+  'Kwinana Fwy @ Canning Hwy (Northbound)': [-31.9848, 115.8519],
+  'Kwinana Fwy @ Canning Hwy (Southbound)': [-31.9848, 115.8521],
+  'Kwinana Fwy @ Manning Rd (Northbound)': [-32.0149, 115.8579],
+  'Kwinana Fwy @ Manning Rd (Southbound)': [-32.0149, 115.8581],
+  'Kwinana Fwy @ Leach Hwy (Northbound)': [-32.0315, 115.8598],
+  'Kwinana Fwy @ Leach Hwy (Southbound)': [-32.0315, 115.8600],
 
   // Corridor stretch center points (for panToSite when stretch ID is selected)
   'mounts-bay-eastbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
   'mounts-bay-westbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
   'stirling-north': [-31.9920, 115.7670],         // Eric St, Cottesloe
   'stirling-south': [-32.0150, 115.7550],         // Center of Mosman Park section
-  'mitchell-northbound': [-31.9350, 115.8510],    // Center of Mitchell Freeway
-  'mitchell-southbound': [-31.9350, 115.8510],    // Center of Mitchell Freeway
-  'kwinana-northbound': [-31.9900, 115.8580],     // Center of Kwinana Freeway
-  'kwinana-southbound': [-31.9900, 115.8580],     // Center of Kwinana Freeway
+  'mitchell-northbound': [-31.9400, 115.8400],    // Center of Mitchell Freeway (OSM)
+  'mitchell-southbound': [-31.9400, 115.8400],    // Center of Mitchell Freeway (OSM)
+  'kwinana-northbound': [-31.9900, 115.8520],     // Center of Kwinana Freeway (OSM)
+  'kwinana-southbound': [-31.9900, 115.8520],     // Center of Kwinana Freeway (OSM)
 };
 
 let highlightMarker = null;
@@ -887,7 +889,7 @@ const corridorCenters = {
   'stirling-claremont': { lat: -31.988, lng: 115.775, zoom: 14 },
   'stirling-mosman': { lat: -32.015, lng: 115.755, zoom: 14 },
   'mitchell-freeway': { lat: -31.935, lng: 115.850, zoom: 13 },
-  'kwinana-freeway': { lat: -31.990, lng: 115.858, zoom: 13 }
+  'kwinana-freeway': { lat: -31.990, lng: 115.866, zoom: 13 }
 };
 
 // Currently selected route for filtering
@@ -1218,6 +1220,211 @@ function getTrafficLevel(hourlyCount) {
   return 'Gridlock';
 }
 
+// Flow animation state
+let flowAnimationFrame = null;
+let flowOffset = 0;
+
+// Road waypoints for each corridor (precise road geometry from OSM)
+const corridorWaypoints = {
+  'Mounts Bay Rd': [
+    [-31.9755360, 115.8180240], // Start: Stirling Hwy meets Mounts Bay Rd
+    [-31.9733899, 115.8256410], // Kings Park
+    [-31.9728911, 115.8265899],
+    [-31.9726546, 115.8274435],
+    [-31.9724305, 115.8289419],
+    [-31.9722547, 115.8308715],
+    [-31.9719219, 115.8321438],
+    [-31.9715072, 115.8331964],
+    [-31.9710934, 115.8336485],
+    [-31.9704117, 115.8340935],
+    [-31.9701018, 115.8345177],
+    [-31.9696950, 115.8357989],
+    [-31.9693711, 115.8365875],
+    [-31.9689912, 115.8371631],
+    [-31.9684943, 115.8377125],
+    [-31.9678280, 115.8383774],
+    [-31.9668462, 115.8390952],
+    [-31.9662305, 115.8395033],
+    [-31.9653717, 115.8398791]  // End: Point Lewis
+  ],
+  'Stirling Hwy - Claremont': [
+    [-31.9820, 115.7900],        // Start: Stirling Rd area
+    [-31.9834402, 115.7802709],  // Claremont Quarter
+    [-31.9850921, 115.7755445],  // School zone
+    [-31.9870, 115.7720],
+    [-31.9890887, 115.7685801],  // Cottesloe approach
+    [-31.9910607, 115.7675329],
+    [-31.9925, 115.7665],
+    [-31.993, 115.766],
+    [-31.994, 115.765]          // End: Eric St
+  ],
+  'Stirling Hwy - Mosman': [
+    [-32.0034093, 115.7601065],  // Start: Forrest St
+    [-32.008, 115.757],
+    [-32.0115020, 115.7555150],  // Bay View Terrace
+    [-32.0160, 115.7545],
+    [-32.0198147, 115.7537381],  // McCabe St
+    [-32.025, 115.753],
+    [-32.0280, 115.7538],
+    [-32.035, 115.751]          // End: Victoria St
+  ],
+  'Mitchell Fwy': [
+    // Mitchell Freeway - OSM-accurate coordinates
+    // Runs NORTH from Narrows Bridge (near Perth CBD) to northern suburbs
+    // Source: OpenStreetMap way data, ordered south to north
+    [-31.9617537, 115.8474375],  // Near Narrows Bridge (shared with Kwinana)
+    [-31.9617026, 115.8470547],
+    [-31.9610505, 115.8472111],
+    [-31.9600697, 115.8474955],
+    [-31.9599643, 115.8480811],
+    [-31.9586325, 115.8490672],
+    [-31.9576990, 115.8491207],
+    [-31.9569363, 115.8494396],
+    [-31.9559977, 115.8494661],
+    [-31.9553135, 115.8494540],
+    [-31.9546864, 115.8490092],
+    [-31.9544093, 115.8488992],
+    [-31.9527661, 115.8483345],
+    [-31.9521316, 115.8485328],
+    [-31.9508178, 115.8490068],
+    [-31.9500845, 115.8491172],
+    [-31.9493950, 115.8496822],
+    [-31.9487427, 115.8497943],
+    [-31.9483945, 115.8501908],
+    [-31.9477915, 115.8501012],
+    [-31.9469178, 115.8500622],
+    [-31.9460202, 115.8498387],
+    [-31.9447636, 115.8491646],
+    [-31.9440531, 115.8485092],
+    [-31.9425963, 115.8461414],
+    [-31.9412033, 115.8439939],
+    [-31.9407769, 115.8422290],
+    [-31.9396551, 115.8405922],
+    [-31.9379469, 115.8389929],
+    [-31.9357000, 115.8375805],
+    [-31.9324073, 115.8356097],
+    [-31.9307069, 115.8350879],
+    [-31.9261945, 115.8302721],
+    [-31.9250347, 115.8284667],
+    [-31.9236279, 115.8269383],
+    [-31.9225382, 115.8259586],
+    [-31.9224042, 115.8263422],
+    [-31.9220940, 115.8256087],
+    [-31.9194459, 115.8240925],
+    [-31.9169184, 115.8237936],
+    [-31.9144881, 115.8233710],
+    [-31.9139701, 115.8228279],
+    [-31.9106849, 115.8224215],
+    [-31.9100909, 115.8227992],
+    [-31.9074332, 115.8224826],
+    [-31.9017170, 115.8208361],  // Karrinyup Rd area
+    [-31.8990018, 115.8175891],
+    [-31.8988621, 115.8181192]   // Northern extent
+  ],
+  'Kwinana Fwy': [
+    // Kwinana Freeway - Dense waypoints for accurate road tracing
+    // Runs SOUTH from Narrows Bridge towards Mandurah
+    // Follows Swan/Canning River on the eastern bank through South Perth, Como, Applecross
+
+    // === NARROWS BRIDGE TO SOUTH PERTH ===
+    [-31.9617026, 115.8470547],  // Narrows Bridge
+    [-31.9630, 115.8468],
+    [-31.9642766, 115.8465777],
+    [-31.9648987, 115.8464631],
+    [-31.9649517, 115.8468475],
+    [-31.9660, 115.8466],
+    [-31.9672592, 115.8464225],
+    [-31.9684, 115.8465],
+    [-31.9695897, 115.8465952],
+    [-31.9704080, 115.8469790],
+    [-31.9715057, 115.8476305],
+    [-31.9723275, 115.8477719],
+    [-31.9736087, 115.8479535],
+    [-31.9747821, 115.8481388],
+    [-31.9756178, 115.8482605],
+    [-31.9761638, 115.8483389],
+
+    // === SOUTH PERTH TO COMO (Mill Point area) ===
+    [-31.9775, 115.8488],
+    [-31.9790, 115.8493],
+    [-31.9805, 115.8498],
+    [-31.9820, 115.8505],
+    [-31.9835, 115.8512],
+    [-31.9848713, 115.8518962],  // Canning Hwy interchange
+    [-31.9858, 115.8523],
+    [-31.9866336, 115.8527271],
+
+    // === COMO SECTION (alongside Swan River) ===
+    [-31.9880, 115.8530],
+    [-31.9895, 115.8532],
+    [-31.9910, 115.8533],
+    [-31.9925, 115.8534],
+    [-31.9940, 115.8534],
+    [-31.9955, 115.8534],
+    [-31.9970, 115.8535],
+    [-31.9985, 115.8535],
+    [-32.0000, 115.8536],
+    [-32.0015, 115.8536],
+    [-32.0029107, 115.8536257],  // Canning Bridge station area
+    [-32.0040, 115.8538],
+    [-32.0053462, 115.8540456],
+
+    // === MOUNT PLEASANT / APPLECROSS SECTION ===
+    [-32.0065, 115.8545],
+    [-32.0078, 115.8550],
+    [-32.0090, 115.8556],
+    [-32.0102, 115.8562],
+    [-32.0115, 115.8568],
+    [-32.0128, 115.8573],
+    [-32.0140, 115.8577],
+    [-32.0149507, 115.8578715],  // Manning Rd interchange
+
+    // === ARDROSS / BOORAGOON SECTION ===
+    [-32.0165, 115.8582],
+    [-32.0180, 115.8585],
+    [-32.0195, 115.8588],
+    [-32.0210, 115.8590],
+    [-32.0225, 115.8592],
+    [-32.0240, 115.8594],
+    [-32.0255, 115.8595],
+    [-32.0270, 115.8596],
+    [-32.0285, 115.8597],
+    [-32.0300, 115.8598],
+    [-32.0315082, 115.8597873],  // Leach Hwy interchange
+
+    // === MYAREE / BULL CREEK SECTION ===
+    [-32.0335, 115.8595],
+    [-32.0355, 115.8590],
+    [-32.0375, 115.8582],
+    [-32.0395, 115.8572],
+    [-32.0415, 115.8560],
+    [-32.0435, 115.8548],
+    [-32.0455, 115.8538],
+    [-32.0475, 115.8528],
+    [-32.0495, 115.8520],
+    [-32.0515, 115.8515],
+    [-32.0535, 115.8512],
+    [-32.0555, 115.8510],
+    [-32.0575, 115.8510],
+    [-32.0587183, 115.8510804],  // Bull Creek
+
+    // === MURDOCH / FARRINGTON RD SECTION ===
+    [-32.0620, 115.8508],
+    [-32.0655, 115.8504],
+    [-32.0690, 115.8500],
+    [-32.0725, 115.8496],
+    [-32.0760, 115.8493],
+    [-32.0804820, 115.8490295],  // Farrington Rd
+
+    // === SOUTHERN EXTENT ===
+    [-32.0850, 115.8490],
+    [-32.0900, 115.8492],
+    [-32.0949711, 115.8494557],
+    [-32.1000, 115.8498],
+    [-32.1037947, 115.8501582]   // Southern extent
+  ]
+};
+
 function updateMapMarkers(sites) {
   // Clear existing markers and polylines
   Object.values(siteMarkers).forEach(marker => trafficMap.removeLayer(marker));
@@ -1225,185 +1432,164 @@ function updateMapMarkers(sites) {
   siteMarkers = {};
   roadPolylines = [];
 
-  // Define all corridor stretches (arterial + freeway)
-  const corridors = [
-    // Arterial Roads
-    {
-      name: 'Stirling Hwy / Mounts Bay Rd',
-      shortName: 'Nedlands-City',
-      filter: 'Mounts Bay Rd',
-      start: L.latLng(-31.9755360, 115.8180240),  // Stirling Hwy meets Mounts Bay Rd
-      end: L.latLng(-31.963231, 115.842311),      // Point Lewis (Malcolm St)
-      label: 'Kings Park → Point Lewis',
-      waypoints: [
-        // Mounts Bay Road section ONLY (Kings Park → Malcolm St)
-        // Route starts where Stirling Hwy meets Mounts Bay Rd, heading east to CBD
-        L.latLng(-31.9755360, 115.8180240), // Start: Stirling Hwy meets Mounts Bay Rd
-        L.latLng(-31.9733899, 115.8256410), // Kings Park - CORRECTED OSM EXACT
-        L.latLng(-31.9728911, 115.8265899), // Along Mounts Bay Rd
-        L.latLng(-31.9726546, 115.8274435),
-        L.latLng(-31.9724305, 115.8289419),
-        L.latLng(-31.9722547, 115.8308715),
-        L.latLng(-31.9719219, 115.8321438),
-        L.latLng(-31.9715072, 115.8331964),
-        L.latLng(-31.9710934, 115.8336485),
-        L.latLng(-31.9704117, 115.8340935),
-        L.latLng(-31.9701018, 115.8345177),
-        L.latLng(-31.9696950, 115.8357989),
-        L.latLng(-31.9693711, 115.8365875),
-        L.latLng(-31.9689912, 115.8371631),
-        L.latLng(-31.9684943, 115.8377125),
-        L.latLng(-31.9678280, 115.8383774),
-        L.latLng(-31.9668462, 115.8390952),
-        L.latLng(-31.9662305, 115.8395033),
-        L.latLng(-31.9653717, 115.8398791)
-      ]
-    },
-    {
-      name: 'Stirling Highway - Claremont/Cottesloe',
-      shortName: 'Claremont',
-      filter: 'Stirling Hwy @ Stirling Rd|Stirling Hwy @ Jarrad St|Stirling Hwy @ Eric St',
-      start: L.latLng(-31.9820, 115.7900),  // Stirling Rd (Bunnings/Claremont Quarter) - CORRECTED
-      end: L.latLng(-31.9940, 115.7650),    // Eric St, Cottesloe - CORRECTED
-      label: 'Claremont Quarter → Eric St',
-      waypoints: [
-        // ALL CORRECTED: Now following actual Stirling Highway geometry from OSM
-        L.latLng(-31.9834402, 115.7802709),  // Claremont Quarter - OSM EXACT
-        L.latLng(-31.9850921, 115.7755445),  // School zone (Christ Church/MLC) - OSM EXACT
-        L.latLng(-31.9870, 115.7720),        // Between school zone and Jarrad St
-        L.latLng(-31.9890887, 115.7685801),  // Cottesloe approach - OSM EXACT
-        L.latLng(-31.9910607, 115.7675329),  // Near Eric St - OSM EXACT
-        L.latLng(-31.9925, 115.7665),        // Approaching Eric St
-        // Approaching Eric St
-        L.latLng(-31.993, 115.766)    // Near Eric St
-      ]
-    },
-    {
-      name: 'Stirling Highway - Mosman Park',
-      shortName: 'Mosman Park',
-      filter: 'Stirling Hwy @ Forrest St|Stirling Hwy @ Bay View|Stirling Hwy @ McCabe|Stirling Hwy @ Victoria',
-      start: L.latLng(-32.0034093, 115.7601065),  // Forrest St - CORRECTED OSM EXACT
-      end: L.latLng(-32.0350, 115.7540),    // Victoria St - CORRECTED
-      label: 'Forrest St → Victoria St',
-      waypoints: [
-        // ALL CORRECTED: Now following actual Stirling Highway geometry from OSM
-        L.latLng(-32.0070, 115.7580),        // Between Forrest and Bay View
-        L.latLng(-32.0115020, 115.7555150),  // Bay View Terrace - OSM EXACT
-        L.latLng(-32.0160, 115.7545),        // Between Bay View and McCabe
-        L.latLng(-32.0198147, 115.7537381),  // McCabe St - OSM EXACT
-        L.latLng(-32.0280, 115.7538)         // Between McCabe and Victoria
-      ]
-    },
-    // Freeways
-    {
-      name: 'Mitchell Freeway',
-      shortName: 'Mitchell Fwy',
-      filter: 'Mitchell Fwy',
-      start: L.latLng(-31.9580, 115.8450),  // Narrows Interchange
-      end: L.latLng(-31.9100, 115.8480),    // Scarborough Beach Rd
-      label: 'Narrows → Scarborough',
-      waypoints: [
-        L.latLng(-31.9540, 115.8470),  // Malcolm St
-        L.latLng(-31.9500, 115.8480),  // Loftus St
-        L.latLng(-31.9450, 115.8510),  // Newcastle St
-        L.latLng(-31.9400, 115.8530),  // Charles St
-        L.latLng(-31.9350, 115.8540),  // Vincent St
-        L.latLng(-31.9300, 115.8520),  // Powis St
-        L.latLng(-31.9200, 115.8500)   // Hutton St
-      ]
-    },
-    {
-      name: 'Kwinana Freeway',
-      shortName: 'Kwinana Fwy',
-      filter: 'Kwinana Fwy',
-      start: L.latLng(-31.9620, 115.8460),  // Narrows South
-      end: L.latLng(-32.0220, 115.8560),    // Leach Highway
-      label: 'Narrows → Leach Hwy',
-      waypoints: [
-        L.latLng(-31.9680, 115.8550),  // Mill Point Rd
-        L.latLng(-31.9780, 115.8620),  // South Tce
-        L.latLng(-31.9950, 115.8600),  // Canning Hwy
-        L.latLng(-32.0100, 115.8580)   // Manning Rd
-      ]
+  // Stop any existing animation
+  if (flowAnimationFrame) {
+    cancelAnimationFrame(flowAnimationFrame);
+    flowAnimationFrame = null;
+  }
+
+  // Group sites by corridor and direction
+  const corridorGroups = {
+    'Mounts Bay Rd': { NB: [], SB: [] },
+    'Stirling Hwy - Claremont': { NB: [], SB: [] },
+    'Stirling Hwy - Mosman': { NB: [], SB: [] },
+    'Mitchell Fwy': { NB: [], SB: [] },
+    'Kwinana Fwy': { NB: [], SB: [] }
+  };
+
+  // Corridor name mappings for display
+  const corridorDisplayNames = {
+    'Mounts Bay Rd': 'Stirling Hwy / Mounts Bay Rd',
+    'Stirling Hwy - Claremont': 'Stirling Highway - Claremont/Cottesloe',
+    'Stirling Hwy - Mosman': 'Stirling Highway - Mosman Park',
+    'Mitchell Fwy': 'Mitchell Freeway',
+    'Kwinana Fwy': 'Kwinana Freeway'
+  };
+
+  // Sort sites into corridor groups
+  sites.forEach(site => {
+    const name = site.name;
+    const direction = name.includes('Northbound') ? 'NB' : 'SB';
+    const coords = siteCoordinates[name];
+
+    if (!coords) return; // Skip if no coordinates
+
+    let corridorKey = null;
+    if (name.includes('Mounts Bay Rd') || (name.includes('Stirling Hwy') && (name.includes('Winthrop') || name.includes('Broadway')))) {
+      corridorKey = 'Mounts Bay Rd';
+    } else if (name.includes('Stirling Hwy') && (name.includes('Stirling Rd') || name.includes('Jarrad') || name.includes('Eric'))) {
+      corridorKey = 'Stirling Hwy - Claremont';
+    } else if (name.includes('Stirling Hwy') && (name.includes('Forrest') || name.includes('Bay View') || name.includes('McCabe') || name.includes('Victoria'))) {
+      corridorKey = 'Stirling Hwy - Mosman';
+    } else if (name.includes('Mitchell Fwy')) {
+      corridorKey = 'Mitchell Fwy';
+    } else if (name.includes('Kwinana Fwy')) {
+      corridorKey = 'Kwinana Fwy';
     }
-  ];
+
+    if (corridorKey && corridorGroups[corridorKey]) {
+      corridorGroups[corridorKey][direction].push({
+        ...site,
+        coords: coords,
+        direction: direction
+      });
+    }
+  });
 
   // Process each corridor
-  corridors.forEach(corridor => {
-    ['Northbound', 'Southbound'].forEach(direction => {
-      const offset = direction === 'Southbound' ? 0.00015 : -0.00015;
+  Object.entries(corridorGroups).forEach(([corridorKey, directions]) => {
+    const displayName = corridorDisplayNames[corridorKey];
+    const waypoints = corridorWaypoints[corridorKey] || [];
 
-      // Filter sites for this specific corridor and direction
-      const filterRegex = new RegExp(corridor.filter);
-      const corridorSites = sites.filter(s =>
-        filterRegex.test(s.name) && s.name.includes(direction)
-      );
+    ['NB', 'SB'].forEach(dir => {
+      const corridorSites = directions[dir];
+      if (corridorSites.length === 0) return;
 
-      if (corridorSites.length === 0) return; // Skip if no sites
+      // Sort sites by latitude (north to south for consistency)
+      corridorSites.sort((a, b) => b.coords[0] - a.coords[0]);
 
-      // Calculate average traffic across all sites in this corridor + direction
-      const totalTraffic = corridorSites.reduce((sum, site) => sum + (site.current_hourly || 0), 0);
-      const avgTraffic = corridorSites.length > 0 ? Math.round(totalTraffic / corridorSites.length) : 0;
-
+      // Calculate average traffic for color
+      const totalTraffic = corridorSites.reduce((sum, s) => sum + (s.current_hourly || 0), 0);
+      const avgTraffic = Math.round(totalTraffic / corridorSites.length);
       const color = getTrafficColor(avgTraffic);
       const estimatedSpeed = Math.round(estimateSpeed(avgTraffic));
       const trafficLevel = getTrafficLevel(avgTraffic);
 
-      // Create route with offset for direction
-      const startCoord = L.latLng(corridor.start.lat + offset, corridor.start.lng);
-      const endCoord = L.latLng(corridor.end.lat + offset, corridor.end.lng);
+      // Offset for direction separation
+      const latOffset = dir === 'SB' ? 0.00015 : -0.00015;
 
-      // Build waypoints array: start + intermediate waypoints + end
-      const allWaypoints = [
-        startCoord,
-        ...corridor.waypoints.map(wp => L.latLng(wp.lat + offset, wp.lng)),
-        endCoord
-      ];
+      // Draw animated flow lines along road waypoints
+      if (waypoints.length > 1) {
+        const lineCoords = waypoints.map(wp => [wp[0] + latOffset, wp[1]]);
 
-      // Interpolate dots every 100 meters along the route
-      const dotPositions = interpolateDotsAlongRoute(allWaypoints, 100);
-
-      // Create circle markers for each dot position
-      dotPositions.forEach((dotPos, index) => {
-        const dot = L.circleMarker([dotPos.lat, dotPos.lng], {
-          radius: 1.5,  // Half the previous size
-          fillColor: color,
+        // Background line (thicker, solid)
+        const bgLine = L.polyline(lineCoords, {
           color: color,
-          weight: 0.5,
-          opacity: 0.8,
-          fillOpacity: 0.7
+          weight: 5,
+          opacity: 0.3,
+          lineCap: 'round',
+          lineJoin: 'round'
         }).addTo(trafficMap);
 
-        // Store metadata for highlighting
-        dot._corridorInfo = {
-          name: corridor.name,
-          shortName: corridor.shortName,
-          direction: direction,
-          sites: corridorSites.map(s => s.name),
+        bgLine._corridorInfo = {
+          name: displayName,
+          shortName: corridorKey,
+          direction: dir === 'NB' ? 'Northbound' : 'Southbound'
+        };
+        roadPolylines.push(bgLine);
+
+        // Animated dashed line showing flow direction
+        const flowLine = L.polyline(lineCoords, {
           color: color,
-          avgTraffic: avgTraffic
+          weight: 4,
+          opacity: 0.9,
+          dashArray: '8, 12',
+          lineCap: 'round',
+          lineJoin: 'round'
+        }).addTo(trafficMap);
+
+        // Store for animation
+        flowLine._flowDirection = dir;
+        flowLine._corridorInfo = {
+          name: displayName,
+          shortName: corridorKey,
+          direction: dir === 'NB' ? 'Northbound' : 'Southbound'
         };
 
-        // Add popup to dot (only show on first and last dots to avoid clutter)
-        if (index === 0 || index === dotPositions.length - 1) {
-          dot.bindPopup(`
-            <div style="font-family: sans-serif;">
-              <strong>${corridor.name} (${direction.substring(0, 2)})</strong><br>
-              <span style="color: #666;">${corridor.label}</span><br>
-              <span style="color: #666;">Avg Flow: ${avgTraffic} veh/hr</span><br>
-              <span style="color: #666;">Est. Speed: ${estimatedSpeed} km/h</span><br>
-              <span style="color: #666;">Level: ${trafficLevel}</span>
-            </div>
-          `);
-        }
+        roadPolylines.push(flowLine);
+      }
 
-        roadPolylines.push(dot);
-      });
+      // Sensor dots hidden - only showing animated flow lines on road paths
     });
   });
 
-  // Route visualization: colored dots every 100m showing traffic heat map
+  // Start flow animation
+  startFlowAnimation();
 }
+
+// Animate the dashed lines to show flow direction
+function startFlowAnimation() {
+  if (flowAnimationFrame) {
+    cancelAnimationFrame(flowAnimationFrame);
+  }
+
+  function animate() {
+    flowOffset = (flowOffset + 0.5) % 20;
+
+    roadPolylines.forEach(layer => {
+      if (layer instanceof L.Polyline && layer.options.dashArray) {
+        const dir = layer._flowDirection;
+        // Reverse animation direction for southbound
+        const offset = dir === 'SB' ? -flowOffset : flowOffset;
+        layer.setStyle({ dashOffset: offset });
+      }
+    });
+
+    flowAnimationFrame = requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+// Stop animation when page is hidden
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && flowAnimationFrame) {
+    cancelAnimationFrame(flowAnimationFrame);
+    flowAnimationFrame = null;
+  } else if (!document.hidden) {
+    startFlowAnimation();
+  }
+});
 
 
 // ============================================================================
@@ -1411,17 +1597,17 @@ function updateMapMarkers(sites) {
 // ============================================================================
 
 function toggleMapFullscreen() {
-  const mapContainer = document.querySelector('.map-container');
-  if (!mapContainer) return;
+  const heroDashboard = document.getElementById('hero-dashboard');
+  if (!heroDashboard) return;
 
   isMapFullscreen = !isMapFullscreen;
 
   if (isMapFullscreen) {
-    mapContainer.classList.add('fullscreen');
-    document.body.classList.add('map-fullscreen');
+    heroDashboard.classList.add('map-fullscreen');
+    document.body.style.overflow = 'hidden';
   } else {
-    mapContainer.classList.remove('fullscreen');
-    document.body.classList.remove('map-fullscreen');
+    heroDashboard.classList.remove('map-fullscreen');
+    document.body.style.overflow = '';
   }
 
   // Invalidate map size after transition to ensure proper rendering
@@ -1694,6 +1880,246 @@ function updateFlowCorridor(sites) {
 }
 
 // ============================================================================
+// Journey Visualization (Road Segment Timeline)
+// ============================================================================
+
+// Journey corridor configuration with segment distances (km)
+const journeyCorridorConfigs = {
+  arterial: {
+    title: 'Mounts Bay Road',
+    normalTime: 7, // Normal travel time in minutes
+    segments: [
+      { id: 1, name: 'Start', location: 'Kings Park', distanceToNext: 1.8, sitePrefix: 'Mounts Bay Rd @ Kings Park' },
+      { id: 2, name: 'Kings Park', location: 'Mill Point', distanceToNext: 2.0, sitePrefix: 'Mounts Bay Rd @ Mill Point' },
+      { id: 3, name: 'Mill Point', location: 'Fraser', distanceToNext: 1.5, sitePrefix: 'Mounts Bay Rd @ Fraser Ave' },
+      { id: 4, name: 'Fraser', location: 'Malcolm', distanceToNext: 1.2, sitePrefix: 'Mounts Bay Rd @ Malcolm St' },
+      { id: 5, name: 'End', location: 'CBD', distanceToNext: 0, sitePrefix: null }
+    ]
+  },
+  freeway: {
+    title: 'Mitchell & Kwinana Freeways',
+    normalTime: 12, // Normal travel time in minutes
+    segments: [
+      { id: 'f1', name: 'Start', location: 'Joondalup', distanceToNext: 8.5, sitePrefix: 'Mitchell Fwy @ Joondalup' },
+      { id: 'f2', name: 'Warwick', location: 'Warwick', distanceToNext: 6.0, sitePrefix: 'Mitchell Fwy @ Warwick' },
+      { id: 'f3', name: 'Stirling', location: 'Stirling', distanceToNext: 5.5, sitePrefix: 'Mitchell Fwy @ Stirling' },
+      { id: 'f4', name: 'Narrows', location: 'Narrows', distanceToNext: 4.0, sitePrefix: 'Kwinana Fwy @ Narrows' },
+      { id: 'f5', name: 'Como', location: 'Como', distanceToNext: 5.0, sitePrefix: 'Kwinana Fwy @ Como' },
+      { id: 'f6', name: 'End', location: 'Murdoch', distanceToNext: 0, sitePrefix: null }
+    ]
+  }
+};
+
+/**
+ * Get traffic status class from speed
+ */
+function getTrafficStatusClass(speed) {
+  if (speed >= 50) return 'flowing';
+  if (speed >= 35) return 'moderate';
+  if (speed >= 20) return 'heavy';
+  return 'gridlock';
+}
+
+/**
+ * Calculate travel time in minutes from distance (km) and speed (km/h)
+ */
+function calculateTravelTime(distanceKm, speedKmh) {
+  if (!speedKmh || speedKmh <= 0) return 0;
+  return Math.round((distanceKm / speedKmh) * 60);
+}
+
+/**
+ * Render a single journey node (location point)
+ */
+function renderJourneyNode(segment, speed) {
+  const statusClass = getTrafficStatusClass(speed);
+  return `
+    <div class="journey-node" id="journey-node-${segment.id}">
+      <div class="journey-dot ${statusClass}"></div>
+      <div class="journey-location">${segment.location}</div>
+      <div class="journey-speed">${speed > 0 ? speed + ' km/h' : '--'}</div>
+    </div>
+  `;
+}
+
+/**
+ * Render a journey connector line between nodes
+ */
+function renderJourneyConnector(segmentId, speed, travelTime) {
+  const statusClass = getTrafficStatusClass(speed);
+  return `
+    <div class="journey-connector" id="journey-connector-${segmentId}">
+      <div class="journey-line ${statusClass}"></div>
+      <div class="journey-time">${travelTime} min</div>
+    </div>
+  `;
+}
+
+/**
+ * Render the journey timeline visualization
+ * @param {string} network - 'arterial' or 'freeway'
+ * @param {string} timelineId - optional ID for the timeline element (for freeway column)
+ */
+function renderJourneyTimeline(network = 'arterial', timelineId = null) {
+  const config = journeyCorridorConfigs[network] || journeyCorridorConfigs.arterial;
+  const targetId = timelineId || 'journey-timeline';
+  const timelineEl = document.getElementById(targetId);
+
+  if (!timelineEl) return;
+
+  // Render initial structure with placeholder values
+  let html = '';
+
+  config.segments.forEach((segment, index) => {
+    html += '<div class="journey-segment">';
+
+    // Render the node
+    html += renderJourneyNode(segment, 0);
+
+    // Render connector if not the last segment
+    if (index < config.segments.length - 1) {
+      html += renderJourneyConnector(segment.id, 0, 0);
+    }
+
+    html += '</div>';
+  });
+
+  timelineEl.innerHTML = html;
+}
+
+/**
+ * Render both arterial and freeway journey timelines (two-column layout)
+ */
+function renderBothJourneyTimelines() {
+  // Render arterial (left column)
+  renderJourneyTimeline('arterial', 'journey-timeline');
+
+  // Render freeway (right column)
+  renderJourneyTimeline('freeway', 'journey-timeline-freeway');
+}
+
+/**
+ * Update journey visualization with live data
+ * @param {Array} sites - Array of site data
+ * @param {string} network - 'arterial' or 'freeway'
+ * @param {string} suffix - Element ID suffix ('' for arterial, '-freeway' for freeway)
+ */
+function updateJourneyTimelineForNetwork(sites, network, suffix = '') {
+  const config = journeyCorridorConfigs[network];
+  if (!config || !config.segments) return;
+
+  // Build a map from site prefix to site data
+  const siteDataMap = {};
+  sites.forEach(site => {
+    const baseName = site.name.replace(/ \((Northbound|Southbound|Eastbound|Westbound)\)$/, '');
+    if (!siteDataMap[baseName]) {
+      siteDataMap[baseName] = { speeds: [], counts: [] };
+    }
+    const hourlyCount = site.current_hourly || 0;
+    const speed = Math.round(estimateSpeed(hourlyCount));
+    siteDataMap[baseName].speeds.push(speed);
+    siteDataMap[baseName].counts.push(hourlyCount);
+  });
+
+  let totalTime = 0;
+  let overallSpeedSum = 0;
+  let speedCount = 0;
+
+  config.segments.forEach((segment, index) => {
+    let avgSpeed = 55; // Default speed
+
+    if (segment.sitePrefix && siteDataMap[segment.sitePrefix]) {
+      const speeds = siteDataMap[segment.sitePrefix].speeds;
+      avgSpeed = speeds.length > 0 ? Math.round(speeds.reduce((a, b) => a + b, 0) / speeds.length) : 55;
+    }
+
+    overallSpeedSum += avgSpeed;
+    speedCount++;
+
+    const statusClass = getTrafficStatusClass(avgSpeed);
+
+    // Update node
+    const nodeEl = document.getElementById(`journey-node-${segment.id}`);
+    if (nodeEl) {
+      const dotEl = nodeEl.querySelector('.journey-dot');
+      const speedEl = nodeEl.querySelector('.journey-speed');
+
+      if (dotEl) {
+        dotEl.className = `journey-dot ${statusClass}`;
+      }
+      if (speedEl) {
+        speedEl.textContent = `${avgSpeed} km/h`;
+      }
+    }
+
+    // Update connector if not last segment
+    if (index < config.segments.length - 1 && segment.distanceToNext > 0) {
+      const travelTime = calculateTravelTime(segment.distanceToNext, avgSpeed);
+      totalTime += travelTime;
+
+      const connectorEl = document.getElementById(`journey-connector-${segment.id}`);
+      if (connectorEl) {
+        const lineEl = connectorEl.querySelector('.journey-line');
+        const timeEl = connectorEl.querySelector('.journey-time');
+
+        if (lineEl) {
+          lineEl.className = `journey-line ${statusClass}`;
+        }
+        if (timeEl) {
+          timeEl.textContent = `${travelTime} min`;
+        }
+      }
+    }
+  });
+
+  // Update journey summary (with suffix for freeway column)
+  const totalTimeEl = document.getElementById(`journey-total-time${suffix}`);
+  const normalTimeEl = document.getElementById(`journey-normal-time${suffix}`);
+  const statusBadgeEl = document.getElementById(`journey-status-badge${suffix}`);
+
+  if (totalTimeEl) {
+    totalTimeEl.textContent = `~${totalTime} min`;
+  }
+
+  if (normalTimeEl) {
+    normalTimeEl.textContent = `(normally ${config.normalTime} min)`;
+  }
+
+  if (statusBadgeEl) {
+    const overallAvgSpeed = speedCount > 0 ? Math.round(overallSpeedSum / speedCount) : 55;
+    let overallStatus;
+    if (overallAvgSpeed >= 50) overallStatus = 'Flowing';
+    else if (overallAvgSpeed >= 35) overallStatus = 'Moderate';
+    else if (overallAvgSpeed >= 20) overallStatus = 'Heavy';
+    else overallStatus = 'Gridlock';
+
+    const statusClass = getTrafficStatusClass(overallAvgSpeed);
+
+    statusBadgeEl.className = `journey-status-badge ${statusClass}`;
+    const statusTextEl = statusBadgeEl.querySelector('.status-text');
+    if (statusTextEl) {
+      statusTextEl.textContent = overallStatus.toUpperCase();
+    }
+  }
+}
+
+/**
+ * Update both journey timelines (arterial and freeway columns)
+ */
+function updateBothJourneyTimelines(arterialSites, freewaySites) {
+  updateJourneyTimelineForNetwork(arterialSites, 'arterial', '');
+  updateJourneyTimelineForNetwork(freewaySites, 'freeway', '-freeway');
+}
+
+/**
+ * Update journey visualization with live data (legacy - updates based on current network)
+ */
+function updateJourneyTimeline(sites) {
+  console.log('[Journey] updateJourneyTimeline called with', sites?.length, 'sites');
+  updateJourneyTimelineForNetwork(sites, currentNetwork, currentNetwork === 'freeway' ? '-freeway' : '');
+}
+
+// ============================================================================
 // Hero Status Card
 // ============================================================================
 
@@ -1858,8 +2284,10 @@ function updateChart(hourlyData) {
   const ctx = document.getElementById('traffic-chart').getContext('2d');
 
   // Extract labels and data
+  // Backend returns hours in UTC - append 'Z' to parse correctly
   const labels = hourlyData.map(d => {
-    const date = new Date(d.hour);
+    const utcHour = d.hour.endsWith('Z') ? d.hour : d.hour.replace(' ', 'T') + 'Z';
+    const date = new Date(utcHour);
     return formatPerthTime(date, 'hour');
   });
 
@@ -1921,7 +2349,9 @@ function updateDetectionsTable(detections) {
   }
 
   tbody.innerHTML = detections.map(d => {
-    const date = new Date(d.created_at);
+    // Backend stores timestamps in UTC - append 'Z' to parse correctly
+    const utcTimestamp = d.created_at.endsWith('Z') ? d.created_at : d.created_at.replace(' ', 'T') + 'Z';
+    const date = new Date(utcTimestamp);
     const timeStr = date.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -1990,6 +2420,7 @@ async function loadAllSitesData() {
   window.allSitesData = allSites;  // Expose for debugging/testing
 
   console.log(`Loaded ${arterialWithStats.length} arterial + ${freewayWithStats.length} freeway = ${allSites.length} total sites`);
+  console.log(`[Debug] trafficMap: ${!!trafficMap}, currentNetwork: ${currentNetwork}, allSites.length: ${allSites.length}`);
 
   // Update map, flow, and hero status card
   // Only update if we have data - don't clear dots on fetch failure
@@ -2009,6 +2440,9 @@ async function loadAllSitesData() {
 
   // Hero card uses arterial corridor for now (main commute route)
   updateHeroStatusCard(arterialWithStats);
+
+  // Update both journey timelines (two-column layout)
+  updateBothJourneyTimelines(arterialWithStats, freewayWithStats);
 }
 
 async function loadDashboard() {
@@ -2116,6 +2550,10 @@ async function switchNetwork(network) {
 
   // Render the appropriate flow corridor for the selected network
   renderFlowCorridor(network);
+
+  // Always render both journey timelines (two-column layout shows both)
+  renderBothJourneyTimelines();
+  document.querySelector('.journey-grid')?.style.setProperty('display', 'grid');
 
   // Reset route highlighting when switching networks
   resetRouteHighlighting();
@@ -2365,8 +2803,8 @@ async function init() {
   siteSelect = document.getElementById('site-select');
   periodSelect = document.getElementById('period-select');
   refreshBtn = document.getElementById('refresh-btn');
-  statusIndicator = document.querySelector('.status-indicator');
-  statusText = document.querySelector('.status-text');
+  statusIndicator = document.querySelector('#connection-status .status-indicator');
+  statusText = document.querySelector('#connection-status .status-text');
 
   // Load saved theme first
   loadTheme();
@@ -2376,6 +2814,9 @@ async function init() {
 
   // Render initial flow corridor (arterial by default)
   renderFlowCorridor(currentNetwork);
+
+  // Render both journey timelines (two-column layout)
+  renderBothJourneyTimelines();
 
   // Load sites and consolidate into stretches
   const rawSites = await fetchSites();
@@ -2430,6 +2871,9 @@ async function init() {
       const selectedRoute = e.target.value;
       handleRouteSelection(selectedRoute);
     });
+    // Default to "Stirling Highway (All)" on page load
+    routeSelect.value = 'stirling-highway';
+    handleRouteSelection('stirling-highway');
   }
 
   // Live mode toggle button
@@ -2615,4 +3059,130 @@ function updateActiveNavOnScroll(sections, navItems) {
 window.addEventListener('DOMContentLoaded', () => {
   // Delay slightly to ensure all elements are rendered
   setTimeout(initMobileBottomNav, 100);
+});
+
+// ============================================================================
+// HERO DASHBOARD - Stats Collapse/Expand and Mobile Drawer
+// Option A Implementation: Stats completely hidden when collapsed
+// ============================================================================
+
+function initHeroDashboard() {
+  const dashboard = document.getElementById('hero-dashboard');
+  const collapseBtn = document.getElementById('collapse-stats-btn');
+  const expandBtn = document.getElementById('expand-stats-btn');
+  const statsColumn = document.getElementById('stats-column');
+
+  if (!dashboard || !collapseBtn || !expandBtn || !statsColumn) return;
+
+  // Load saved collapse state from localStorage
+  const isCollapsed = localStorage.getItem('swanflow-stats-collapsed') === 'true';
+  if (isCollapsed) {
+    dashboard.classList.add('stats-collapsed');
+  }
+
+  // Collapse button handler
+  collapseBtn.addEventListener('click', () => {
+    dashboard.classList.add('stats-collapsed');
+    localStorage.setItem('swanflow-stats-collapsed', 'true');
+
+    // Invalidate map size after animation
+    setTimeout(() => {
+      if (trafficMap) {
+        trafficMap.invalidateSize();
+      }
+    }, 350);
+  });
+
+  // Expand button handler
+  expandBtn.addEventListener('click', () => {
+    dashboard.classList.remove('stats-collapsed');
+    localStorage.setItem('swanflow-stats-collapsed', 'false');
+
+    // Invalidate map size after animation
+    setTimeout(() => {
+      if (trafficMap) {
+        trafficMap.invalidateSize();
+      }
+    }, 350);
+  });
+
+  // Initialize mobile drawer functionality
+  initMobileStatsDrawer();
+}
+
+// ============================================================================
+// MOBILE STATS DRAWER - Swipe gestures for slide-up drawer
+// ============================================================================
+
+function initMobileStatsDrawer() {
+  const statsColumn = document.getElementById('stats-column');
+  const drawerHeader = statsColumn?.querySelector('.hero-stats-header');
+
+  if (!statsColumn || !drawerHeader) return;
+
+  // Touch tracking state
+  let touchStartY = 0;
+  let touchCurrentY = 0;
+  let isDragging = false;
+
+  // Tap on header to toggle drawer
+  drawerHeader.addEventListener('click', (e) => {
+    // Only handle clicks on mobile
+    if (window.innerWidth > 768) return;
+
+    // Prevent toggle if clicking the collapse button
+    if (e.target.closest('.hero-collapse-btn')) return;
+
+    statsColumn.classList.toggle('drawer-open');
+  });
+
+  // Touch start
+  statsColumn.addEventListener('touchstart', (e) => {
+    if (window.innerWidth > 768) return;
+
+    touchStartY = e.touches[0].clientY;
+    isDragging = true;
+  }, { passive: true });
+
+  // Touch move
+  statsColumn.addEventListener('touchmove', (e) => {
+    if (!isDragging || window.innerWidth > 768) return;
+
+    touchCurrentY = e.touches[0].clientY;
+  }, { passive: true });
+
+  // Touch end
+  statsColumn.addEventListener('touchend', () => {
+    if (!isDragging || window.innerWidth > 768) return;
+
+    const deltaY = touchCurrentY - touchStartY;
+    const threshold = 50; // Minimum swipe distance
+
+    if (deltaY < -threshold) {
+      // Swipe up - open drawer
+      statsColumn.classList.add('drawer-open');
+    } else if (deltaY > threshold) {
+      // Swipe down - close drawer
+      statsColumn.classList.remove('drawer-open');
+    }
+
+    isDragging = false;
+    touchStartY = 0;
+    touchCurrentY = 0;
+  }, { passive: true });
+
+  // Close drawer when clicking outside (on the map area)
+  const mapColumn = document.querySelector('.hero-map-column');
+  if (mapColumn) {
+    mapColumn.addEventListener('click', () => {
+      if (window.innerWidth <= 768 && statsColumn.classList.contains('drawer-open')) {
+        statsColumn.classList.remove('drawer-open');
+      }
+    });
+  }
+}
+
+// Initialize hero dashboard after DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initHeroDashboard, 150);
 });
