@@ -97,11 +97,13 @@ function formatPerthTime(dateInput, format = 'short') {
 // Consolidates 22 individual sites into 4 meaningful corridor stretches
 // ============================================================================
 const CORRIDOR_STRETCHES = [
+  // Arterial Roads
   {
     id: 'mounts-bay-eastbound',
     name: 'Mounts Bay Road (Eastbound)',
     description: 'Kings Park → CBD',
     direction: 'Northbound',
+    type: 'arterial',
     sitePatterns: ['Mounts Bay Rd'],
     directionFilter: 'Northbound'
   },
@@ -110,22 +112,63 @@ const CORRIDOR_STRETCHES = [
     name: 'Mounts Bay Road (Westbound)',
     description: 'CBD → Kings Park',
     direction: 'Southbound',
+    type: 'arterial',
     sitePatterns: ['Mounts Bay Rd'],
     directionFilter: 'Southbound'
   },
   {
     id: 'stirling-north',
-    name: 'Stirling Hwy North (Claremont)',
-    description: 'Grant St → Campbell Barracks',
+    name: 'Stirling Hwy North (Cottesloe)',
+    description: 'Eric St area',
     direction: 'Both',
-    sitePatterns: ['Stirling Hwy @ Grant', 'Stirling Hwy @ Campbell']
+    type: 'arterial',
+    sitePatterns: ['Stirling Hwy @ Eric']
   },
   {
     id: 'stirling-south',
-    name: 'Stirling Hwy South (Fremantle)',
-    description: 'Eric St → Victoria St',
+    name: 'Stirling Hwy South (Mosman Park)',
+    description: 'Forrest St → Victoria St',
     direction: 'Both',
-    sitePatterns: ['Stirling Hwy @ Eric', 'Stirling Hwy @ Forrest', 'Stirling Hwy @ Bay View', 'Stirling Hwy @ McCabe', 'Stirling Hwy @ Victoria']
+    type: 'arterial',
+    sitePatterns: ['Stirling Hwy @ Forrest', 'Stirling Hwy @ Bay View', 'Stirling Hwy @ McCabe', 'Stirling Hwy @ Victoria']
+  },
+
+  // Freeways
+  {
+    id: 'mitchell-northbound',
+    name: 'Mitchell Freeway (Northbound)',
+    description: 'Narrows → Scarborough Beach Rd',
+    direction: 'Northbound',
+    type: 'freeway',
+    sitePatterns: ['Mitchell Fwy'],
+    directionFilter: 'Northbound'
+  },
+  {
+    id: 'mitchell-southbound',
+    name: 'Mitchell Freeway (Southbound)',
+    description: 'Scarborough Beach Rd → Narrows',
+    direction: 'Southbound',
+    type: 'freeway',
+    sitePatterns: ['Mitchell Fwy'],
+    directionFilter: 'Southbound'
+  },
+  {
+    id: 'kwinana-northbound',
+    name: 'Kwinana Freeway (Northbound)',
+    description: 'Leach Hwy → Narrows',
+    direction: 'Northbound',
+    type: 'freeway',
+    sitePatterns: ['Kwinana Fwy'],
+    directionFilter: 'Northbound'
+  },
+  {
+    id: 'kwinana-southbound',
+    name: 'Kwinana Freeway (Southbound)',
+    description: 'Narrows → Leach Hwy',
+    direction: 'Southbound',
+    type: 'freeway',
+    sitePatterns: ['Kwinana Fwy'],
+    directionFilter: 'Southbound'
   }
 ];
 
@@ -552,39 +595,49 @@ const siteCoordinates = {
   'Stirling Hwy @ Victoria St (Northbound)': [-32.035, 115.751],
   'Stirling Hwy @ Victoria St (Southbound)': [-32.035, 115.751],
 
-  // Mitchell Freeway
-  'Narrows Interchange (Northbound)': [-31.9580, 115.8450],
-  'Narrows Interchange (Southbound)': [-31.9580, 115.8452],
-  'Malcolm Street (Northbound)': [-31.9540, 115.8470],
-  'Malcolm Street (Southbound)': [-31.9540, 115.8472],
-  'Loftus Street (Northbound)': [-31.9500, 115.8480],
-  'Loftus Street (Southbound)': [-31.9500, 115.8482],
-  'Newcastle/Roe Street (Northbound)': [-31.9450, 115.8510],
-  'Newcastle/Roe Street (Southbound)': [-31.9450, 115.8512],
-  'Charles Street (Northbound)': [-31.9400, 115.8530],
-  'Charles Street (Southbound)': [-31.9400, 115.8532],
-  'Vincent Street (Northbound)': [-31.9350, 115.8540],
-  'Vincent Street (Southbound)': [-31.9350, 115.8542],
-  'Powis Street (Northbound)': [-31.9300, 115.8520],
-  'Powis Street (Southbound)': [-31.9300, 115.8522],
-  'Hutton Street (Northbound)': [-31.9200, 115.8500],
-  'Hutton Street (Southbound)': [-31.9200, 115.8502],
-  'Scarborough Beach Road (Northbound)': [-31.9100, 115.8480],
-  'Scarborough Beach Road (Southbound)': [-31.9100, 115.8482],
+  // Mitchell Freeway - site coordinates
+  'Mitchell Fwy @ Narrows (Northbound)': [-31.9580, 115.8450],
+  'Mitchell Fwy @ Narrows (Southbound)': [-31.9580, 115.8452],
+  'Mitchell Fwy @ Malcolm St (Northbound)': [-31.9540, 115.8470],
+  'Mitchell Fwy @ Malcolm St (Southbound)': [-31.9540, 115.8472],
+  'Mitchell Fwy @ Loftus St (Northbound)': [-31.9500, 115.8480],
+  'Mitchell Fwy @ Loftus St (Southbound)': [-31.9500, 115.8482],
+  'Mitchell Fwy @ Newcastle St (Northbound)': [-31.9450, 115.8510],
+  'Mitchell Fwy @ Newcastle St (Southbound)': [-31.9450, 115.8512],
+  'Mitchell Fwy @ Charles St (Northbound)': [-31.9400, 115.8530],
+  'Mitchell Fwy @ Charles St (Southbound)': [-31.9400, 115.8532],
+  'Mitchell Fwy @ Vincent St (Northbound)': [-31.9350, 115.8540],
+  'Mitchell Fwy @ Vincent St (Southbound)': [-31.9350, 115.8542],
+  'Mitchell Fwy @ Powis St (Northbound)': [-31.9300, 115.8520],
+  'Mitchell Fwy @ Powis St (Southbound)': [-31.9300, 115.8522],
+  'Mitchell Fwy @ Hutton St (Northbound)': [-31.9200, 115.8500],
+  'Mitchell Fwy @ Hutton St (Southbound)': [-31.9200, 115.8502],
+  'Mitchell Fwy @ Scarborough Beach Rd (Northbound)': [-31.9100, 115.8480],
+  'Mitchell Fwy @ Scarborough Beach Rd (Southbound)': [-31.9100, 115.8482],
 
-  // Kwinana Freeway
-  'Narrows South (Northbound)': [-31.9620, 115.8460],
-  'Narrows South (Southbound)': [-31.9620, 115.8462],
-  'Mill Point Road (Northbound)': [-31.9680, 115.8550],
-  'Mill Point Road (Southbound)': [-31.9680, 115.8552],
-  'South Terrace/Judd St (Northbound)': [-31.9780, 115.8620],
-  'South Terrace/Judd St (Southbound)': [-31.9780, 115.8622],
-  'Canning Highway (Northbound)': [-31.9950, 115.8600],
-  'Canning Highway (Southbound)': [-31.9950, 115.8602],
-  'Manning Road (Northbound)': [-32.0100, 115.8580],
-  'Manning Road (Southbound)': [-32.0100, 115.8582],
-  'Leach Highway (Northbound)': [-32.0220, 115.8560],
-  'Leach Highway (Southbound)': [-32.0220, 115.8562],
+  // Kwinana Freeway - site coordinates
+  'Kwinana Fwy @ Narrows South (Northbound)': [-31.9620, 115.8460],
+  'Kwinana Fwy @ Narrows South (Southbound)': [-31.9620, 115.8462],
+  'Kwinana Fwy @ Mill Point Rd (Northbound)': [-31.9680, 115.8550],
+  'Kwinana Fwy @ Mill Point Rd (Southbound)': [-31.9680, 115.8552],
+  'Kwinana Fwy @ South Tce (Northbound)': [-31.9780, 115.8620],
+  'Kwinana Fwy @ South Tce (Southbound)': [-31.9780, 115.8622],
+  'Kwinana Fwy @ Canning Hwy (Northbound)': [-31.9950, 115.8600],
+  'Kwinana Fwy @ Canning Hwy (Southbound)': [-31.9950, 115.8602],
+  'Kwinana Fwy @ Manning Rd (Northbound)': [-32.0100, 115.8580],
+  'Kwinana Fwy @ Manning Rd (Southbound)': [-32.0100, 115.8582],
+  'Kwinana Fwy @ Leach Hwy (Northbound)': [-32.0220, 115.8560],
+  'Kwinana Fwy @ Leach Hwy (Southbound)': [-32.0220, 115.8562],
+
+  // Corridor stretch center points (for panToSite when stretch ID is selected)
+  'mounts-bay-eastbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
+  'mounts-bay-westbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
+  'stirling-north': [-31.9920, 115.7670],         // Eric St, Cottesloe
+  'stirling-south': [-32.0150, 115.7550],         // Center of Mosman Park section
+  'mitchell-northbound': [-31.9350, 115.8510],    // Center of Mitchell Freeway
+  'mitchell-southbound': [-31.9350, 115.8510],    // Center of Mitchell Freeway
+  'kwinana-northbound': [-31.9900, 115.8580],     // Center of Kwinana Freeway
+  'kwinana-southbound': [-31.9900, 115.8580],     // Center of Kwinana Freeway
 };
 
 let highlightMarker = null;
@@ -687,29 +740,47 @@ function interpolateDotsAlongRoute(waypoints, intervalMeters = 100) {
 function highlightRouteForSite(siteName) {
   if (!trafficMap || !siteName) return;
 
+  // Check if siteName is a corridor stretch ID (from CORRIDOR_STRETCHES)
+  const stretch = CORRIDOR_STRETCHES.find(s => s.id === siteName);
+  const sitePatterns = stretch ? stretch.sitePatterns : [siteName];
+  const directionFilter = stretch ? stretch.directionFilter : null;
+
+  const baseRadius = getBaseRadiusForZoom();
+  const baseWeight = Math.max(0.5, baseRadius / 3);
+
   // Iterate through all map layers to find route dots
   trafficMap.eachLayer(layer => {
     // Check if this layer is a route dot with corridor info
     if (layer instanceof L.CircleMarker && layer._corridorInfo) {
       const corridorInfo = layer._corridorInfo;
 
-      // Check if this site is part of this corridor
+      // Check if any of the corridor's sites match our patterns
       const isPartOfCorridor = corridorInfo.sites &&
-                               corridorInfo.sites.some(site => site.includes(siteName) || siteName.includes(site));
+        corridorInfo.sites.some(site => {
+          // Check if site matches any of our patterns
+          const matchesPattern = sitePatterns.some(pattern =>
+            site.includes(pattern) || pattern.includes(site)
+          );
+          // Also check direction filter if specified
+          const matchesDirection = !directionFilter ||
+            site.includes(directionFilter) ||
+            corridorInfo.direction === directionFilter;
+          return matchesPattern && matchesDirection;
+        });
 
       if (isPartOfCorridor) {
         // Make highlighted dots larger and more prominent
         layer.setStyle({
-          radius: 2.5,  // Half the previous size
-          fillOpacity: 0.9,
-          weight: 1
+          radius: baseRadius * 2,
+          fillOpacity: 0.95,
+          weight: baseWeight * 2
         });
       } else {
         // Keep other dots small and subtle
         layer.setStyle({
-          radius: 1.5,  // Half the previous size
-          fillOpacity: 0.6,
-          weight: 0.5
+          radius: baseRadius * 0.7,
+          fillOpacity: 0.25,
+          weight: baseWeight * 0.5
         });
       }
     }
@@ -1222,14 +1293,14 @@ function updateMapMarkers(sites) {
     {
       name: 'Mitchell Freeway',
       shortName: 'Mitchell Fwy',
-      filter: 'Narrows Interchange|Malcolm Street|Loftus Street|Newcastle/Roe Street|Charles Street|Vincent Street|Powis Street|Hutton Street|Scarborough Beach Road',
+      filter: 'Mitchell Fwy',
       start: L.latLng(-31.9580, 115.8450),  // Narrows Interchange
       end: L.latLng(-31.9100, 115.8480),    // Scarborough Beach Rd
       label: 'Narrows → Scarborough',
       waypoints: [
         L.latLng(-31.9540, 115.8470),  // Malcolm St
         L.latLng(-31.9500, 115.8480),  // Loftus St
-        L.latLng(-31.9450, 115.8510),  // Newcastle/Roe St
+        L.latLng(-31.9450, 115.8510),  // Newcastle St
         L.latLng(-31.9400, 115.8530),  // Charles St
         L.latLng(-31.9350, 115.8540),  // Vincent St
         L.latLng(-31.9300, 115.8520),  // Powis St
@@ -1239,13 +1310,13 @@ function updateMapMarkers(sites) {
     {
       name: 'Kwinana Freeway',
       shortName: 'Kwinana Fwy',
-      filter: 'Narrows South|Mill Point Road|South Terrace/Judd St|Canning Highway|Manning Road|Leach Highway',
+      filter: 'Kwinana Fwy',
       start: L.latLng(-31.9620, 115.8460),  // Narrows South
       end: L.latLng(-32.0220, 115.8560),    // Leach Highway
       label: 'Narrows → Leach Hwy',
       waypoints: [
         L.latLng(-31.9680, 115.8550),  // Mill Point Rd
-        L.latLng(-31.9780, 115.8620),  // South Terrace/Judd St
+        L.latLng(-31.9780, 115.8620),  // South Tce
         L.latLng(-31.9950, 115.8600),  // Canning Hwy
         L.latLng(-32.0100, 115.8580)   // Manning Rd
       ]
@@ -1916,7 +1987,8 @@ async function loadAllSitesData() {
   console.log(`Loaded ${arterialWithStats.length} arterial + ${freewayWithStats.length} freeway = ${allSites.length} total sites`);
 
   // Update map, flow, and hero status card
-  if (trafficMap) {
+  // Only update if we have data - don't clear dots on fetch failure
+  if (trafficMap && allSites.length > 0) {
     updateMapMarkers(allSites);
 
     // Update flow corridor based on current network
@@ -1962,6 +2034,10 @@ async function loadDashboard() {
   if (detections) {
     updateDetectionsTable(detections);
   }
+
+  // Re-apply highlighting after dots are rebuilt
+  // (loadAllSitesData rebuilds all dots, losing any highlighting)
+  highlightRouteForSite(currentSite);
 
   setStatus('connected', 'Connected');
 }
@@ -2379,9 +2455,8 @@ async function init() {
   siteSelect.addEventListener('change', async (e) => {
     currentSite = e.target.value;
     panToSite(currentSite); // Pan map to selected site
-    highlightRouteForSite(currentSite); // Highlight routes containing this site
+    await loadDashboard(); // loadDashboard will call highlightRouteForSite after rebuilding dots
     animateRouteArrow(currentSite); // Animate arrow along route
-    await loadDashboard();
   });
 
   periodSelect.addEventListener('change', async (e) => {
