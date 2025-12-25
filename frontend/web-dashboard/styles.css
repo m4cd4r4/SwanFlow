@@ -2046,6 +2046,351 @@ header h1 {
   background: #991b1b;
 }
 
+/* ============================================
+   Incident Alerts & Historical Trends Section
+   ============================================ */
+
+.trends-alerts-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Incident Alerts */
+.incident-alerts {
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.incident-alerts.has-alerts {
+  border-color: var(--warning);
+  box-shadow: 0 2px 12px rgba(232, 155, 95, 0.2);
+}
+
+.alerts-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.alerts-icon {
+  width: 20px;
+  height: 20px;
+  stroke: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.incident-alerts.has-alerts .alerts-icon {
+  stroke: var(--warning);
+}
+
+.alerts-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.alerts-count {
+  margin-left: auto;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.incident-alerts.has-alerts .alerts-count {
+  background: var(--warning);
+  color: white;
+}
+
+.alerts-list {
+  padding: 0.75rem 1rem;
+}
+
+.no-alerts {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--success);
+  font-size: 0.85rem;
+}
+
+.no-alerts-icon {
+  font-size: 1rem;
+}
+
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--warning);
+}
+
+.alert-item:last-child {
+  margin-bottom: 0;
+}
+
+.alert-item.severe {
+  border-left-color: var(--danger);
+}
+
+.alert-severity {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warning);
+  flex-shrink: 0;
+  margin-top: 0.35rem;
+}
+
+.alert-item.severe .alert-severity {
+  background: var(--danger);
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-message {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.alert-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.alert-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  font-size: 1rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.alert-dismiss:hover {
+  opacity: 1;
+}
+
+/* Historical Trends */
+.historical-trends {
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.trends-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.trends-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.trends-icon {
+  width: 20px;
+  height: 20px;
+  stroke: var(--primary);
+}
+
+.trends-period-selector {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  padding: 0.2rem;
+}
+
+.period-btn {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.period-btn:hover {
+  color: var(--text);
+  background: var(--card-bg);
+}
+
+.period-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.trends-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Trend Card */
+.trend-card {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.trend-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.trend-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.trend-corridor-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.trend-comparison {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: var(--bg-secondary);
+}
+
+.trend-arrow {
+  font-weight: bold;
+}
+
+.trend-arrow.up {
+  color: var(--danger);
+}
+
+.trend-arrow.down {
+  color: var(--success);
+}
+
+.trend-arrow.same {
+  color: var(--text-muted);
+}
+
+.trend-value {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.trend-chart-mini {
+  height: 60px;
+  margin-bottom: 0.75rem;
+  background: var(--card-bg);
+  border-radius: 6px;
+  padding: 0.25rem;
+}
+
+.trend-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.trend-stat {
+  text-align: center;
+  padding: 0.5rem 0.25rem;
+  background: var(--card-bg);
+  border-radius: 6px;
+}
+
+.trend-stat-label {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.2rem;
+}
+
+.trend-stat-value {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text);
+}
+
+/* Responsive trends */
+@media (max-width: 768px) {
+  .trends-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trends-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .trend-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .trends-period-selector {
+    width: 100%;
+  }
+
+  .period-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
 /* Chart */
 .chart-container {
   background: var(--card-bg);

@@ -2512,6 +2512,12 @@ async function loadAllSitesData() {
 
   // Update both journey timelines (two-column layout)
   updateBothJourneyTimelines(arterialWithStats, freewayWithStats);
+
+  // Detect incidents based on traffic anomalies
+  detectIncidents(allSites);
+
+  // Update historical trends with current journey times
+  updateTrendsWithCurrentData();
 }
 
 async function loadDashboard() {
@@ -3040,6 +3046,9 @@ async function init() {
   // Setup auto-refresh
   refreshTimer = setInterval(loadDashboard, REFRESH_INTERVAL);
 
+  // Initialize historical trends and incident detection
+  initTrendsAndAlerts();
+
   console.log('Dashboard initialized');
 }
 
@@ -3058,6 +3067,471 @@ window.addEventListener('beforeunload', () => {
     trafficChart.destroy();
   }
 });
+
+// ============================================================================
+// HISTORICAL TRENDS & INCIDENT DETECTION
+// Track journey times over time and detect traffic anomalies
+// ============================================================================
+
+// Store historical journey times (simulated data for PoC)
+const journeyTimeHistory = {
+  arterial: {
+    today: [],
+    week: [],
+    month: []
+  },
+  freeway: {
+    today: [],
+    week: [],
+    month: []
+  }
+};
+
+// Active incidents list
+let activeIncidents = [];
+
+// Mini charts for trends
+let arterialTrendChart = null;
+let freewayTrendChart = null;
+
+/**
+ * Initialize historical trends and incident detection
+ */
+function initTrendsAndAlerts() {
+  // Generate simulated historical data for PoC
+  generateSimulatedHistory();
+
+  // Setup period selector buttons
+  const periodBtns = document.querySelectorAll('.period-btn');
+  periodBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      periodBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateTrendsDisplay(btn.dataset.period);
+    });
+  });
+
+  // Create mini trend charts
+  createTrendCharts();
+
+  // Initial update
+  updateTrendsDisplay('today');
+}
+
+/**
+ * Generate simulated historical journey time data
+ */
+function generateSimulatedHistory() {
+  const now = new Date();
+  const hour = now.getHours();
+
+  // Generate today's data (hourly points up to current hour)
+  for (let h = 6; h <= hour; h++) {
+    const isPeakHour = (h >= 7 && h <= 9) || (h >= 16 && h <= 18);
+
+    // Arterial - base 7 min, peak adds 3-5 min
+    const arterialTime = 7 + (isPeakHour ? Math.random() * 5 + 2 : Math.random() * 2);
+    journeyTimeHistory.arterial.today.push({
+      hour: h,
+      time: Math.round(arterialTime),
+      timestamp: new Date(now.getFullYear(), now.getMonth(), now.getDate(), h)
+    });
+
+    // Freeway - base 12 min, peak adds 4-8 min
+    const freewayTime = 12 + (isPeakHour ? Math.random() * 8 + 3 : Math.random() * 3);
+    journeyTimeHistory.freeway.today.push({
+      hour: h,
+      time: Math.round(freewayTime),
+      timestamp: new Date(now.getFullYear(), now.getMonth(), now.getDate(), h)
+    });
+  }
+
+  // Generate week data (daily averages)
+  for (let d = 6; d >= 0; d--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - d);
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+    journeyTimeHistory.arterial.week.push({
+      day: date.toLocaleDateString('en-AU', { weekday: 'short' }),
+      time: Math.round(isWeekend ? 6 + Math.random() * 2 : 8 + Math.random() * 3),
+      date: date
+    });
+
+    journeyTimeHistory.freeway.week.push({
+      day: date.toLocaleDateString('en-AU', { weekday: 'short' }),
+      time: Math.round(isWeekend ? 11 + Math.random() * 2 : 14 + Math.random() * 4),
+      date: date
+    });
+  }
+
+  // Generate month data (weekly averages)
+  for (let w = 3; w >= 0; w--) {
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - (w * 7));
+
+    journeyTimeHistory.arterial.month.push({
+      week: `Week ${4 - w}`,
+      time: Math.round(7 + Math.random() * 2),
+      date: weekStart
+    });
+
+    journeyTimeHistory.freeway.month.push({
+      week: `Week ${4 - w}`,
+      time: Math.round(13 + Math.random() * 3),
+      date: weekStart
+    });
+  }
+}
+
+/**
+ * Create mini trend sparkline charts
+ */
+function createTrendCharts() {
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false }
+    },
+    scales: {
+      x: { display: false },
+      y: { display: false }
+    },
+    elements: {
+      point: { radius: 0 },
+      line: { tension: 0.4, borderWidth: 2 }
+    }
+  };
+
+  // Arterial trend chart
+  const arterialCtx = document.getElementById('arterial-trend-chart');
+  if (arterialCtx) {
+    arterialTrendChart = new Chart(arterialCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          borderColor: 'rgba(45, 139, 148, 1)',
+          backgroundColor: 'rgba(45, 139, 148, 0.1)',
+          fill: true
+        }]
+      },
+      options: chartOptions
+    });
+  }
+
+  // Freeway trend chart
+  const freewayCtx = document.getElementById('freeway-trend-chart');
+  if (freewayCtx) {
+    freewayTrendChart = new Chart(freewayCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          borderColor: 'rgba(74, 157, 165, 1)',
+          backgroundColor: 'rgba(74, 157, 165, 0.1)',
+          fill: true
+        }]
+      },
+      options: chartOptions
+    });
+  }
+}
+
+/**
+ * Update trends display based on selected period
+ */
+function updateTrendsDisplay(period = 'today') {
+  const arterialData = journeyTimeHistory.arterial[period];
+  const freewayData = journeyTimeHistory.freeway[period];
+
+  if (!arterialData || !freewayData) return;
+
+  // Update arterial stats
+  updateCorridorTrendStats('arterial', arterialData, period);
+
+  // Update freeway stats
+  updateCorridorTrendStats('freeway', freewayData, period);
+
+  // Update charts
+  updateTrendChart(arterialTrendChart, arterialData, period);
+  updateTrendChart(freewayTrendChart, freewayData, period);
+}
+
+/**
+ * Update stats for a corridor
+ */
+function updateCorridorTrendStats(corridor, data, period) {
+  if (!data || data.length === 0) return;
+
+  const times = data.map(d => d.time);
+  const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+  const best = Math.min(...times);
+  const worst = Math.max(...times);
+
+  // Get current journey time from the journey summary
+  const currentTimeEl = document.getElementById(`journey-total-time${corridor === 'freeway' ? '-freeway' : ''}`);
+  const currentTime = currentTimeEl ? parseInt(currentTimeEl.textContent.replace(/[^0-9]/g, '')) || avg : avg;
+
+  // Update current time display
+  const currentEl = document.getElementById(`${corridor}-current-time`);
+  if (currentEl) currentEl.textContent = `~${currentTime} min`;
+
+  // Update avg, best, worst
+  const avgEl = document.getElementById(`${corridor}-avg-time`);
+  if (avgEl) avgEl.textContent = `~${avg} min`;
+
+  const bestEl = document.getElementById(`${corridor}-best-time`);
+  if (bestEl) bestEl.textContent = `~${best} min`;
+
+  const worstEl = document.getElementById(`${corridor}-worst-time`);
+  if (worstEl) worstEl.textContent = `~${worst} min`;
+
+  // Update comparison badge
+  const comparisonEl = document.getElementById(`${corridor}-trend-comparison`);
+  if (comparisonEl) {
+    const diff = currentTime - avg;
+    const arrowEl = comparisonEl.querySelector('.trend-arrow');
+    const valueEl = comparisonEl.querySelector('.trend-value');
+
+    if (arrowEl && valueEl) {
+      if (diff > 1) {
+        arrowEl.textContent = '↑';
+        arrowEl.className = 'trend-arrow up';
+        valueEl.textContent = `${diff} min slower`;
+      } else if (diff < -1) {
+        arrowEl.textContent = '↓';
+        arrowEl.className = 'trend-arrow down';
+        valueEl.textContent = `${Math.abs(diff)} min faster`;
+      } else {
+        arrowEl.textContent = '→';
+        arrowEl.className = 'trend-arrow same';
+        valueEl.textContent = 'On average';
+      }
+    }
+  }
+}
+
+/**
+ * Update a trend chart with data
+ */
+function updateTrendChart(chart, data, period) {
+  if (!chart || !data) return;
+
+  let labels, values;
+
+  switch (period) {
+    case 'today':
+      labels = data.map(d => `${d.hour}:00`);
+      values = data.map(d => d.time);
+      break;
+    case 'week':
+      labels = data.map(d => d.day);
+      values = data.map(d => d.time);
+      break;
+    case 'month':
+      labels = data.map(d => d.week);
+      values = data.map(d => d.time);
+      break;
+  }
+
+  chart.data.labels = labels;
+  chart.data.datasets[0].data = values;
+  chart.update('none');
+}
+
+/**
+ * Record current journey time for history
+ */
+function recordJourneyTime(corridor, time) {
+  const now = new Date();
+  const hour = now.getHours();
+
+  // Update today's data
+  const todayData = journeyTimeHistory[corridor].today;
+  const existingHour = todayData.find(d => d.hour === hour);
+
+  if (existingHour) {
+    existingHour.time = time;
+  } else {
+    todayData.push({ hour, time, timestamp: now });
+  }
+}
+
+/**
+ * Detect traffic incidents based on speed anomalies
+ */
+function detectIncidents(sites) {
+  if (!sites || sites.length === 0) return;
+
+  const newIncidents = [];
+
+  // Group sites by corridor
+  const corridors = {};
+  sites.forEach(site => {
+    const corridorName = site.name.includes('Freeway') ? 'freeway' : 'arterial';
+    if (!corridors[corridorName]) corridors[corridorName] = [];
+    corridors[corridorName].push(site);
+  });
+
+  // Check each corridor for anomalies
+  Object.entries(corridors).forEach(([corridor, corridorSites]) => {
+    corridorSites.forEach(site => {
+      const hourlyCount = site.current_hourly || 0;
+      const speed = estimateSpeed(hourlyCount);
+
+      // Detect severe congestion (< 20 km/h) that's not already tracked
+      if (speed < 20) {
+        const existingIncident = activeIncidents.find(i =>
+          i.location === site.name && !i.dismissed
+        );
+
+        if (!existingIncident) {
+          newIncidents.push({
+            id: Date.now() + Math.random(),
+            type: speed < 10 ? 'severe' : 'warning',
+            location: site.name,
+            message: speed < 10
+              ? `Gridlock detected: ${site.name} - Traffic at ${Math.round(speed)} km/h`
+              : `Heavy congestion: ${site.name} - Traffic slowed to ${Math.round(speed)} km/h`,
+            speed: Math.round(speed),
+            timestamp: new Date(),
+            dismissed: false
+          });
+        }
+      }
+    });
+  });
+
+  // Add new incidents
+  if (newIncidents.length > 0) {
+    activeIncidents = [...newIncidents, ...activeIncidents].slice(0, 5); // Keep max 5 incidents
+    updateIncidentDisplay();
+  }
+
+  // Clear resolved incidents (speed recovered)
+  const now = Date.now();
+  activeIncidents = activeIncidents.filter(incident => {
+    // Keep dismissed incidents for 5 minutes
+    if (incident.dismissed) {
+      return (now - incident.dismissedAt) < 5 * 60 * 1000;
+    }
+    // Check if incident is still valid (congestion still present)
+    const site = sites.find(s => s.name === incident.location);
+    if (site) {
+      const currentSpeed = estimateSpeed(site.current_hourly || 0);
+      return currentSpeed < 30; // Still congested
+    }
+    return true;
+  });
+}
+
+/**
+ * Update incident alerts display
+ */
+function updateIncidentDisplay() {
+  const alertsContainer = document.getElementById('incident-alerts');
+  const alertsList = document.getElementById('alerts-list');
+  const alertsCount = document.getElementById('alerts-count');
+
+  if (!alertsContainer || !alertsList) return;
+
+  const visibleIncidents = activeIncidents.filter(i => !i.dismissed);
+
+  // Update count
+  if (alertsCount) {
+    alertsCount.textContent = visibleIncidents.length;
+  }
+
+  // Update container class
+  if (visibleIncidents.length > 0) {
+    alertsContainer.classList.add('has-alerts');
+  } else {
+    alertsContainer.classList.remove('has-alerts');
+  }
+
+  // Update list
+  if (visibleIncidents.length === 0) {
+    alertsList.innerHTML = `
+      <div class="no-alerts">
+        <span class="no-alerts-icon">✓</span>
+        <span>No incidents detected - all corridors flowing normally</span>
+      </div>
+    `;
+  } else {
+    alertsList.innerHTML = visibleIncidents.map(incident => `
+      <div class="alert-item ${incident.type === 'severe' ? 'severe' : ''}">
+        <span class="alert-severity"></span>
+        <div class="alert-content">
+          <div class="alert-message">${incident.message}</div>
+          <div class="alert-time">${formatTimeAgo(incident.timestamp)}</div>
+        </div>
+        <button class="alert-dismiss" onclick="dismissIncident('${incident.id}')" title="Dismiss">×</button>
+      </div>
+    `).join('');
+  }
+}
+
+/**
+ * Dismiss an incident alert
+ */
+function dismissIncident(incidentId) {
+  const incident = activeIncidents.find(i => i.id == incidentId);
+  if (incident) {
+    incident.dismissed = true;
+    incident.dismissedAt = Date.now();
+    updateIncidentDisplay();
+  }
+}
+
+// Make dismissIncident globally accessible
+window.dismissIncident = dismissIncident;
+
+/**
+ * Format time ago string
+ */
+function formatTimeAgo(date) {
+  const now = new Date();
+  const diffMs = now - new Date(date);
+  const diffMins = Math.floor(diffMs / 60000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins === 1) return '1 minute ago';
+  if (diffMins < 60) return `${diffMins} minutes ago`;
+
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours === 1) return '1 hour ago';
+  return `${diffHours} hours ago`;
+}
+
+/**
+ * Update trends with current journey data
+ */
+function updateTrendsWithCurrentData() {
+  // Get current journey times
+  const arterialTimeEl = document.getElementById('journey-total-time');
+  const freewayTimeEl = document.getElementById('journey-total-time-freeway');
+
+  if (arterialTimeEl) {
+    const time = parseInt(arterialTimeEl.textContent.replace(/[^0-9]/g, '')) || 7;
+    recordJourneyTime('arterial', time);
+  }
+
+  if (freewayTimeEl) {
+    const time = parseInt(freewayTimeEl.textContent.replace(/[^0-9]/g, '')) || 12;
+    recordJourneyTime('freeway', time);
+  }
+
+  // Update the current time displays
+  const activePeriod = document.querySelector('.period-btn.active');
+  if (activePeriod) {
+    updateTrendsDisplay(activePeriod.dataset.period);
+  }
+}
 
 // ============================================================================
 // MOBILE BOTTOM NAVIGATION
