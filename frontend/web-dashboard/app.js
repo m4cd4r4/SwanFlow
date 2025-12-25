@@ -4,7 +4,7 @@
 
 // Configuration
 const API_BASE_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:3000'  // Local dev: separate frontend server
+  ? 'https://swanflow.com.au/traffic'  // Local dev: separate frontend server
   : 'https://swanflow.com.au/traffic';  // Production: Vultr Sydney VPS via nginx proxy
 
 const REFRESH_INTERVAL = 60000; // 60 seconds (normal mode)
@@ -41,6 +41,159 @@ let periodSelect;
 let refreshBtn;
 let statusIndicator;
 let statusText;
+
+// ============================================================================
+// Perth Timezone Helpers (AWST, UTC+8)
+// ============================================================================
+const PERTH_TIMEZONE = 'Australia/Perth';
+
+/**
+ * Get current hour in Perth timezone
+ */
+function getPerthHour() {
+  return parseInt(new Date().toLocaleString('en-AU', {
+    timeZone: PERTH_TIMEZONE,
+    hour: 'numeric',
+    hour12: false
+  }));
+}
+
+/**
+ * Get current time string in Perth timezone
+ */
+function getPerthTimeString() {
+  return new Date().toLocaleTimeString('en-AU', {
+    timeZone: PERTH_TIMEZONE,
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
+/**
+ * Format a date/timestamp for display in Perth time
+ */
+function formatPerthTime(dateInput, format = 'short') {
+  const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+  
+  if (format === 'hour') {
+    return date.toLocaleTimeString('en-AU', {
+      timeZone: PERTH_TIMEZONE,
+      hour: 'numeric',
+      hour12: true
+    });
+  }
+  
+  return date.toLocaleString('en-AU', {
+    timeZone: PERTH_TIMEZONE,
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
+// ============================================================================
+// Corridor Stretches Configuration
+// Consolidates 22 individual sites into 4 meaningful corridor stretches
+// ============================================================================
+const CORRIDOR_STRETCHES = [
+  // Arterial Roads
+  {
+    id: 'mounts-bay-eastbound',
+    name: 'Mounts Bay Road (Eastbound)',
+    description: 'Kings Park → CBD',
+    direction: 'Northbound',
+    type: 'arterial',
+    sitePatterns: ['Mounts Bay Rd'],
+    directionFilter: 'Northbound'
+  },
+  {
+    id: 'mounts-bay-westbound',
+    name: 'Mounts Bay Road (Westbound)',
+    description: 'CBD → Kings Park',
+    direction: 'Southbound',
+    type: 'arterial',
+    sitePatterns: ['Mounts Bay Rd'],
+    directionFilter: 'Southbound'
+  },
+  {
+    id: 'stirling-north',
+    name: 'Stirling Hwy North (Cottesloe)',
+    description: 'Eric St area',
+    direction: 'Both',
+    type: 'arterial',
+    sitePatterns: ['Stirling Hwy @ Eric']
+  },
+  {
+    id: 'stirling-south',
+    name: 'Stirling Hwy South (Mosman Park)',
+    description: 'Forrest St → Victoria St',
+    direction: 'Both',
+    type: 'arterial',
+    sitePatterns: ['Stirling Hwy @ Forrest', 'Stirling Hwy @ Bay View', 'Stirling Hwy @ McCabe', 'Stirling Hwy @ Victoria']
+  },
+
+  // Freeways
+  {
+    id: 'mitchell-northbound',
+    name: 'Mitchell Freeway (Northbound)',
+    description: 'Narrows → Scarborough Beach Rd',
+    direction: 'Northbound',
+    type: 'freeway',
+    sitePatterns: ['Mitchell Fwy'],
+    directionFilter: 'Northbound'
+  },
+  {
+    id: 'mitchell-southbound',
+    name: 'Mitchell Freeway (Southbound)',
+    description: 'Scarborough Beach Rd → Narrows',
+    direction: 'Southbound',
+    type: 'freeway',
+    sitePatterns: ['Mitchell Fwy'],
+    directionFilter: 'Southbound'
+  },
+  {
+    id: 'kwinana-northbound',
+    name: 'Kwinana Freeway (Northbound)',
+    description: 'Leach Hwy → Narrows',
+    direction: 'Northbound',
+    type: 'freeway',
+    sitePatterns: ['Kwinana Fwy'],
+    directionFilter: 'Northbound'
+  },
+  {
+    id: 'kwinana-southbound',
+    name: 'Kwinana Freeway (Southbound)',
+    description: 'Narrows → Leach Hwy',
+    direction: 'Southbound',
+    type: 'freeway',
+    sitePatterns: ['Kwinana Fwy'],
+    directionFilter: 'Southbound'
+  }
+];
+
+/**
+ * Group individual sites into corridor stretches
+ */
+function consolidateSitesToStretches(sites) {
+  return CORRIDOR_STRETCHES.map(stretch => {
+    const matchingSites = sites.filter(site => {
+      const matchesPattern = stretch.sitePatterns.some(pattern => site.name.includes(pattern));
+      const matchesDirection = !stretch.directionFilter || site.name.includes(stretch.directionFilter);
+      return matchesPattern && matchesDirection;
+    });
+    const avgSpeed = matchingSites.length > 0
+      ? matchingSites.reduce((sum, s) => sum + (s.avg_speed || 0), 0) / matchingSites.length : 0;
+    const totalHourly = matchingSites.reduce((sum, s) => sum + (s.current_hourly || 0), 0);
+    return {
+      id: stretch.id, name: stretch.name, description: stretch.description,
+      sites: matchingSites, siteCount: matchingSites.length,
+      avg_speed: Math.round(avgSpeed), current_hourly: totalHourly,
+      coordinates: matchingSites[0]?.coordinates || null
+    };
+  });
+}
+
 
 // ============================================================================
 // API Functions
@@ -98,16 +251,52 @@ async function fetchAllNetworkSites() {
   }
 }
 
+/**
+ * Resolve a corridor ID to actual site names from the data-sites attribute
+ * Returns the first site name for single queries, or null if not a corridor ID
+ */
+function resolveCorridorToSites(corridorId) {
+  const option = document.querySelector(`#site-select option[value="${corridorId}"]`);
+  if (option && option.dataset.sites) {
+    return option.dataset.sites.split('|');
+  }
+  // Not a corridor ID, return as-is (might be an actual site name)
+  return [corridorId];
+}
+
 async function fetchStats(site, period) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/stats/${encodeURIComponent(site)}?period=${period}`);
-    const data = await response.json();
+    // Resolve corridor ID to actual site names
+    const siteNames = resolveCorridorToSites(site);
 
-    if (data.success) {
-      return data.stats;
-    }
+    // Fetch stats for all sites in the corridor and aggregate
+    const statsPromises = siteNames.map(async (siteName) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/stats/${encodeURIComponent(siteName)}?period=${period}`);
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.success ? data.stats : null;
+      } catch {
+        return null;
+      }
+    });
 
-    return null;
+    const allStats = (await Promise.all(statsPromises)).filter(s => s !== null);
+
+    if (allStats.length === 0) return null;
+
+    // Aggregate stats from all sites in the corridor
+    const aggregated = {
+      total_count: allStats.reduce((sum, s) => sum + (s.current_total || 0), 0),
+      current_total: allStats.reduce((sum, s) => sum + (s.current_total || 0), 0),
+      avg_hourly: allStats.reduce((sum, s) => sum + (s.avg_hourly || 0), 0) / allStats.length,
+      avg_confidence: allStats.reduce((sum, s) => sum + (s.avg_confidence || 0), 0) / allStats.length,
+      data_points: allStats.reduce((sum, s) => sum + (s.data_points || 0), 0),
+      first_seen: allStats.map(s => s.first_seen).sort()[0],
+      last_seen: allStats.map(s => s.last_seen).sort().reverse()[0]
+    };
+
+    return aggregated;
   } catch (error) {
     console.error('Error fetching stats:', error);
     setStatus('error', 'Connection error');
@@ -117,14 +306,39 @@ async function fetchStats(site, period) {
 
 async function fetchHourlyData(site, hours = 24) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/stats/${encodeURIComponent(site)}/hourly?hours=${hours}`);
-    const data = await response.json();
+    // Resolve corridor ID to actual site names
+    const siteNames = resolveCorridorToSites(site);
 
-    if (data.success) {
-      return data.data;
-    }
+    // Fetch hourly data for all sites and aggregate by hour
+    const dataPromises = siteNames.map(async (siteName) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/stats/${encodeURIComponent(siteName)}/hourly?hours=${hours}`);
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.success ? data.data : [];
+      } catch {
+        return [];
+      }
+    });
 
-    return [];
+    const allData = await Promise.all(dataPromises);
+
+    // If only one site, return its data directly
+    if (allData.length === 1) return allData[0];
+
+    // Aggregate by hour - combine all sites' data
+    const hourlyMap = new Map();
+    allData.flat().forEach(item => {
+      const hour = item.hour;
+      if (!hourlyMap.has(hour)) {
+        hourlyMap.set(hour, { hour, count: 0, sites: 0 });
+      }
+      const existing = hourlyMap.get(hour);
+      existing.count += item.count || 0;
+      existing.sites += 1;
+    });
+
+    return Array.from(hourlyMap.values()).sort((a, b) => a.hour.localeCompare(b.hour));
   } catch (error) {
     console.error('Error fetching hourly data:', error);
     return [];
@@ -133,14 +347,27 @@ async function fetchHourlyData(site, hours = 24) {
 
 async function fetchRecentDetections(site, limit = 20) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/detections?site=${encodeURIComponent(site)}&limit=${limit}`);
-    const data = await response.json();
+    // Resolve corridor ID to actual site names
+    const siteNames = resolveCorridorToSites(site);
 
-    if (data.success) {
-      return data.detections;
-    }
+    // Fetch detections for all sites
+    const detectionsPromises = siteNames.map(async (siteName) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/detections?site=${encodeURIComponent(siteName)}&limit=${Math.ceil(limit / siteNames.length)}`);
+        if (!response.ok) return [];
+        const data = await response.json();
+        return data.success ? data.detections : [];
+      } catch {
+        return [];
+      }
+    });
 
-    return [];
+    const allDetections = (await Promise.all(detectionsPromises)).flat();
+
+    // Sort by timestamp (most recent first) and limit
+    return allDetections
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, limit);
   } catch (error) {
     console.error('Error fetching detections:', error);
     return [];
@@ -368,39 +595,49 @@ const siteCoordinates = {
   'Stirling Hwy @ Victoria St (Northbound)': [-32.035, 115.751],
   'Stirling Hwy @ Victoria St (Southbound)': [-32.035, 115.751],
 
-  // Mitchell Freeway
-  'Narrows Interchange (Northbound)': [-31.9580, 115.8450],
-  'Narrows Interchange (Southbound)': [-31.9580, 115.8452],
-  'Malcolm Street (Northbound)': [-31.9540, 115.8470],
-  'Malcolm Street (Southbound)': [-31.9540, 115.8472],
-  'Loftus Street (Northbound)': [-31.9500, 115.8480],
-  'Loftus Street (Southbound)': [-31.9500, 115.8482],
-  'Newcastle/Roe Street (Northbound)': [-31.9450, 115.8510],
-  'Newcastle/Roe Street (Southbound)': [-31.9450, 115.8512],
-  'Charles Street (Northbound)': [-31.9400, 115.8530],
-  'Charles Street (Southbound)': [-31.9400, 115.8532],
-  'Vincent Street (Northbound)': [-31.9350, 115.8540],
-  'Vincent Street (Southbound)': [-31.9350, 115.8542],
-  'Powis Street (Northbound)': [-31.9300, 115.8520],
-  'Powis Street (Southbound)': [-31.9300, 115.8522],
-  'Hutton Street (Northbound)': [-31.9200, 115.8500],
-  'Hutton Street (Southbound)': [-31.9200, 115.8502],
-  'Scarborough Beach Road (Northbound)': [-31.9100, 115.8480],
-  'Scarborough Beach Road (Southbound)': [-31.9100, 115.8482],
+  // Mitchell Freeway - site coordinates
+  'Mitchell Fwy @ Narrows (Northbound)': [-31.9580, 115.8450],
+  'Mitchell Fwy @ Narrows (Southbound)': [-31.9580, 115.8452],
+  'Mitchell Fwy @ Malcolm St (Northbound)': [-31.9540, 115.8470],
+  'Mitchell Fwy @ Malcolm St (Southbound)': [-31.9540, 115.8472],
+  'Mitchell Fwy @ Loftus St (Northbound)': [-31.9500, 115.8480],
+  'Mitchell Fwy @ Loftus St (Southbound)': [-31.9500, 115.8482],
+  'Mitchell Fwy @ Newcastle St (Northbound)': [-31.9450, 115.8510],
+  'Mitchell Fwy @ Newcastle St (Southbound)': [-31.9450, 115.8512],
+  'Mitchell Fwy @ Charles St (Northbound)': [-31.9400, 115.8530],
+  'Mitchell Fwy @ Charles St (Southbound)': [-31.9400, 115.8532],
+  'Mitchell Fwy @ Vincent St (Northbound)': [-31.9350, 115.8540],
+  'Mitchell Fwy @ Vincent St (Southbound)': [-31.9350, 115.8542],
+  'Mitchell Fwy @ Powis St (Northbound)': [-31.9300, 115.8520],
+  'Mitchell Fwy @ Powis St (Southbound)': [-31.9300, 115.8522],
+  'Mitchell Fwy @ Hutton St (Northbound)': [-31.9200, 115.8500],
+  'Mitchell Fwy @ Hutton St (Southbound)': [-31.9200, 115.8502],
+  'Mitchell Fwy @ Scarborough Beach Rd (Northbound)': [-31.9100, 115.8480],
+  'Mitchell Fwy @ Scarborough Beach Rd (Southbound)': [-31.9100, 115.8482],
 
-  // Kwinana Freeway
-  'Narrows South (Northbound)': [-31.9620, 115.8460],
-  'Narrows South (Southbound)': [-31.9620, 115.8462],
-  'Mill Point Road (Northbound)': [-31.9680, 115.8550],
-  'Mill Point Road (Southbound)': [-31.9680, 115.8552],
-  'South Terrace/Judd St (Northbound)': [-31.9780, 115.8620],
-  'South Terrace/Judd St (Southbound)': [-31.9780, 115.8622],
-  'Canning Highway (Northbound)': [-31.9950, 115.8600],
-  'Canning Highway (Southbound)': [-31.9950, 115.8602],
-  'Manning Road (Northbound)': [-32.0100, 115.8580],
-  'Manning Road (Southbound)': [-32.0100, 115.8582],
-  'Leach Highway (Northbound)': [-32.0220, 115.8560],
-  'Leach Highway (Southbound)': [-32.0220, 115.8562],
+  // Kwinana Freeway - site coordinates
+  'Kwinana Fwy @ Narrows South (Northbound)': [-31.9620, 115.8460],
+  'Kwinana Fwy @ Narrows South (Southbound)': [-31.9620, 115.8462],
+  'Kwinana Fwy @ Mill Point Rd (Northbound)': [-31.9680, 115.8550],
+  'Kwinana Fwy @ Mill Point Rd (Southbound)': [-31.9680, 115.8552],
+  'Kwinana Fwy @ South Tce (Northbound)': [-31.9780, 115.8620],
+  'Kwinana Fwy @ South Tce (Southbound)': [-31.9780, 115.8622],
+  'Kwinana Fwy @ Canning Hwy (Northbound)': [-31.9950, 115.8600],
+  'Kwinana Fwy @ Canning Hwy (Southbound)': [-31.9950, 115.8602],
+  'Kwinana Fwy @ Manning Rd (Northbound)': [-32.0100, 115.8580],
+  'Kwinana Fwy @ Manning Rd (Southbound)': [-32.0100, 115.8582],
+  'Kwinana Fwy @ Leach Hwy (Northbound)': [-32.0220, 115.8560],
+  'Kwinana Fwy @ Leach Hwy (Southbound)': [-32.0220, 115.8562],
+
+  // Corridor stretch center points (for panToSite when stretch ID is selected)
+  'mounts-bay-eastbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
+  'mounts-bay-westbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
+  'stirling-north': [-31.9920, 115.7670],         // Eric St, Cottesloe
+  'stirling-south': [-32.0150, 115.7550],         // Center of Mosman Park section
+  'mitchell-northbound': [-31.9350, 115.8510],    // Center of Mitchell Freeway
+  'mitchell-southbound': [-31.9350, 115.8510],    // Center of Mitchell Freeway
+  'kwinana-northbound': [-31.9900, 115.8580],     // Center of Kwinana Freeway
+  'kwinana-southbound': [-31.9900, 115.8580],     // Center of Kwinana Freeway
 };
 
 let highlightMarker = null;
@@ -503,29 +740,47 @@ function interpolateDotsAlongRoute(waypoints, intervalMeters = 100) {
 function highlightRouteForSite(siteName) {
   if (!trafficMap || !siteName) return;
 
+  // Check if siteName is a corridor stretch ID (from CORRIDOR_STRETCHES)
+  const stretch = CORRIDOR_STRETCHES.find(s => s.id === siteName);
+  const sitePatterns = stretch ? stretch.sitePatterns : [siteName];
+  const directionFilter = stretch ? stretch.directionFilter : null;
+
+  const baseRadius = getBaseRadiusForZoom();
+  const baseWeight = Math.max(0.5, baseRadius / 3);
+
   // Iterate through all map layers to find route dots
   trafficMap.eachLayer(layer => {
     // Check if this layer is a route dot with corridor info
     if (layer instanceof L.CircleMarker && layer._corridorInfo) {
       const corridorInfo = layer._corridorInfo;
 
-      // Check if this site is part of this corridor
+      // Check if any of the corridor's sites match our patterns
       const isPartOfCorridor = corridorInfo.sites &&
-                               corridorInfo.sites.some(site => site.includes(siteName) || siteName.includes(site));
+        corridorInfo.sites.some(site => {
+          // Check if site matches any of our patterns
+          const matchesPattern = sitePatterns.some(pattern =>
+            site.includes(pattern) || pattern.includes(site)
+          );
+          // Also check direction filter if specified
+          const matchesDirection = !directionFilter ||
+            site.includes(directionFilter) ||
+            corridorInfo.direction === directionFilter;
+          return matchesPattern && matchesDirection;
+        });
 
       if (isPartOfCorridor) {
         // Make highlighted dots larger and more prominent
         layer.setStyle({
-          radius: 2.5,  // Half the previous size
-          fillOpacity: 0.9,
-          weight: 1
+          radius: baseRadius * 2,
+          fillOpacity: 0.95,
+          weight: baseWeight * 2
         });
       } else {
         // Keep other dots small and subtle
         layer.setStyle({
-          radius: 1.5,  // Half the previous size
-          fillOpacity: 0.6,
-          weight: 0.5
+          radius: baseRadius * 0.7,
+          fillOpacity: 0.25,
+          weight: baseWeight * 0.5
         });
       }
     }
@@ -536,19 +791,88 @@ function highlightRouteForSite(siteName) {
 function resetRouteHighlighting() {
   if (!trafficMap) return;
 
+  const baseRadius = getBaseRadiusForZoom();
   trafficMap.eachLayer(layer => {
     if (layer instanceof L.CircleMarker && layer._corridorInfo) {
       layer.setStyle({
-        radius: 1.5,  // Half the previous size
+        radius: baseRadius,
         fillOpacity: 0.6,
-        weight: 0.5
+        weight: Math.max(0.5, baseRadius / 3)
       });
+    }
+  });
+}
+
+/**
+ * Calculate base dot radius based on current zoom level
+ * Dots grow larger as you zoom in for better visibility
+ */
+function getBaseRadiusForZoom() {
+  if (!trafficMap) return 1.5;
+
+  const zoom = trafficMap.getZoom();
+
+  // Zoom level mapping:
+  // 10-11: 1.0 (zoomed out, small dots)
+  // 12: 1.5 (default view)
+  // 13: 2.5
+  // 14: 4
+  // 15: 6
+  // 16: 8
+  // 17+: 10 (zoomed in, large dots)
+
+  if (zoom <= 10) return 1.0;
+  if (zoom === 11) return 1.2;
+  if (zoom === 12) return 1.5;
+  if (zoom === 13) return 2.5;
+  if (zoom === 14) return 4;
+  if (zoom === 15) return 6;
+  if (zoom === 16) return 8;
+  return 10; // zoom 17+
+}
+
+/**
+ * Update all dot sizes when zoom level changes
+ */
+function updateDotSizeForZoom() {
+  if (!trafficMap) return;
+
+  const baseRadius = getBaseRadiusForZoom();
+  const baseWeight = Math.max(0.5, baseRadius / 3);
+
+  trafficMap.eachLayer(layer => {
+    if (layer instanceof L.CircleMarker && layer._corridorInfo) {
+      // Check if this dot is currently highlighted (from route selection)
+      const currentRadius = layer.options.radius;
+      const isHighlighted = currentRadius > baseRadius * 1.5;
+      const isDimmed = layer.options.fillOpacity < 0.4;
+
+      if (isHighlighted) {
+        // Keep highlighted dots larger relative to base
+        layer.setStyle({
+          radius: baseRadius * 2,
+          weight: baseWeight * 2
+        });
+      } else if (isDimmed) {
+        // Keep dimmed dots smaller relative to base
+        layer.setStyle({
+          radius: baseRadius * 0.7,
+          weight: baseWeight * 0.5
+        });
+      } else {
+        // Normal dots
+        layer.setStyle({
+          radius: baseRadius,
+          weight: baseWeight
+        });
+      }
     }
   });
 }
 
 // Route selector mapping to corridor names
 const routeCorridorMap = {
+  'stirling-highway': ['Stirling Hwy / Mounts Bay Rd', 'Stirling Highway - Claremont/Cottesloe', 'Stirling Highway - Mosman Park'],
   'stirling-mounts-bay': 'Stirling Hwy / Mounts Bay Rd',
   'stirling-claremont': 'Stirling Highway - Claremont/Cottesloe',
   'stirling-mosman': 'Stirling Highway - Mosman Park',
@@ -558,6 +882,7 @@ const routeCorridorMap = {
 
 // Corridor center coordinates for map panning
 const corridorCenters = {
+  'stirling-highway': { lat: -31.985, lng: 115.795, zoom: 13 },
   'stirling-mounts-bay': { lat: -31.972, lng: 115.830, zoom: 14 },
   'stirling-claremont': { lat: -31.988, lng: 115.775, zoom: 14 },
   'stirling-mosman': { lat: -32.015, lng: 115.755, zoom: 14 },
@@ -585,16 +910,17 @@ function handleRouteSelection(routeValue) {
     // "All Routes" selected - reset to default view
     resetRouteHighlighting();
     if (trafficMap) {
-      trafficMap.flyTo([-31.995, 115.785], 12, { duration: 1 });
+      trafficMap.flyTo([-31.965, 115.82], 13, { duration: 1 });
     }
     return;
   }
 
-  const corridorName = routeCorridorMap[routeValue];
-  if (!corridorName) return;
+  const corridorNames = routeCorridorMap[routeValue];
+  if (!corridorNames) return;
 
   // Highlight selected corridor, dim others
-  highlightCorridorByName(corridorName);
+  // corridorNames can be string or array (for "Stirling Highway All")
+  highlightCorridorByName(corridorNames);
 
   // Pan to corridor center
   const center = corridorCenters[routeValue];
@@ -606,26 +932,31 @@ function handleRouteSelection(routeValue) {
 /**
  * Highlight a specific corridor by name, dimming all others
  */
-function highlightCorridorByName(corridorName) {
+function highlightCorridorByName(corridorNames) {
+  // Normalize to array for consistent handling
+  const namesToMatch = Array.isArray(corridorNames) ? corridorNames : [corridorNames];
   if (!trafficMap) return;
+
+  const baseRadius = getBaseRadiusForZoom();
+  const baseWeight = Math.max(0.5, baseRadius / 3);
 
   trafficMap.eachLayer(layer => {
     if (layer instanceof L.CircleMarker && layer._corridorInfo) {
-      const isMatch = layer._corridorInfo.name === corridorName;
+      const isMatch = namesToMatch.includes(layer._corridorInfo.name);
 
       if (isMatch) {
         // Highlighted route - larger, more visible
         layer.setStyle({
-          radius: 3,
+          radius: baseRadius * 2,
           fillOpacity: 0.95,
-          weight: 1.5
+          weight: baseWeight * 2
         });
       } else {
         // Other routes - smaller, dimmed
         layer.setStyle({
-          radius: 1,
+          radius: baseRadius * 0.7,
           fillOpacity: 0.2,
-          weight: 0.3
+          weight: baseWeight * 0.5
         });
       }
     }
@@ -700,17 +1031,23 @@ function animateRouteArrow(siteName) {
 
 function initMap() {
   // Center on SwanFlow traffic corridor
-  const center = [-31.995, 115.785];
+  const center = [-31.965, 115.82]; // Optimized to show all arterials at 1km scale
 
   trafficMap = L.map('traffic-map', {
     center: center,
-    zoom: 12,
+    zoom: 13,
     zoomControl: true,
     attributionControl: true
   });
 
   // Expose to window for debugging/testing
   window.trafficMap = trafficMap;
+
+  // Add zoom-based dot scaling
+  trafficMap.on('zoomend', updateDotSizeForZoom);
+
+  // Initial call to set correct size
+  setTimeout(updateDotSizeForZoom, 100);
 
   // Define multiple basemap layers
   const baseMaps = {
@@ -750,7 +1087,7 @@ function initMap() {
 
   // Set default based on theme
   const isDark = currentTheme === 'dark';
-  const defaultLayer = isDark ? baseMaps['Dark Mode'] : baseMaps['Satellite'];
+  const defaultLayer = isDark ? baseMaps['Dark Mode'] : baseMaps['Street Map'];
   defaultLayer.addTo(trafficMap);
 
   // Add scale control (bottom left)
@@ -961,14 +1298,14 @@ function updateMapMarkers(sites) {
     {
       name: 'Mitchell Freeway',
       shortName: 'Mitchell Fwy',
-      filter: 'Narrows Interchange|Malcolm Street|Loftus Street|Newcastle/Roe Street|Charles Street|Vincent Street|Powis Street|Hutton Street|Scarborough Beach Road',
+      filter: 'Mitchell Fwy',
       start: L.latLng(-31.9580, 115.8450),  // Narrows Interchange
       end: L.latLng(-31.9100, 115.8480),    // Scarborough Beach Rd
       label: 'Narrows → Scarborough',
       waypoints: [
         L.latLng(-31.9540, 115.8470),  // Malcolm St
         L.latLng(-31.9500, 115.8480),  // Loftus St
-        L.latLng(-31.9450, 115.8510),  // Newcastle/Roe St
+        L.latLng(-31.9450, 115.8510),  // Newcastle St
         L.latLng(-31.9400, 115.8530),  // Charles St
         L.latLng(-31.9350, 115.8540),  // Vincent St
         L.latLng(-31.9300, 115.8520),  // Powis St
@@ -978,13 +1315,13 @@ function updateMapMarkers(sites) {
     {
       name: 'Kwinana Freeway',
       shortName: 'Kwinana Fwy',
-      filter: 'Narrows South|Mill Point Road|South Terrace/Judd St|Canning Highway|Manning Road|Leach Highway',
+      filter: 'Kwinana Fwy',
       start: L.latLng(-31.9620, 115.8460),  // Narrows South
       end: L.latLng(-32.0220, 115.8560),    // Leach Highway
       label: 'Narrows → Leach Hwy',
       waypoints: [
         L.latLng(-31.9680, 115.8550),  // Mill Point Rd
-        L.latLng(-31.9780, 115.8620),  // South Terrace/Judd St
+        L.latLng(-31.9780, 115.8620),  // South Tce
         L.latLng(-31.9950, 115.8600),  // Canning Hwy
         L.latLng(-32.0100, 115.8580)   // Manning Rd
       ]
@@ -1493,7 +1830,9 @@ function updateStatsCards(stats) {
 
   // Calculate time since last update
   if (stats.last_seen) {
-    const lastSeen = new Date(stats.last_seen);
+    // Backend returns UTC timestamps without timezone indicator - append 'Z' to parse as UTC
+    const lastSeenStr = stats.last_seen.endsWith('Z') ? stats.last_seen : stats.last_seen.replace(' ', 'T') + 'Z';
+    const lastSeen = new Date(lastSeenStr);
     const now = new Date();
     const diffMinutes = Math.floor((now - lastSeen) / 60000);
 
@@ -1521,7 +1860,7 @@ function updateChart(hourlyData) {
   // Extract labels and data
   const labels = hourlyData.map(d => {
     const date = new Date(d.hour);
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+    return formatPerthTime(date, 'hour');
   });
 
   const counts = hourlyData.map(d => Math.round(d.avg_count));
@@ -1653,7 +1992,8 @@ async function loadAllSitesData() {
   console.log(`Loaded ${arterialWithStats.length} arterial + ${freewayWithStats.length} freeway = ${allSites.length} total sites`);
 
   // Update map, flow, and hero status card
-  if (trafficMap) {
+  // Only update if we have data - don't clear dots on fetch failure
+  if (trafficMap && allSites.length > 0) {
     updateMapMarkers(allSites);
 
     // Update flow corridor based on current network
@@ -1699,6 +2039,10 @@ async function loadDashboard() {
   if (detections) {
     updateDetectionsTable(detections);
   }
+
+  // Re-apply highlighting after dots are rebuilt
+  // (loadAllSitesData rebuilds all dots, losing any highlighting)
+  highlightRouteForSite(currentSite);
 
   setStatus('connected', 'Connected');
 }
@@ -2033,23 +2377,30 @@ async function init() {
   // Render initial flow corridor (arterial by default)
   renderFlowCorridor(currentNetwork);
 
-  // Load sites
-  const sites = await fetchSites();
+  // Load sites and consolidate into stretches
+  const rawSites = await fetchSites();
 
-  if (sites.length === 0) {
+  if (rawSites.length === 0) {
     siteSelect.innerHTML = '<option value="">No sites available</option>';
     setStatus('error', 'No monitoring sites found');
     return;
   }
 
-  // Populate site selector
-  siteSelect.innerHTML = sites.map(site =>
-    `<option value="${site.name}">${site.name}</option>`
+  // Store raw sites for data lookups
+  window.allRawSites = rawSites;
+
+  // Consolidate into 4 corridor stretches for simpler UX
+  const stretches = consolidateSitesToStretches(rawSites);
+
+  // Populate site selector with stretches
+  siteSelect.innerHTML = stretches.map(stretch =>
+    `<option value="${stretch.id}" data-sites="${stretch.sites.map(s => s.name).join('|')}">${stretch.name}</option>`
   ).join('');
 
-  // Set default site
-  currentSite = sites[0].name;
+  // Set default stretch
+  currentSite = stretches[0].id;
   siteSelect.value = currentSite;
+  window.currentStretch = stretches[0];
 
   // Load initial data
   await loadDashboard();
@@ -2109,9 +2460,8 @@ async function init() {
   siteSelect.addEventListener('change', async (e) => {
     currentSite = e.target.value;
     panToSite(currentSite); // Pan map to selected site
-    highlightRouteForSite(currentSite); // Highlight routes containing this site
+    await loadDashboard(); // loadDashboard will call highlightRouteForSite after rebuilding dots
     animateRouteArrow(currentSite); // Animate arrow along route
-    await loadDashboard();
   });
 
   periodSelect.addEventListener('change', async (e) => {
@@ -2167,4 +2517,102 @@ window.addEventListener('beforeunload', () => {
   if (trafficChart) {
     trafficChart.destroy();
   }
+});
+
+// ============================================================================
+// MOBILE BOTTOM NAVIGATION
+// Smooth scroll to sections with active state management
+// ============================================================================
+
+function initMobileBottomNav() {
+  const bottomNav = document.getElementById('mobile-bottom-nav');
+  if (!bottomNav) return;
+
+  const navItems = bottomNav.querySelectorAll('.nav-item');
+  const sections = {
+    hero: document.getElementById('section-hero'),
+    map: document.getElementById('section-map'),
+    flow: document.getElementById('section-flow'),
+    chart: document.getElementById('section-chart'),
+    table: document.getElementById('section-table')
+  };
+
+  // Click handler for nav items
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const sectionId = item.dataset.section;
+      const section = sections[sectionId];
+
+      if (section) {
+        // Smooth scroll to section
+        section.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+        // Update active state
+        setActiveNavItem(sectionId);
+      }
+    });
+  });
+
+  // Track scroll position to update active nav item
+  let scrollTimeout;
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      updateActiveNavOnScroll(sections, navItems);
+    }, 100);
+  }, { passive: true });
+}
+
+function setActiveNavItem(sectionId) {
+  const bottomNav = document.getElementById('mobile-bottom-nav');
+  if (!bottomNav) return;
+
+  bottomNav.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.dataset.section === sectionId) {
+      item.classList.add('active');
+    }
+  });
+}
+
+function updateActiveNavOnScroll(sections, navItems) {
+  const scrollTop = window.scrollY;
+  const windowHeight = window.innerHeight;
+
+  // Find which section is most visible
+  let activeSection = 'hero';
+  let maxVisibility = 0;
+
+  Object.entries(sections).forEach(([id, section]) => {
+    if (!section) return;
+
+    const rect = section.getBoundingClientRect();
+    const sectionTop = rect.top;
+    const sectionBottom = rect.bottom;
+
+    // Calculate how much of the section is visible in viewport
+    const visibleTop = Math.max(0, sectionTop);
+    const visibleBottom = Math.min(windowHeight, sectionBottom);
+    const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+    // Weight sections near the top of viewport more heavily
+    const topBonus = sectionTop < windowHeight / 3 && sectionTop > -100 ? 200 : 0;
+    const visibility = visibleHeight + topBonus;
+
+    if (visibility > maxVisibility) {
+      maxVisibility = visibility;
+      activeSection = id;
+    }
+  });
+
+  setActiveNavItem(activeSection);
+}
+
+// Initialize bottom nav after DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+  // Delay slightly to ensure all elements are rendered
+  setTimeout(initMobileBottomNav, 100);
 });

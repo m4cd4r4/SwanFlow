@@ -13,40 +13,81 @@ const db = new Database('./traffic-watch.db');
 
 // Site definitions
 const sites = [
+  // ============================================================================
+  // ARTERIAL ROADS
+  // ============================================================================
+
   // Stirling Highway / Mounts Bay Road (Winthrop Ave → Point Lewis) - PoC Phase 1
-  { name: 'Stirling Hwy @ Winthrop Ave (Northbound)', multiplier: 1.3, direction: 'NB' },  // High traffic - SCGH/UWA
-  { name: 'Stirling Hwy @ Winthrop Ave (Southbound)', multiplier: 1.25, direction: 'SB' },
-  { name: 'Stirling Hwy @ Broadway (Northbound)', multiplier: 1.15, direction: 'NB' },
-  { name: 'Stirling Hwy @ Broadway (Southbound)', multiplier: 1.2, direction: 'SB' },
-  { name: 'Mounts Bay Rd @ Kings Park (Northbound)', multiplier: 1.2, direction: 'NB' },
-  { name: 'Mounts Bay Rd @ Kings Park (Southbound)', multiplier: 1.1, direction: 'SB' },
-  { name: 'Mounts Bay Rd @ Mill Point (Northbound)', multiplier: 1.0, direction: 'NB' },
-  { name: 'Mounts Bay Rd @ Mill Point (Southbound)', multiplier: 0.9, direction: 'SB' },
-  { name: 'Mounts Bay Rd @ Fraser Ave (Northbound)', multiplier: 0.95, direction: 'NB' },
-  { name: 'Mounts Bay Rd @ Fraser Ave (Southbound)', multiplier: 1.05, direction: 'SB' },
-  { name: 'Mounts Bay Rd @ Malcolm St (Northbound)', multiplier: 0.85, direction: 'NB' },
-  { name: 'Mounts Bay Rd @ Malcolm St (Southbound)', multiplier: 1.15, direction: 'SB' },
+  { name: 'Stirling Hwy @ Winthrop Ave (Northbound)', multiplier: 1.3, direction: 'NB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Winthrop Ave (Southbound)', multiplier: 1.25, direction: 'SB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Broadway (Northbound)', multiplier: 1.15, direction: 'NB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Broadway (Southbound)', multiplier: 1.2, direction: 'SB', type: 'arterial' },
+  { name: 'Mounts Bay Rd @ Kings Park (Northbound)', multiplier: 1.2, direction: 'NB', type: 'arterial' },
+  { name: 'Mounts Bay Rd @ Kings Park (Southbound)', multiplier: 1.1, direction: 'SB', type: 'arterial' },
+  { name: 'Mounts Bay Rd @ Mill Point (Northbound)', multiplier: 1.0, direction: 'NB', type: 'arterial' },
+  { name: 'Mounts Bay Rd @ Mill Point (Southbound)', multiplier: 0.9, direction: 'SB', type: 'arterial' },
+  { name: 'Mounts Bay Rd @ Fraser Ave (Northbound)', multiplier: 0.95, direction: 'NB', type: 'arterial' },
+  { name: 'Mounts Bay Rd @ Fraser Ave (Southbound)', multiplier: 1.05, direction: 'SB', type: 'arterial' },
+  { name: 'Mounts Bay Rd @ Malcolm St (Northbound)', multiplier: 0.85, direction: 'NB', type: 'arterial' },
+  { name: 'Mounts Bay Rd @ Malcolm St (Southbound)', multiplier: 1.15, direction: 'SB', type: 'arterial' },
 
   // Stirling Hwy - Claremont to Cottesloe (Stirling Rd → Eric St) - Phase 2
-  // Commercial zone (Bunnings, Claremont Quarter) - higher weekend/midday traffic
-  { name: 'Stirling Hwy @ Stirling Rd (Northbound)', multiplier: 1.2, direction: 'NB', zone: 'commercial' },
-  { name: 'Stirling Hwy @ Stirling Rd (Southbound)', multiplier: 1.15, direction: 'SB', zone: 'commercial' },
-  // School zone (Christ Church, MLC nearby) - peak at school times
-  { name: 'Stirling Hwy @ Jarrad St (Northbound)', multiplier: 1.1, direction: 'NB', zone: 'school' },
-  { name: 'Stirling Hwy @ Jarrad St (Southbound)', multiplier: 1.05, direction: 'SB', zone: 'school' },
-  // Residential/transition zone
-  { name: 'Stirling Hwy @ Eric St (Northbound)', multiplier: 1.0, direction: 'NB' },
-  { name: 'Stirling Hwy @ Eric St (Southbound)', multiplier: 0.95, direction: 'SB' },
+  { name: 'Stirling Hwy @ Stirling Rd (Northbound)', multiplier: 1.2, direction: 'NB', type: 'arterial', zone: 'commercial' },
+  { name: 'Stirling Hwy @ Stirling Rd (Southbound)', multiplier: 1.15, direction: 'SB', type: 'arterial', zone: 'commercial' },
+  { name: 'Stirling Hwy @ Jarrad St (Northbound)', multiplier: 1.1, direction: 'NB', type: 'arterial', zone: 'school' },
+  { name: 'Stirling Hwy @ Jarrad St (Southbound)', multiplier: 1.05, direction: 'SB', type: 'arterial', zone: 'school' },
+  { name: 'Stirling Hwy @ Eric St (Northbound)', multiplier: 1.0, direction: 'NB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Eric St (Southbound)', multiplier: 0.95, direction: 'SB', type: 'arterial' },
 
   // Stirling Hwy - Mosman Park (Forrest St → Victoria St) - Phase 1
-  { name: 'Stirling Hwy @ Forrest St (Northbound)', multiplier: 1.1, direction: 'NB' },
-  { name: 'Stirling Hwy @ Forrest St (Southbound)', multiplier: 1.0, direction: 'SB' },
-  { name: 'Stirling Hwy @ Bay View Terrace (Northbound)', multiplier: 1.05, direction: 'NB' },
-  { name: 'Stirling Hwy @ Bay View Terrace (Southbound)', multiplier: 0.95, direction: 'SB' },
-  { name: 'Stirling Hwy @ McCabe St (Northbound)', multiplier: 1.0, direction: 'NB' },
-  { name: 'Stirling Hwy @ McCabe St (Southbound)', multiplier: 1.1, direction: 'SB' },
-  { name: 'Stirling Hwy @ Victoria St (Northbound)', multiplier: 0.95, direction: 'NB' },
-  { name: 'Stirling Hwy @ Victoria St (Southbound)', multiplier: 1.15, direction: 'SB' }
+  { name: 'Stirling Hwy @ Forrest St (Northbound)', multiplier: 1.1, direction: 'NB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Forrest St (Southbound)', multiplier: 1.0, direction: 'SB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Bay View Terrace (Northbound)', multiplier: 1.05, direction: 'NB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Bay View Terrace (Southbound)', multiplier: 0.95, direction: 'SB', type: 'arterial' },
+  { name: 'Stirling Hwy @ McCabe St (Northbound)', multiplier: 1.0, direction: 'NB', type: 'arterial' },
+  { name: 'Stirling Hwy @ McCabe St (Southbound)', multiplier: 1.1, direction: 'SB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Victoria St (Northbound)', multiplier: 0.95, direction: 'NB', type: 'arterial' },
+  { name: 'Stirling Hwy @ Victoria St (Southbound)', multiplier: 1.15, direction: 'SB', type: 'arterial' },
+
+  // ============================================================================
+  // FREEWAYS - Higher volume, stronger directional bias
+  // ============================================================================
+
+  // Mitchell Freeway (Narrows Interchange → Scarborough Beach Rd)
+  // Major north-south freeway through Perth CBD suburbs
+  { name: 'Mitchell Fwy @ Narrows (Northbound)', multiplier: 2.5, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Narrows (Southbound)', multiplier: 2.3, direction: 'SB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Malcolm St (Northbound)', multiplier: 2.4, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Malcolm St (Southbound)', multiplier: 2.2, direction: 'SB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Loftus St (Northbound)', multiplier: 2.3, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Loftus St (Southbound)', multiplier: 2.1, direction: 'SB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Newcastle St (Northbound)', multiplier: 2.2, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Newcastle St (Southbound)', multiplier: 2.0, direction: 'SB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Charles St (Northbound)', multiplier: 2.1, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Charles St (Southbound)', multiplier: 1.9, direction: 'SB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Vincent St (Northbound)', multiplier: 2.0, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Vincent St (Southbound)', multiplier: 1.8, direction: 'SB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Powis St (Northbound)', multiplier: 1.9, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Powis St (Southbound)', multiplier: 1.7, direction: 'SB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Hutton St (Northbound)', multiplier: 1.8, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Hutton St (Southbound)', multiplier: 1.6, direction: 'SB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Scarborough Beach Rd (Northbound)', multiplier: 1.7, direction: 'NB', type: 'freeway' },
+  { name: 'Mitchell Fwy @ Scarborough Beach Rd (Southbound)', multiplier: 1.5, direction: 'SB', type: 'freeway' },
+
+  // Kwinana Freeway (Narrows South → Leach Hwy)
+  // Major freeway heading south from CBD to Fremantle/Rockingham
+  { name: 'Kwinana Fwy @ Narrows South (Northbound)', multiplier: 2.4, direction: 'NB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Narrows South (Southbound)', multiplier: 2.2, direction: 'SB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Mill Point Rd (Northbound)', multiplier: 2.3, direction: 'NB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Mill Point Rd (Southbound)', multiplier: 2.1, direction: 'SB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ South Tce (Northbound)', multiplier: 2.2, direction: 'NB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ South Tce (Southbound)', multiplier: 2.0, direction: 'SB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Canning Hwy (Northbound)', multiplier: 2.1, direction: 'NB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Canning Hwy (Southbound)', multiplier: 1.9, direction: 'SB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Manning Rd (Northbound)', multiplier: 2.0, direction: 'NB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Manning Rd (Southbound)', multiplier: 1.8, direction: 'SB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Leach Hwy (Northbound)', multiplier: 1.9, direction: 'NB', type: 'freeway' },
+  { name: 'Kwinana Fwy @ Leach Hwy (Southbound)', multiplier: 1.7, direction: 'SB', type: 'freeway' }
 ];
 
 // Traffic patterns by hour (base vehicles per minute)
@@ -58,127 +99,26 @@ const trafficPatterns = {
   20: 3.33, 21: 2.50, 22: 1.83, 23: 1.17
 };
 
-// Direction modifiers
+// Direction modifiers - freeways have stronger directional bias during rush hour
 const directionModifiers = {
-  NB: { morning: 1.3, evening: 0.7 },
-  SB: { morning: 0.7, evening: 1.3 }
+  arterial: {
+    NB: { morning: 1.3, evening: 0.7 },
+    SB: { morning: 0.7, evening: 1.3 }
+  },
+  freeway: {
+    NB: { morning: 1.5, evening: 0.5 },  // Stronger bias for freeways
+    SB: { morning: 0.5, evening: 1.5 }
+  }
 };
 
 // Get current hour in Perth timezone (AWST, UTC+8)
 function getPerthHour() {
-  return parseInt(new Date().toLocaleString('en-AU', {
+  const hour = parseInt(new Date().toLocaleString('en-AU', {
     timeZone: 'Australia/Perth',
     hour: 'numeric',
     hour12: false
   }));
-}
-
-// Zone-specific traffic modifiers by hour
-// School zones: Peak at 8-9am (drop-off) and 3-4pm (pickup)
-// Commercial zones: Higher midday traffic, weekend patterns
-const zoneModifiers = {
-  school: {
-    // School drop-off peak (8-9am)
-    7: 1.4, 8: 1.8, 9: 1.3,
-    // School pickup peak (3-4pm)
-    14: 1.2, 15: 1.7, 16: 1.5,
-    // Regular hours
-    default: 1.0
-  },
-  commercial: {
-    // Shopping hours - higher midday/afternoon
-    9: 1.2, 10: 1.4, 11: 1.5, 12: 1.4, 13: 1.3,
-    14: 1.4, 15: 1.3, 16: 1.2, 17: 1.1,
-    // Weekend effect (simulated - we apply a small boost)
-    default: 1.1
-  }
-};
-
-function getZoneModifier(hour, zone) {
-  if (!zone || !zoneModifiers[zone]) return 1.0;
-  return zoneModifiers[zone][hour] || zoneModifiers[zone].default || 1.0;
-}
-
-function getVehicleCount(hour, site) {
-  const baseRate = trafficPatterns[hour];
-  let count = baseRate * site.multiplier;
-
-  // Apply rush hour direction bias (commute patterns)
-  if (hour >= 6 && hour <= 9) {
-    count *= directionModifiers[site.direction].morning;
-  } else if (hour >= 16 && hour <= 19) {
-    count *= directionModifiers[site.direction].evening;
-  }
-
-  // Apply zone-specific modifiers (school/commercial areas)
-  if (site.zone) {
-    count *= getZoneModifier(hour, site.zone);
-  }
-
-  // Convert to 30-second count (UPDATE_INTERVAL / 1000 / 60)
-  count = count * (UPDATE_INTERVAL / 1000 / 60);
-
-  // Add random variance (±20%)
-  count *= 0.8 + (Math.random() * 0.4);
-
-  return Math.max(Math.round(count), 0);
-}
-
-function getConfidence() {
-  const hour = getPerthHour();
-  const isDay = hour >= 6 && hour <= 20;
-  return isDay ? 0.75 + Math.random() * 0.20 : 0.60 + Math.random() * 0.20;
-}
-
-function simulateTrafficUpdate() {
-  const now = Date.now();
-  const hour = getPerthHour();
-
-  const insertDetection = db.prepare(`
-    INSERT INTO detections (
-      site, latitude, longitude, timestamp,
-      total_count, hour_count, minute_count,
-      avg_confidence, uptime
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  sites.forEach(site => {
-    // Get the latest record for this site
-    const latest = db.prepare(`
-      SELECT total_count, uptime FROM detections
-      WHERE site = ?
-      ORDER BY timestamp DESC
-      LIMIT 1
-    `).get(site.name);
-
-    if (!latest) return; // Skip if site not initialized
-
-    // Generate new vehicles
-    const newVehicles = getVehicleCount(hour, site);
-
-    // Always update, even if 0 vehicles (important for low-traffic periods)
-    const totalCount = latest.total_count + newVehicles;
-    const hourCount = newVehicles * (3600 / (UPDATE_INTERVAL / 1000)); // Extrapolate to hourly
-    const minuteCount = newVehicles * (60 / (UPDATE_INTERVAL / 1000)); // Extrapolate to per minute
-    const confidence = getConfidence();
-    const uptime = latest.uptime + (UPDATE_INTERVAL / 1000);
-
-    insertDetection.run(
-      site.name,
-      null, // lat/lon already in sites table
-      null,
-      now,
-      totalCount,
-      Math.round(hourCount),
-      Math.round(minuteCount),
-      confidence,
-      uptime
-    );
-
-    if (newVehicles > 0) {
-      console.log(`[SIMULATOR] ${site.name.substring(0, 35).padEnd(35)} | +${newVehicles} vehicles | Total: ${totalCount} | Rate: ${Math.round(hourCount)}/hr`);
-    }
-  });
+  return hour === 24 ? 0 : hour;
 }
 
 function startSimulator() {
@@ -187,11 +127,16 @@ function startSimulator() {
     return;
   }
 
+  const arterialCount = sites.filter(s => s.type === 'arterial').length;
+  const freewayCount = sites.filter(s => s.type === 'freeway').length;
+
   console.log('=================================');
   console.log('Live Traffic Simulator Started');
   console.log('=================================');
   console.log(`Update interval: ${UPDATE_INTERVAL / 1000}s`);
-  console.log(`Sites: ${sites.length}`);
+  console.log(`Sites: ${sites.length} total`);
+  console.log(`  - Arterial: ${arterialCount}`);
+  console.log(`  - Freeway: ${freewayCount}`);
   console.log('Generating real-time traffic data...\n');
 
   // Run immediately on start
@@ -201,7 +146,7 @@ function startSimulator() {
     } catch (error) {
       console.error('[SIMULATOR] Error:', error.message);
     }
-  }, 5000); // Wait 5 seconds for server to stabilize
+  }, 5000);
 
   // Then run on interval
   setInterval(() => {
@@ -211,6 +156,77 @@ function startSimulator() {
       console.error('[SIMULATOR] Error:', error.message);
     }
   }, UPDATE_INTERVAL);
+}
+
+/**
+ * Simulate a traffic update for all sites
+ */
+function simulateTrafficUpdate() {
+  const hour = getPerthHour();
+  const baseRate = trafficPatterns[hour];
+  const timestamp = Date.now();
+
+  const isMorningRush = hour >= 6 && hour <= 9;
+  const isEveningRush = hour >= 16 && hour <= 19;
+
+  const insertStmt = db.prepare(`
+    INSERT INTO detections (site, timestamp, total_count, hour_count, minute_count, avg_confidence, uptime, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+  `);
+
+  const updateTotalStmt = db.prepare(`
+    SELECT MAX(total_count) as max_total FROM detections WHERE site = ?
+  `);
+
+  let updatedCount = 0;
+  let arterialUpdated = 0;
+  let freewayUpdated = 0;
+
+  for (const site of sites) {
+    const result = updateTotalStmt.get(site.name);
+    const currentTotal = result?.max_total || 0;
+
+    // Get modifiers based on road type
+    const roadType = site.type || 'arterial';
+    const modifiers = directionModifiers[roadType];
+
+    let rate = baseRate * site.multiplier;
+
+    // Apply direction modifiers for rush hours
+    if (isMorningRush) {
+      rate *= modifiers[site.direction]?.morning || 1.0;
+    } else if (isEveningRush) {
+      rate *= modifiers[site.direction]?.evening || 1.0;
+    }
+
+    // Apply zone modifiers for arterials
+    if (site.zone === 'commercial' && (hour >= 10 && hour <= 16)) {
+      rate *= 1.2;
+    }
+    if (site.zone === 'school' && ((hour >= 8 && hour <= 9) || (hour >= 15 && hour <= 16))) {
+      rate *= 1.4;
+    }
+
+    // Add randomness (±20%)
+    rate *= 0.8 + Math.random() * 0.4;
+
+    const minuteCount = Math.round(rate);
+    const hourCount = Math.round(rate * 60);
+    const newTotal = currentTotal + minuteCount;
+    const confidence = 0.85 + Math.random() * 0.1;
+    const uptime = Math.floor((Date.now() - 1734789355000) / 1000);
+
+    try {
+      insertStmt.run(site.name, timestamp, newTotal, hourCount, minuteCount, confidence, uptime);
+      updatedCount++;
+      if (roadType === 'freeway') freewayUpdated++;
+      else arterialUpdated++;
+    } catch (err) {
+      // Site might not exist in sites table, skip silently
+    }
+  }
+
+  console.log(`[SIMULATOR] Updated ${updatedCount} sites (${arterialUpdated} arterial, ${freewayUpdated} freeway) at hour ${hour} (base rate: ${baseRate.toFixed(2)} veh/min)`);
 }
 
 // Graceful shutdown

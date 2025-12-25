@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Base - SwanFlow</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css?v=20251225-03">
+  <link rel="stylesheet" href="knowledge.css?v=20251225-01">
+</head>
+<body>
+  <div class="knowledge-page">
+    <!-- Navigation Bar -->
+    <nav class="knowledge-nav">
+      <a href="index.html" class="nav-back">
+        <span class="back-icon">&larr;</span>
+        <span>Back to Dashboard</span>
+      </a>
+      <div class="nav-brand">
+        <span class="brand-icon">🦢</span>
+        <span class="brand-text">SwanFlow</span>
+      </div>
+      <button type="button" id="theme-toggle-btn" class="theme-btn" aria-label="Toggle dark mode">
+        <span class="icon-sun">☀️</span>
+        <span class="icon-moon">🌙</span>
+      </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="knowledge-hero">
+      <div class="hero-bg-pattern"></div>
+      <div class="hero-content">
+        <div class="hero-badge">Technical Documentation</div>
+        <h1>SwanFlow Knowledge Base</h1>
+        <p class="hero-subtitle">Deep dive into the technology powering Perth's real-time traffic intelligence</p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="stat-value">52</span>
+            <span class="stat-label">Sensor Sites</span>
+          </div>
+          <div class="hero-stat">
+            <span class="stat-value">48ms</span>
+            <span class="stat-label">Inference Time</span>
+          </div>
+          <div class="hero-stat">
+            <span class="stat-value">90.5%</span>
+            <span class="stat-label">F1 Score</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Quick Navigation -->
+    <div class="quick-nav">
+      <button class="quick-nav-btn active" data-target="all">All Topics</button>
+      <button class="quick-nav-btn" data-target="algorithm">Algorithm</button>
+      <button class="quick-nav-btn" data-target="ml">ML & AI</button>
+      <button class="quick-nav-btn" data-target="hardware">Hardware</button>
+      <button class="quick-nav-btn" data-target="infrastructure">Infrastructure</button>
+    </div>
+
+    <!-- Knowledge Cards Grid -->
+    <main class="knowledge-container">
+      <div class="knowledge-grid">
+
+        <!-- Card 1: Traffic Flow Algorithm -->
+        <article class="knowledge-card" data-category="algorithm">
+          <div class="card-header">
+            <div class="card-icon-wrapper algorithm">
+              <span class="card-icon">🧠</span>
+            </div>
+            <div class="card-title-group">
+              <h2>Traffic Flow Algorithm</h2>
+              <span class="card-badge">Core Logic</span>
+            </div>
+            <button class="card-expand" aria-label="Expand card">
+              <span class="expand-icon">+</span>
+            </button>
+          </div>
+          <div class="card-content">
+            <div class="content-section">
+              <h3>Vehicle Detection Pipeline</h3>
+              <ul class="spec-list">
+                <li>
+                  <span class="spec-label">Frame Capture</span>
+                  <span class="spec-value">320x240 @ 10 FPS</span>
+                </li>
+                <li>
+                  <span class="spec-label">Inference Time</span>
+                  <span class="spec-value">~50ms per frame</span>
+                </li>
+                <li>
+                  <span class="spec-label">Confidence Threshold</span>
+                  <span class="spec-value">&gt;0.6 (60%)</span>
+                </li>
+                <li>
+                  <span class="spec-label">Aggregation Window</span>
+                  <span class="spec-value">5 seconds</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Corridor Aggregation</h3>
+              <p class="section-text">Sites are grouped into corridors (Mounts Bay, Stirling Highway, Mitchell Freeway, Kwinana Freeway) with directional filtering for accurate flow analysis.</p>
+              <div class="code-block">
+                <pre><code>// Corridor grouping example
+corridors: {
+  'mounts-bay-eastbound': {
+    sitePatterns: ['Mounts Bay'],
+    directionFilter: 'Eastbound'
+  },
+  'mitchell-northbound': {
+    sitePatterns: ['Mitchell Fwy'],
+    directionFilter: 'Northbound'
+  }
+}</code></pre>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Speed Estimation</h3>
+              <p class="section-text">Traffic speed is estimated using detection frequency patterns and historical calibration data. Higher detection rates typically correlate with slower traffic due to increased vehicle density.</p>
+              <div class="status-legend">
+                <div class="status-item flowing">
+                  <span class="status-dot"></span>
+                  <span class="status-name">Flowing</span>
+                  <span class="status-speed">55-65 km/h</span>
+                </div>
+                <div class="status-item moderate">
+                  <span class="status-dot"></span>
+                  <span class="status-name">Moderate</span>
+                  <span class="status-speed">30-50 km/h</span>
+                </div>
+                <div class="status-item heavy">
+                  <span class="status-dot"></span>
+                  <span class="status-name">Heavy</span>
+                  <span class="status-speed">15-35 km/h</span>
+                </div>
+                <div class="status-item gridlock">
+                  <span class="status-dot"></span>
+                  <span class="status-name">Gridlock</span>
+                  <span class="status-speed">5-20 km/h</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Directional Flow Analysis</h3>
+              <p class="section-text">Each site tracks both directions independently, enabling accurate commute pattern analysis:</p>
+              <ul class="feature-list">
+                <li>Morning peak: Inbound flow dominates (towards CBD)</li>
+                <li>Evening peak: Outbound flow dominates (towards suburbs)</li>
+                <li>Freeway multipliers: 1.5x stronger directional bias than arterials</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: Edge AI & ML Models -->
+        <article class="knowledge-card" data-category="ml">
+          <div class="card-header">
+            <div class="card-icon-wrapper ml">
+              <span class="card-icon">🤖</span>
+            </div>
+            <div class="card-title-group">
+              <h2>Edge AI & ML Models</h2>
+              <span class="card-badge">Machine Learning</span>
+            </div>
+            <button class="card-expand" aria-label="Expand card">
+              <span class="expand-icon">+</span>
+            </button>
+          </div>
+          <div class="card-content">
+            <div class="content-section">
+              <h3>FOMO Architecture</h3>
+              <p class="section-text"><strong>FOMO</strong> (Faster Objects, More Objects) is a novel machine learning architecture designed specifically for constrained devices. It outputs a heatmap instead of bounding boxes, enabling much faster inference.</p>
+              <ul class="spec-list">
+                <li>
+                  <span class="spec-label">Backbone</span>
+                  <span class="spec-value">MobileNetV2 (alpha=0.35)</span>
+                </li>
+                <li>
+                  <span class="spec-label">Input Size</span>
+                  <span class="spec-value">96x96 grayscale</span>
+                </li>
+                <li>
+                  <span class="spec-label">Output</span>
+                  <span class="spec-value">Fully convolutional heatmap</span>
+                </li>
+                <li>
+                  <span class="spec-label">Model Size</span>
+                  <span class="spec-value">~50KB (int8 quantized)</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Edge Impulse Training Pipeline</h3>
+              <div class="pipeline-diagram">
+                <div class="pipeline-step">
+                  <span class="step-number">1</span>
+                  <span class="step-label">Data Collection</span>
+                </div>
+                <div class="pipeline-arrow">&rarr;</div>
+                <div class="pipeline-step">
+                  <span class="step-number">2</span>
+                  <span class="step-label">Labeling</span>
+                </div>
+                <div class="pipeline-arrow">&rarr;</div>
+                <div class="pipeline-step">
+                  <span class="step-number">3</span>
+                  <span class="step-label">Training</span>
+                </div>
+                <div class="pipeline-arrow">&rarr;</div>
+                <div class="pipeline-step">
+                  <span class="step-number">4</span>
+                  <span class="step-label">Quantization</span>
+                </div>
+                <div class="pipeline-arrow">&rarr;</div>
+                <div class="pipeline-step">
+                  <span class="step-number">5</span>
+                  <span class="step-label">Deployment</span>
+                </div>
+              </div>
+              <ul class="feature-list">
+                <li>2,000+ labeled vehicle images from Perth roads</li>
+                <li>Data augmentation: rotation, brightness, Gaussian noise</li>
+                <li>80/20 train/test split with stratified sampling</li>
+                <li>Cloud-based training on Edge Impulse platform</li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Performance Metrics</h3>
+              <div class="metrics-grid">
+                <div class="metric-card">
+                  <span class="metric-value">89%</span>
+                  <span class="metric-label">Precision</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">92%</span>
+                  <span class="metric-label">Recall</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">90.5%</span>
+                  <span class="metric-label">F1 Score</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">48ms</span>
+                  <span class="metric-label">Inference</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Model Quantization</h3>
+              <p class="section-text">The model is quantized from float32 to int8 for ESP32 deployment, reducing memory footprint by 4x while maintaining >95% of original accuracy.</p>
+              <div class="code-block">
+                <pre><code>// TensorFlow Lite Micro inference
+TfLiteTensor* input = interpreter->input(0);
+// Input: 96x96 grayscale image (9,216 bytes)
+// Output: 12x12 heatmap (144 values)</code></pre>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3: Hardware Architecture -->
+        <article class="knowledge-card" data-category="hardware">
+          <div class="card-header">
+            <div class="card-icon-wrapper hardware">
+              <span class="card-icon">🔧</span>
+            </div>
+            <div class="card-title-group">
+              <h2>Hardware Architecture</h2>
+              <span class="card-badge">Edge Devices</span>
+            </div>
+            <button class="card-expand" aria-label="Expand card">
+              <span class="expand-icon">+</span>
+            </button>
+          </div>
+          <div class="card-content">
+            <div class="content-section">
+              <h3>ESP32-CAM Specifications</h3>
+              <ul class="spec-list">
+                <li>
+                  <span class="spec-label">MCU</span>
+                  <span class="spec-value">ESP32-S (240MHz dual-core)</span>
+                </li>
+                <li>
+                  <span class="spec-label">RAM</span>
+                  <span class="spec-value">520KB SRAM + 4MB PSRAM</span>
+                </li>
+                <li>
+                  <span class="spec-label">Flash</span>
+                  <span class="spec-value">4MB</span>
+                </li>
+                <li>
+                  <span class="spec-label">Camera</span>
+                  <span class="spec-value">OV2640 (2MP)</span>
+                </li>
+                <li>
+                  <span class="spec-label">Connectivity</span>
+                  <span class="spec-value">WiFi 802.11 b/g/n</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Camera Sensor Details</h3>
+              <p class="section-text">The OV2640 sensor provides 2 megapixel resolution, but we downsample to 320x240 for optimal inference speed while maintaining sufficient detail for vehicle detection.</p>
+              <ul class="spec-list">
+                <li>
+                  <span class="spec-label">Max Resolution</span>
+                  <span class="spec-value">1600x1200</span>
+                </li>
+                <li>
+                  <span class="spec-label">Operating Resolution</span>
+                  <span class="spec-value">320x240 (QVGA)</span>
+                </li>
+                <li>
+                  <span class="spec-label">Frame Rate</span>
+                  <span class="spec-value">10 FPS @ QVGA</span>
+                </li>
+                <li>
+                  <span class="spec-label">Lens Angle</span>
+                  <span class="spec-value">120° wide-angle</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Power Analysis</h3>
+              <div class="power-table">
+                <div class="power-row header">
+                  <span>Mode</span>
+                  <span>Current</span>
+                  <span>Power</span>
+                </div>
+                <div class="power-row">
+                  <span>Active (WiFi + Camera)</span>
+                  <span>310mA</span>
+                  <span>1.55W</span>
+                </div>
+                <div class="power-row">
+                  <span>Inference Only</span>
+                  <span>180mA</span>
+                  <span>0.90W</span>
+                </div>
+                <div class="power-row">
+                  <span>Light Sleep</span>
+                  <span>6.7mA</span>
+                  <span>33mW</span>
+                </div>
+                <div class="power-row">
+                  <span>Deep Sleep</span>
+                  <span>10μA</span>
+                  <span>50μW</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Deployment Considerations</h3>
+              <ul class="feature-list">
+                <li><strong>Weatherproofing:</strong> IP65-rated enclosure required for outdoor deployment</li>
+                <li><strong>Power Supply:</strong> 5V 2A via solar panel + battery or mains adapter</li>
+                <li><strong>Mounting:</strong> 3-4m height, angled 15-30° down towards road</li>
+                <li><strong>Connectivity:</strong> WiFi range ~50m; cellular 4G modem for remote sites</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4: Data Pipeline -->
+        <article class="knowledge-card" data-category="infrastructure">
+          <div class="card-header">
+            <div class="card-icon-wrapper infrastructure">
+              <span class="card-icon">🔄</span>
+            </div>
+            <div class="card-title-group">
+              <h2>Data Pipeline</h2>
+              <span class="card-badge">Backend</span>
+            </div>
+            <button class="card-expand" aria-label="Expand card">
+              <span class="expand-icon">+</span>
+            </button>
+          </div>
+          <div class="card-content">
+            <div class="content-section">
+              <h3>Detection to Dashboard Flow</h3>
+              <div class="flow-diagram">
+                <div class="flow-node">
+                  <span class="flow-icon">📷</span>
+                  <span class="flow-label">ESP32-CAM</span>
+                </div>
+                <div class="flow-connector">&rarr;</div>
+                <div class="flow-node">
+                  <span class="flow-icon">🔌</span>
+                  <span class="flow-label">REST API</span>
+                </div>
+                <div class="flow-connector">&rarr;</div>
+                <div class="flow-node">
+                  <span class="flow-icon">💾</span>
+                  <span class="flow-label">SQLite DB</span>
+                </div>
+                <div class="flow-connector">&rarr;</div>
+                <div class="flow-node">
+                  <span class="flow-icon">📊</span>
+                  <span class="flow-label">Dashboard</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>SQLite Storage Schema</h3>
+              <div class="code-block">
+                <pre><code>CREATE TABLE detections (
+  id INTEGER PRIMARY KEY,
+  site_id INTEGER NOT NULL,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+  vehicle_count INTEGER,
+  confidence REAL,
+  direction TEXT,
+  speed_estimate REAL,
+  FOREIGN KEY (site_id) REFERENCES sites(id)
+);
+
+CREATE TABLE sites (
+  id INTEGER PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  description TEXT,
+  latitude REAL,
+  longitude REAL,
+  active BOOLEAN DEFAULT 1
+);</code></pre>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>API Endpoints</h3>
+              <div class="api-table">
+                <div class="api-row header">
+                  <span>Method</span>
+                  <span>Endpoint</span>
+                  <span>Description</span>
+                </div>
+                <div class="api-row">
+                  <span class="method get">GET</span>
+                  <span class="endpoint">/api/sites</span>
+                  <span>List all monitoring sites</span>
+                </div>
+                <div class="api-row">
+                  <span class="method get">GET</span>
+                  <span class="endpoint">/api/detections</span>
+                  <span>Get recent detections</span>
+                </div>
+                <div class="api-row">
+                  <span class="method get">GET</span>
+                  <span class="endpoint">/api/stats/:site</span>
+                  <span>Site-specific statistics</span>
+                </div>
+                <div class="api-row">
+                  <span class="method post">POST</span>
+                  <span class="endpoint">/api/detection</span>
+                  <span>Submit new detection</span>
+                </div>
+                <div class="api-row">
+                  <span class="method get">GET</span>
+                  <span class="endpoint">/api/health</span>
+                  <span>System health check</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Data Retention</h3>
+              <ul class="feature-list">
+                <li><strong>Raw Detections:</strong> 30 days rolling window</li>
+                <li><strong>Hourly Aggregates:</strong> 1 year retention</li>
+                <li><strong>Daily Summaries:</strong> Indefinite storage</li>
+                <li><strong>Automatic Cleanup:</strong> Nightly cron job at 3:00 AM AWST</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 5: Corridor Intelligence -->
+        <article class="knowledge-card" data-category="algorithm">
+          <div class="card-header">
+            <div class="card-icon-wrapper algorithm">
+              <span class="card-icon">🛣️</span>
+            </div>
+            <div class="card-title-group">
+              <h2>Corridor Intelligence</h2>
+              <span class="card-badge">Analytics</span>
+            </div>
+            <button class="card-expand" aria-label="Expand card">
+              <span class="expand-icon">+</span>
+            </button>
+          </div>
+          <div class="card-content">
+            <div class="content-section">
+              <h3>Site Grouping Methodology</h3>
+              <p class="section-text">Sites are organized into logical corridors representing major traffic routes through Perth's western suburbs.</p>
+              <div class="corridor-list">
+                <div class="corridor-item">
+                  <span class="corridor-icon arterial"></span>
+                  <div class="corridor-info">
+                    <strong>Mounts Bay Road</strong>
+                    <span>Nedlands → Perth CBD (2 directions)</span>
+                  </div>
+                  <span class="corridor-count">6 sites</span>
+                </div>
+                <div class="corridor-item">
+                  <span class="corridor-icon arterial"></span>
+                  <div class="corridor-info">
+                    <strong>Stirling Highway</strong>
+                    <span>Claremont → Nedlands (2 directions)</span>
+                  </div>
+                  <span class="corridor-count">16 sites</span>
+                </div>
+                <div class="corridor-item">
+                  <span class="corridor-icon freeway"></span>
+                  <div class="corridor-info">
+                    <strong>Mitchell Freeway</strong>
+                    <span>Narrows → Scarborough Beach Rd (2 directions)</span>
+                  </div>
+                  <span class="corridor-count">18 sites</span>
+                </div>
+                <div class="corridor-item">
+                  <span class="corridor-icon freeway"></span>
+                  <div class="corridor-info">
+                    <strong>Kwinana Freeway</strong>
+                    <span>Narrows → Leach Hwy (2 directions)</span>
+                  </div>
+                  <span class="corridor-count">12 sites</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Traffic Status Calculation</h3>
+              <p class="section-text">Corridor status is calculated using weighted averaging across all active sites, with higher weights for sites with more traffic lanes.</p>
+              <div class="code-block">
+                <pre><code>function calculateCorridorStatus(sites) {
+  const weightedSum = sites.reduce((acc, site) => {
+    return acc + (site.speed * site.laneCount);
+  }, 0);
+  const totalLanes = sites.reduce((acc, s) => acc + s.laneCount, 0);
+  return weightedSum / totalLanes;
+}</code></pre>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Peak Hour Detection</h3>
+              <ul class="spec-list">
+                <li>
+                  <span class="spec-label">Morning Peak</span>
+                  <span class="spec-value">7:00 AM - 9:30 AM</span>
+                </li>
+                <li>
+                  <span class="spec-label">Evening Peak</span>
+                  <span class="spec-value">4:00 PM - 6:30 PM</span>
+                </li>
+                <li>
+                  <span class="spec-label">Weekend Pattern</span>
+                  <span class="spec-value">10:00 AM - 2:00 PM (shopping)</span>
+                </li>
+                <li>
+                  <span class="spec-label">Holiday Adjustment</span>
+                  <span class="spec-value">Reduced multipliers</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Future: Predictive Capabilities</h3>
+              <p class="section-text upcoming">Coming in v2.0:</p>
+              <ul class="feature-list">
+                <li>15-minute traffic predictions using LSTM neural network</li>
+                <li>Event-based surge detection (concerts, sports games)</li>
+                <li>Weather-adjusted forecasting</li>
+                <li>Personalized commute recommendations</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 6: Deployment & Infrastructure -->
+        <article class="knowledge-card" data-category="infrastructure">
+          <div class="card-header">
+            <div class="card-icon-wrapper infrastructure">
+              <span class="card-icon">☁️</span>
+            </div>
+            <div class="card-title-group">
+              <h2>Deployment & Infrastructure</h2>
+              <span class="card-badge">DevOps</span>
+            </div>
+            <button class="card-expand" aria-label="Expand card">
+              <span class="expand-icon">+</span>
+            </button>
+          </div>
+          <div class="card-content">
+            <div class="content-section">
+              <h3>VPS Architecture</h3>
+              <ul class="spec-list">
+                <li>
+                  <span class="spec-label">Provider</span>
+                  <span class="spec-value">Vultr (Sydney, AU)</span>
+                </li>
+                <li>
+                  <span class="spec-label">Instance</span>
+                  <span class="spec-value">4 vCPU, 8GB RAM, 160GB SSD</span>
+                </li>
+                <li>
+                  <span class="spec-label">OS</span>
+                  <span class="spec-value">Ubuntu 22.04 LTS</span>
+                </li>
+                <li>
+                  <span class="spec-label">Monthly Cost</span>
+                  <span class="spec-value">~AU$60</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Docker Container Setup</h3>
+              <div class="code-block">
+                <pre><code>services:
+  api:
+    build: ./backend/api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/ssl/certs
+    depends_on:
+      - api</code></pre>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Nginx Configuration</h3>
+              <ul class="feature-list">
+                <li>Reverse proxy to Node.js API on port 3000</li>
+                <li>SSL/TLS termination with Let's Encrypt certificates</li>
+                <li>Gzip compression for static assets</li>
+                <li>Rate limiting: 100 requests/minute per IP</li>
+                <li>CORS headers for dashboard API access</li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Monitoring & Health</h3>
+              <div class="monitoring-grid">
+                <div class="monitor-item">
+                  <span class="monitor-icon">💓</span>
+                  <span class="monitor-label">Health Endpoint</span>
+                  <span class="monitor-status">/api/health</span>
+                </div>
+                <div class="monitor-item">
+                  <span class="monitor-icon">📈</span>
+                  <span class="monitor-label">Uptime</span>
+                  <span class="monitor-status">99.9% SLA</span>
+                </div>
+                <div class="monitor-item">
+                  <span class="monitor-icon">🔔</span>
+                  <span class="monitor-label">Alerts</span>
+                  <span class="monitor-status">Discord webhook</span>
+                </div>
+                <div class="monitor-item">
+                  <span class="monitor-icon">📊</span>
+                  <span class="monitor-label">Logging</span>
+                  <span class="monitor-status">Docker logs</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Deployment Commands</h3>
+              <div class="code-block">
+                <pre><code># Deploy frontend updates
+scp frontend/web-dashboard/* root@45.77.233.102:/var/www/swanflow/
+
+# Restart API container
+ssh root@45.77.233.102 "cd /opt/swanflow && docker compose restart api"
+
+# View logs
+ssh root@45.77.233.102 "docker logs -f swanflow-api --tail 100"</code></pre>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="knowledge-footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="brand-icon">🦢</span>
+          <span>SwanFlow</span>
+        </div>
+        <p class="footer-text">Real-time traffic intelligence for Perth, Western Australia</p>
+        <div class="footer-links">
+          <a href="index.html">Dashboard</a>
+          <a href="https://github.com/macdara-pw/perth-traffic-watch" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://edgeimpulse.com" target="_blank" rel="noopener">Edge Impulse</a>
+        </div>
+        <p class="footer-copyright">© 2025 SwanFlow Project. Built with Edge AI.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="knowledge.js?v=20251225-01"></script>
+</body>
+</html>
