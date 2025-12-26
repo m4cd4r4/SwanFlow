@@ -53,8 +53,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: none;
-  margin: 0;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .knowledge-header .brand-wrapper {
