@@ -99,7 +99,12 @@ body {
 
 /* Header */
 header {
-  margin-bottom: 2rem;
+  margin-bottom: 0;
+  background: var(--bg);
+  margin-left: -2rem;
+  margin-right: -2rem;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border);
 }
 
 .header-content {
@@ -108,6 +113,50 @@ header {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+/* Scrolling Ticker Banner */
+.ticker-banner {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.06) 50%, rgba(245, 158, 11, 0.12) 100%);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.3rem 0;
+  margin-left: -2rem;
+  margin-right: -2rem;
+  margin-bottom: 1rem;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ticker-content {
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.ticker-content span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--warning);
+  letter-spacing: 0.3px;
+  opacity: 0.9;
+}
+
+.ticker-separator {
+  margin: 0 1.5rem;
+  color: rgba(245, 158, 11, 0.4);
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* Brand with Logo */
@@ -863,18 +912,19 @@ header h1 {
 
 .network-tabs {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0;
+  margin-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
 }
 
 .network-tab {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 1rem;
+  padding: 0.6rem 0.75rem;
   background: transparent;
   border: none;
   border-bottom: 3px solid transparent;
@@ -898,27 +948,27 @@ header h1 {
 }
 
 .network-tab .tab-icon {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   stroke: currentColor;
   flex-shrink: 0;
 }
 
 .network-tab .tab-label {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .network-tab .tab-count {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
+  padding: 0.15rem 0.5rem;
   background: var(--primary);
   color: var(--text-inverse);
-  border-radius: 12px;
-  font-size: 0.75rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
   font-weight: 700;
-  min-width: 2rem;
+  min-width: 1.5rem;
   text-align: center;
 }
 
@@ -1069,18 +1119,35 @@ header h1 {
 /* Responsive Network Tabs */
 @media (max-width: 768px) {
   .network-tabs {
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .network-tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .network-tab {
-    flex-direction: row;
-    justify-content: space-between;
+    flex: 0 0 auto;
+    min-width: auto;
+    padding: 0.5rem 0.6rem;
+    gap: 0.3rem;
+  }
+
+  .network-tab .tab-icon {
+    width: 16px;
+    height: 16px;
   }
 
   .network-tab .tab-label {
-    flex: 1;
-    text-align: left;
+    font-size: 0.65rem;
+  }
+
+  .network-tab .tab-count {
+    padding: 0.1rem 0.4rem;
+    font-size: 0.6rem;
   }
 }
 
@@ -2146,8 +2213,392 @@ header h1 {
   color: white;
 }
 
+/* ============================================================================
+   ALERT MINI-MAP SPLIT VIEW
+   ============================================================================ */
+
+.alerts-split-view {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0;
+  height: 420px;
+}
+
+/* Left 2/3: Network Map */
+.alerts-minimap {
+  padding: 1rem;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.minimap-svg {
+  width: 100%;
+  height: 100%;
+  max-height: 390px;
+  display: block;
+}
+
+/* Map label styles */
+.minimap-label-major {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  fill: var(--text);
+  font-weight: 700;
+}
+
+.minimap-label-minor {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  fill: var(--text-muted);
+  font-weight: 600;
+}
+
+.minimap-label-road {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  fill: var(--text-muted);
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.minimap-label-suburb {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8px;
+  fill: var(--text-muted);
+  font-weight: 500;
+}
+
+.minimap-label-freeway {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  fill: var(--text-muted);
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+.minimap-direction {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  fill: var(--text-muted);
+  font-weight: 700;
+  opacity: 0.5;
+}
+
+/* Legacy label class */
+.minimap-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8px;
+  fill: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Map legend */
+.minimap-legend {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  display: flex;
+  gap: 1rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.minimap-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.minimap-legend .legend-line {
+  width: 20px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.minimap-legend .legend-line.arterial {
+  background: var(--success);
+}
+
+.minimap-legend .legend-line.freeway {
+  background: var(--success);
+  height: 5px;
+}
+
+.minimap-route {
+  transition: stroke 0.3s ease;
+}
+
+/* Alert dot styling */
+.alert-dot {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.alert-dot:hover {
+  transform: scale(1.3);
+}
+
+.alert-dot.warning {
+  fill: var(--warning);
+}
+
+.alert-dot.severe {
+  fill: var(--danger);
+}
+
+.alert-dot.selected {
+  stroke: white;
+  stroke-width: 2;
+}
+
+/* Pulsing animation for severe alerts - use transform instead of r for stability */
+.alert-dot.severe {
+  animation: dot-pulse 2s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.4); }
+}
+
+.minimap-hint {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+/* Right 1/3: Detail panel */
+.alert-detail-panel {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.detail-header-icon {
+  width: 18px;
+  height: 18px;
+  stroke: var(--primary);
+}
+
+.detail-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.detail-empty .detail-icon {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.detail-empty .detail-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: var(--success);
+}
+
+.detail-empty .detail-message {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--success);
+  margin-bottom: 0.25rem;
+}
+
+.detail-empty .detail-submessage {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.detail-empty .detail-hint {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  line-height: 1.5;
+}
+
+.detail-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.detail-severity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(232, 155, 95, 0.1);
+  border-radius: 20px;
+}
+
+.detail-severity .severity-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--warning);
+}
+
+.detail-severity.severe {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.detail-severity.severe .severity-dot {
+  background: var(--danger);
+  animation: dot-pulse-small 1s ease-in-out infinite;
+}
+
+@keyframes dot-pulse-small {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+.detail-severity .severity-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--warning);
+}
+
+.detail-severity.severe .severity-label {
+  color: var(--danger);
+}
+
+.detail-location {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.detail-speed {
+  margin-bottom: 1rem;
+}
+
+.detail-speed .speed-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--danger);
+  line-height: 1;
+}
+
+.detail-speed .speed-unit {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-left: 0.25rem;
+}
+
+.detail-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+.detail-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.detail-stat .stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.detail-stat .stat-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.detail-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.detail-dismiss {
+  padding: 0.4rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.detail-dismiss:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+
+/* Mobile: Stack vertically */
+@media (max-width: 600px) {
+  .alerts-split-view {
+    grid-template-columns: 1fr;
+  }
+
+  .alerts-minimap {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .alert-detail-panel {
+    min-height: 100px;
+  }
+}
+
+/* Legacy alert list styles (keep for fallback) */
 .alerts-list {
   padding: 0.75rem 1rem;
+  display: none; /* Hidden - using mini-map now */
 }
 
 .no-alerts {
@@ -3488,6 +3939,38 @@ body.map-fullscreen {
   justify-content: space-between;
   align-items: center;
   border-bottom: 3px solid #f39c12; /* WA gold accent */
+  position: relative;
+}
+
+/* Official WA Gov Data Banner */
+.mainroads-header::after {
+  content: 'OFFICIAL WA GOV DATA';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(90deg, #27ae60, #2ecc71, #27ae60);
+  background-size: 200% 100%;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  padding: 0.35rem 1rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  animation: gov-banner-pulse 2s ease-in-out infinite, gov-banner-shimmer 3s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.4);
+  z-index: 10;
+}
+
+@keyframes gov-banner-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes gov-banner-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .mainroads-title {

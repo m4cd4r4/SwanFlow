@@ -895,6 +895,17 @@ const corridorCenters = {
 // Currently selected route for filtering
 let currentSelectedRoute = '';
 
+// Route display names for the sidebar
+const routeDisplayNames = {
+  '': 'Perth CBD → Fremantle Corridor',
+  'stirling-highway': 'Stirling Highway Corridor',
+  'stirling-mounts-bay': 'Mounts Bay Road',
+  'stirling-claremont': 'Stirling Hwy - Claremont',
+  'stirling-mosman': 'Stirling Hwy - Mosman Park',
+  'mitchell-freeway': 'Mitchell Freeway',
+  'kwinana-freeway': 'Kwinana Freeway'
+};
+
 /**
  * Handle route selection from dropdown
  * Highlights the selected route and pans map to center on it
@@ -908,12 +919,20 @@ function handleRouteSelection(routeValue) {
     routePulseAnimationInterval = null;
   }
 
+  // Update sidebar label
+  const heroStatusLabel = document.querySelector('.hero-status-label');
+  if (heroStatusLabel) {
+    heroStatusLabel.textContent = routeDisplayNames[routeValue] || 'Perth CBD → Fremantle Corridor';
+  }
+
   if (!routeValue) {
     // "All Routes" selected - reset to default view
     resetRouteHighlighting();
     if (trafficMap) {
       trafficMap.flyTo([-31.965, 115.82], 13, { duration: 1 });
     }
+    // Recalculate corridor status for all routes
+    recalculateCorridorStatus();
     return;
   }
 
@@ -928,6 +947,106 @@ function handleRouteSelection(routeValue) {
   const center = corridorCenters[routeValue];
   if (center && trafficMap) {
     trafficMap.flyTo([center.lat, center.lng], center.zoom, { duration: 1.2 });
+  }
+
+  // Recalculate corridor status for selected route
+  recalculateCorridorStatus(routeValue);
+}
+
+/**
+ * Recalculate and update corridor status based on selected route
+ */
+function recalculateCorridorStatus(routeValue) {
+  // Get relevant sites based on selection
+  const allSites = window.allRawSites || [];
+  let relevantSites = allSites;
+
+  if (routeValue && routeCorridorMap[routeValue]) {
+    const corridorNames = routeCorridorMap[routeValue];
+    const namesToMatch = Array.isArray(corridorNames) ? corridorNames : [corridorNames];
+
+    relevantSites = allSites.filter(site => {
+      // Match by corridor name in site name
+      return namesToMatch.some(corridor => {
+        if (corridor.includes('Stirling') && site.name.includes('Stirling')) return true;
+        if (corridor.includes('Mounts Bay') && site.name.includes('Mounts Bay')) return true;
+        if (corridor.includes('Mitchell') && site.name.includes('Mitchell')) return true;
+        if (corridor.includes('Kwinana') && site.name.includes('Kwinana')) return true;
+        return false;
+      });
+    });
+  }
+
+  if (relevantSites.length === 0) return;
+
+  // Calculate average speed for relevant sites
+  const isFreeway = routeValue && (routeValue.includes('mitchell') || routeValue.includes('kwinana'));
+  let totalSpeed = 0;
+  let siteCount = 0;
+
+  relevantSites.forEach(site => {
+    const hourlyCount = site.current_hourly || 0;
+    const speed = isFreeway ? estimateFreewaySpeed(hourlyCount) : estimateSpeed(hourlyCount);
+    totalSpeed += speed;
+    siteCount++;
+  });
+
+  const avgSpeed = siteCount > 0 ? Math.round(totalSpeed / siteCount) : 60;
+
+  // Update the hero status display with calculated values
+  updateHeroStatusWithSpeed(avgSpeed, relevantSites.length);
+}
+
+/**
+ * Update hero status card with pre-calculated speed
+ */
+function updateHeroStatusWithSpeed(avgSpeed, siteCount) {
+  // Update corridor status text
+  let statusText;
+  if (avgSpeed >= 55) statusText = 'Flowing';
+  else if (avgSpeed >= 35) statusText = 'Moderate';
+  else if (avgSpeed >= 20) statusText = 'Heavy';
+  else statusText = 'Gridlock';
+
+  const corridorStatus = document.getElementById('corridor-status');
+  if (corridorStatus) {
+    if (corridorStatus.textContent !== statusText) {
+      corridorStatus.classList.add('value-updated');
+      setTimeout(() => corridorStatus.classList.remove('value-updated'), 400);
+    }
+    corridorStatus.textContent = statusText;
+  }
+
+  // Update average speed
+  const avgSpeedElement = document.getElementById('avg-speed-hero');
+  if (avgSpeedElement) {
+    const newSpeed = avgSpeed.toString();
+    if (avgSpeedElement.textContent !== newSpeed) {
+      avgSpeedElement.classList.add('value-updated');
+      setTimeout(() => avgSpeedElement.classList.remove('value-updated'), 400);
+    }
+    avgSpeedElement.textContent = newSpeed;
+  }
+
+  // Update recommendation
+  const recommendationElement = document.getElementById('drive-recommendation');
+  if (recommendationElement) {
+    let icon, text, bgColor;
+    if (avgSpeed >= 50) {
+      icon = '✓'; text = 'Excellent - flowing freely'; bgColor = 'rgba(16, 185, 129, 0.3)';
+    } else if (avgSpeed >= 35) {
+      icon = '⚠️'; text = 'Moderate - allow extra time'; bgColor = 'rgba(245, 158, 11, 0.3)';
+    } else if (avgSpeed >= 20) {
+      icon = '🚗'; text = 'Heavy - consider alternatives'; bgColor = 'rgba(239, 68, 68, 0.3)';
+    } else {
+      icon = '⛔'; text = 'Gridlock - avoid if possible'; bgColor = 'rgba(153, 27, 27, 0.3)';
+    }
+
+    const recIcon = recommendationElement.querySelector('.rec-icon');
+    const recText = recommendationElement.querySelector('.rec-text');
+    if (recIcon) recIcon.textContent = icon;
+    if (recText) recText.textContent = text;
+    recommendationElement.style.background = bgColor;
   }
 }
 
@@ -1038,9 +1157,14 @@ function initMap() {
   trafficMap = L.map('traffic-map', {
     center: center,
     zoom: 13,
-    zoomControl: true,
+    zoomControl: false,  // Disable default, add custom position
     attributionControl: true
   });
+
+  // Add zoom control at bottom left (above scale)
+  L.control.zoom({
+    position: 'bottomleft'
+  }).addTo(trafficMap);
 
   // Expose to window for debugging/testing
   window.trafficMap = trafficMap;
@@ -1323,14 +1447,18 @@ const corridorWaypoints = {
     [-31.994, 115.765]          // End: Eric St
   ],
   'Stirling Hwy - Mosman': [
-    [-32.0034093, 115.7601065],  // Start: Forrest St
-    [-32.008, 115.757],
+    // Stirling Highway through Mosman Park - ends at Victoria St before North Fremantle
+    // Source: OSM data - road stays on Stirling Highway proper
+    [-32.0034093, 115.7601065],  // Start: Forrest St (Cottesloe/Mosman border)
+    [-32.0060, 115.7580],
+    [-32.0080, 115.7565],
+    [-32.0100, 115.7555],
     [-32.0115020, 115.7555150],  // Bay View Terrace
-    [-32.0160, 115.7545],
+    [-32.0140, 115.7548],
+    [-32.0165, 115.7543],
     [-32.0198147, 115.7537381],  // McCabe St
-    [-32.025, 115.753],
-    [-32.0280, 115.7538],
-    [-32.035, 115.751]          // End: Victoria St
+    [-32.0230, 115.7532],
+    [-32.0260, 115.7530]         // End: Near Victoria St, before North Fremantle
   ],
   'Mitchell Fwy': [
     // Mitchell Freeway - OSM-accurate coordinates
@@ -1473,19 +1601,13 @@ const corridorWaypoints = {
     [-32.0587183, 115.8510804],  // Bull Creek
 
     // === MURDOCH / FARRINGTON RD SECTION ===
+    // End monitoring at Farrington Rd - south of this is beyond core monitoring area
     [-32.0620, 115.8508],
     [-32.0655, 115.8504],
     [-32.0690, 115.8500],
     [-32.0725, 115.8496],
     [-32.0760, 115.8493],
-    [-32.0804820, 115.8490295],  // Farrington Rd
-
-    // === SOUTHERN EXTENT ===
-    [-32.0850, 115.8490],
-    [-32.0900, 115.8492],
-    [-32.0949711, 115.8494557],
-    [-32.1000, 115.8498],
-    [-32.1037947, 115.8501582]   // Southern extent
+    [-32.0804820, 115.8490295]   // Farrington Rd - southern extent of monitoring
   ]
 };
 
@@ -3205,7 +3327,13 @@ async function init() {
 }
 
 // Start dashboard when page loads
-window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded', () => {
+  // Initialize Lucide icons
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+  init();
+});
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {
@@ -3730,48 +3858,279 @@ function detectIncidents(sites) {
 }
 
 /**
- * Update incident alerts display
+ * Map site names to minimap coordinates
+ * The SVG viewBox is 500x380, with CBD at top-right (420,130), Freo at bottom-left (15,355)
+ */
+const minimapCoords = {
+  // Mounts Bay Road (CBD to Nedlands) - follows path from (420,130) to (130,188)
+  'Mounts Bay Rd @ Kings Park': { x: 390, y: 135 },
+  'Mounts Bay Rd @ Mill Point': { x: 330, y: 145 },
+  'Mounts Bay Rd @ Fraser Ave': { x: 270, y: 155 },
+  'Mounts Bay Rd @ Malcolm St': { x: 210, y: 168 },
+  'Mounts Bay Rd @ Crawley': { x: 155, y: 182 },
+
+  // Stirling Highway - Nedlands to Claremont - follows path from (130,188) to (70,215)
+  'Stirling Hwy @ Broadway': { x: 115, y: 195 },
+  'Stirling Hwy @ Stirling Rd': { x: 90, y: 207 },
+  'Stirling Hwy @ Jarrad St': { x: 70, y: 215 },
+
+  // Stirling Highway - Claremont to Cottesloe - follows path from (70,215) to (35,260)
+  'Stirling Hwy @ Bay Rd': { x: 58, y: 228 },
+  'Stirling Hwy @ Eric St': { x: 45, y: 245 },
+
+  // Stirling Highway - Mosman Park to Fremantle - follows path from (35,260) to (15,355)
+  'Stirling Hwy @ Forrest St': { x: 30, y: 275 },
+  'Stirling Hwy @ Bay View Terrace': { x: 22, y: 302 },
+  'Stirling Hwy @ McCabe St': { x: 18, y: 325 },
+  'Stirling Hwy @ Victoria St': { x: 15, y: 355 },
+
+  // Mitchell Freeway (north from CBD) - follows path from (420,130) to (462,8)
+  'Mitchell Fwy @ Loftus St': { x: 423, y: 115 },
+  'Mitchell Fwy @ Vincent St': { x: 430, y: 88 },
+  'Mitchell Fwy @ Powis St': { x: 438, y: 60 },
+  'Mitchell Fwy @ Hutton St': { x: 448, y: 35 },
+  'Mitchell Fwy @ Karrinyup': { x: 460, y: 12 },
+
+  // Kwinana Freeway (south from CBD) - follows path from (420,130) to (488,365)
+  'Kwinana Fwy @ Mill Point': { x: 428, y: 155 },
+  'Kwinana Fwy @ South Perth': { x: 438, y: 185 },
+  'Kwinana Fwy @ Como': { x: 455, y: 235 },
+  'Kwinana Fwy @ Manning Rd': { x: 468, y: 280 },
+  'Kwinana Fwy @ Canning Hwy': { x: 478, y: 320 },
+  'Kwinana Fwy @ Murdoch': { x: 486, y: 360 }
+};
+
+/**
+ * Get minimap coordinates for a site name
+ * Uses fuzzy matching to handle various site name formats
+ */
+function getMinimapCoords(siteName) {
+  const name = siteName.toLowerCase();
+
+  // Try exact match first
+  for (const [key, coords] of Object.entries(minimapCoords)) {
+    const keyLower = key.toLowerCase().replace(' (northbound)', '').replace(' (southbound)', '');
+    if (name.includes(keyLower) || keyLower.includes(name.split('@')[1]?.trim() || '')) {
+      return coords;
+    }
+  }
+
+  // Use a hash of the site name to get consistent but varied positions
+  const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+  // Check for Mounts Bay Road
+  if (name.includes('mounts bay') || name.includes('mount bay') || name.includes('kings park') || name.includes('crawley')) {
+    const baseX = 270 + ((hash % 80) - 40);
+    const baseY = 155 + ((hash % 30) - 15);
+    return { x: Math.max(155, Math.min(390, baseX)), y: Math.max(135, Math.min(182, baseY)) };
+  }
+
+  // Check for Stirling Highway (multiple spelling variants)
+  if (name.includes('stirling') || name.includes('hwy @') || name.includes('highway')) {
+    // Determine which section of Stirling Highway based on suburb/street
+    if (name.includes('nedlands') || name.includes('broadway') || name.includes('hampden')) {
+      return { x: 100 + (hash % 30), y: 195 + (hash % 15) };
+    }
+    if (name.includes('claremont') || name.includes('jarrad') || name.includes('bay rd') || name.includes('bayview')) {
+      return { x: 60 + (hash % 20), y: 220 + (hash % 20) };
+    }
+    if (name.includes('cottesloe') || name.includes('eric') || name.includes('grant') || name.includes('napoleon')) {
+      return { x: 40 + (hash % 15), y: 245 + (hash % 20) };
+    }
+    if (name.includes('mosman') || name.includes('forrest') || name.includes('glyde')) {
+      return { x: 25 + (hash % 12), y: 280 + (hash % 25) };
+    }
+    if (name.includes('fremantle') || name.includes('freo') || name.includes('victoria') || name.includes('high st')) {
+      return { x: 15 + (hash % 10), y: 345 + (hash % 15) };
+    }
+    // Default Stirling Hwy position - spread along the route based on hash
+    const section = hash % 5;
+    const positions = [
+      { x: 100, y: 200 },  // Nedlands area
+      { x: 70, y: 220 },   // Claremont area
+      { x: 45, y: 250 },   // Cottesloe area
+      { x: 28, y: 285 },   // Mosman area
+      { x: 18, y: 330 }    // Near Freo
+    ];
+    const pos = positions[section];
+    return { x: pos.x + (hash % 15) - 7, y: pos.y + (hash % 15) - 7 };
+  }
+
+  // Check for Mitchell Freeway
+  if (name.includes('mitchell') || name.includes('leederville') || name.includes('karrinyup') || name.includes('northbridge')) {
+    const baseY = 30 + (hash % 80);
+    return { x: 430 + (hash % 25), y: Math.max(15, Math.min(115, baseY)) };
+  }
+
+  // Check for Kwinana Freeway
+  if (name.includes('kwinana') || name.includes('south perth') || name.includes('como') || name.includes('manning') || name.includes('murdoch')) {
+    const baseY = 180 + (hash % 150);
+    return { x: 445 + (hash % 35), y: Math.max(155, Math.min(355, baseY)) };
+  }
+
+  // Fallback: Place on Stirling Highway corridor (most common)
+  // This ensures ALL incidents get a dot somewhere visible
+  const section = hash % 5;
+  const positions = [
+    { x: 100, y: 200 },
+    { x: 70, y: 220 },
+    { x: 45, y: 250 },
+    { x: 28, y: 285 },
+    { x: 18, y: 330 }
+  ];
+  const pos = positions[section];
+  return { x: pos.x + (hash % 20) - 10, y: pos.y + (hash % 20) - 10 };
+}
+
+// Track selected incident for detail panel
+let selectedIncidentId = null;
+
+/**
+ * Update incident alerts display with mini-map dots
  */
 function updateIncidentDisplay() {
   const alertsContainer = document.getElementById('incident-alerts');
-  const alertsList = document.getElementById('alerts-list');
   const alertsCount = document.getElementById('alerts-count');
+  const alertDotsGroup = document.getElementById('alert-dots');
+  const detailEmpty = document.getElementById('detail-empty');
+  const detailContent = document.getElementById('detail-content');
 
-  if (!alertsContainer || !alertsList) return;
+  if (!alertsContainer) return;
 
   const visibleIncidents = activeIncidents.filter(i => !i.dismissed);
 
-  // Update count
+  // Update count badge
   if (alertsCount) {
     alertsCount.textContent = visibleIncidents.length;
   }
 
-  // Update container class
+  // Update container class for styling
   if (visibleIncidents.length > 0) {
     alertsContainer.classList.add('has-alerts');
   } else {
     alertsContainer.classList.remove('has-alerts');
   }
 
-  // Update list
+  // Clear and redraw dots on mini-map
+  if (alertDotsGroup) {
+    alertDotsGroup.innerHTML = '';
+
+    visibleIncidents.forEach(incident => {
+      const coords = getMinimapCoords(incident.location);
+      if (!coords) return;
+
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', coords.x);
+      circle.setAttribute('cy', coords.y);
+      circle.setAttribute('r', '6');
+      circle.setAttribute('class', `alert-dot ${incident.type} ${incident.id === selectedIncidentId ? 'selected' : ''}`);
+      circle.setAttribute('data-id', incident.id);
+
+      // Click handler to show details
+      circle.addEventListener('click', () => selectIncident(incident.id));
+
+      alertDotsGroup.appendChild(circle);
+    });
+  }
+
+  // Update detail panel
   if (visibleIncidents.length === 0) {
-    alertsList.innerHTML = `
-      <div class="no-alerts">
-        <span class="no-alerts-icon">✓</span>
-        <span>No incidents detected - all corridors flowing normally</span>
-      </div>
-    `;
-  } else {
-    alertsList.innerHTML = visibleIncidents.map(incident => `
-      <div class="alert-item ${incident.type === 'severe' ? 'severe' : ''}">
-        <span class="alert-severity"></span>
-        <div class="alert-content">
-          <div class="alert-message">${incident.message}</div>
-          <div class="alert-time">${formatTimeAgo(incident.timestamp)}</div>
-        </div>
-        <button class="alert-dismiss" onclick="dismissIncident('${incident.id}')" title="Dismiss">×</button>
-      </div>
-    `).join('');
+    // Show "all clear" state
+    if (detailEmpty) detailEmpty.style.display = 'block';
+    if (detailContent) detailContent.style.display = 'none';
+    selectedIncidentId = null;
+  } else if (!selectedIncidentId || !visibleIncidents.find(i => i.id === selectedIncidentId)) {
+    // Auto-select first incident if none selected
+    selectIncident(visibleIncidents[0].id);
+  }
+}
+
+/**
+ * Select an incident and show its details
+ */
+function selectIncident(incidentId) {
+  const incident = activeIncidents.find(i => i.id == incidentId);
+  if (!incident) return;
+
+  selectedIncidentId = incidentId;
+
+  // Update dot selection states
+  document.querySelectorAll('.alert-dot').forEach(dot => {
+    dot.classList.toggle('selected', dot.dataset.id == incidentId);
+  });
+
+  // Show detail content
+  const detailEmpty = document.getElementById('detail-empty');
+  const detailContent = document.getElementById('detail-content');
+  const detailSeverity = document.getElementById('detail-severity');
+  const detailLocation = document.getElementById('detail-location');
+  const detailSpeed = document.getElementById('detail-speed');
+  const detailTime = document.getElementById('detail-time');
+  const detailDismiss = document.getElementById('detail-dismiss');
+
+  if (detailEmpty) detailEmpty.style.display = 'none';
+  if (detailContent) detailContent.style.display = 'block';
+
+  if (detailSeverity) {
+    detailSeverity.className = `detail-severity ${incident.type}`;
+    detailSeverity.querySelector('.severity-label').textContent =
+      incident.type === 'severe' ? 'Gridlock' : 'Heavy Traffic';
+  }
+
+  if (detailLocation) {
+    // Shorten location name for display
+    let shortName = incident.location
+      .replace(' (Northbound)', '')
+      .replace(' (Southbound)', '')
+      .replace('Mounts Bay Rd @ ', '')
+      .replace('Stirling Hwy @ ', 'Stirling @ ')
+      .replace('Mitchell Fwy @ ', 'Mitchell @ ')
+      .replace('Kwinana Fwy @ ', 'Kwinana @ ');
+    detailLocation.textContent = shortName;
+  }
+
+  if (detailSpeed) {
+    detailSpeed.querySelector('.speed-value').textContent = incident.speed || '--';
+  }
+
+  // Update direction and corridor stats
+  const detailDirection = document.getElementById('detail-direction');
+  const detailCorridor = document.getElementById('detail-corridor');
+
+  if (detailDirection) {
+    if (incident.location.includes('(Northbound)')) {
+      detailDirection.textContent = 'Northbound';
+    } else if (incident.location.includes('(Southbound)')) {
+      detailDirection.textContent = 'Southbound';
+    } else if (incident.location.includes('(Eastbound)')) {
+      detailDirection.textContent = 'Eastbound';
+    } else if (incident.location.includes('(Westbound)')) {
+      detailDirection.textContent = 'Westbound';
+    } else {
+      detailDirection.textContent = 'Both';
+    }
+  }
+
+  if (detailCorridor) {
+    if (incident.location.includes('Mounts Bay')) {
+      detailCorridor.textContent = 'Mounts Bay Rd';
+    } else if (incident.location.includes('Stirling Hwy')) {
+      detailCorridor.textContent = 'Stirling Hwy';
+    } else if (incident.location.includes('Mitchell')) {
+      detailCorridor.textContent = 'Mitchell Fwy';
+    } else if (incident.location.includes('Kwinana')) {
+      detailCorridor.textContent = 'Kwinana Fwy';
+    } else {
+      detailCorridor.textContent = 'Corridor';
+    }
+  }
+
+  if (detailTime) {
+    detailTime.textContent = `Detected ${formatTimeAgo(incident.timestamp)}`;
+  }
+
+  if (detailDismiss) {
+    detailDismiss.onclick = () => dismissIncident(incidentId);
   }
 }
 

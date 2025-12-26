@@ -41,7 +41,7 @@
 .knowledge-header {
   background: var(--card-bg);
   border-bottom: 1px solid var(--border);
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 2rem;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -53,8 +53,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1600px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
 }
 
 .knowledge-header .brand-wrapper {
@@ -235,13 +235,55 @@
 }
 
 /* ============================================================================
+   TICKER BANNER (scrolling notice)
+   ============================================================================ */
+
+.ticker-banner {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.06) 50%, rgba(245, 158, 11, 0.12) 100%);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.3rem 0;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ticker-content {
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.ticker-content span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--warning, #f59e0b);
+  letter-spacing: 0.3px;
+  opacity: 0.9;
+}
+
+.ticker-separator {
+  margin: 0 1.5rem;
+  color: rgba(245, 158, 11, 0.4);
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================================================
    FILTER BAR (under header)
    ============================================================================ */
 
 .filter-bar {
   background: var(--card-bg);
   border-bottom: 1px solid var(--border);
-  padding: 0.6rem 1.5rem;
+  padding: 0.6rem 2rem;
   position: sticky;
   top: 60px; /* Below header */
   z-index: 99;
@@ -251,7 +293,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  max-width: 1600px;
+  max-width: 1800px;
   margin: 0 auto;
 }
 
@@ -351,14 +393,14 @@
    ============================================================================ */
 
 .knowledge-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
 
 .knowledge-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 

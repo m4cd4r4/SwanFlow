@@ -12,12 +12,16 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-  <link rel="stylesheet" href="styles.css?v=20251225-31">
+  <link rel="stylesheet" href="styles.css?v=20251226-01">
+  <link rel="stylesheet" href="knowledge.css?v=20251226-02">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <div class="container">
-    <!-- Header -->
-    <header>
+    <!-- Header (matching knowledge.html) -->
+    <header class="knowledge-header">
       <div class="header-content">
         <div class="brand-wrapper">
           <div class="brand">
@@ -28,44 +32,42 @@
           <p class="subtitle">Real-time vehicle detection using Edge AI</p>
         </div>
         <div class="header-actions">
-          <a href="#section-hero" class="header-nav-btn" title="Dashboard">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="3" width="7" height="7" rx="1"/>
-              <rect x="3" y="14" width="7" height="7" rx="1"/>
-              <rect x="14" y="14" width="7" height="7" rx="1"/>
-            </svg>
+          <a href="index.html" class="header-nav-btn active" title="Dashboard">
+            <i data-lucide="layout-dashboard" class="nav-icon"></i>
             <span class="nav-text">Dashboard</span>
           </a>
           <a href="knowledge.html" class="header-nav-btn" title="Technical Documentation">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg>
+            <i data-lucide="file-text" class="nav-icon"></i>
             <span class="nav-text">Technical Docs</span>
           </a>
           <div class="theme-toggle">
             <button type="button" id="theme-toggle-btn" class="theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
-              <span class="icon-sun">☀️</span>
-              <span class="icon-moon">🌙</span>
+              <i data-lucide="sun" class="icon-sun"></i>
+              <i data-lucide="moon" class="icon-moon"></i>
             </button>
           </div>
         </div>
       </div>
-      <!-- Simulated Data Notice -->
-      <div class="poc-notice">
-        <span class="notice-icon">⚠️</span>
-        <div class="notice-content">
-          <strong>PROOF OF CONCEPT - SIMULATED DATA</strong>
-          <p>This dashboard displays simulated traffic data for demonstration purposes. Hardware deployment at Mounts Bay Road in development.</p>
-        </div>
-        <span class="notice-badge">PoC v0.1</span>
-      </div>
-
     </header>
+
+    <!-- Scrolling Ticker Banner -->
+    <div class="ticker-banner">
+      <div class="ticker-track">
+        <div class="ticker-content">
+          <span>SIMULATED DATA - Phase 1 of PoC is in development</span>
+          <span class="ticker-separator">|</span>
+          <span>Hardware deployment at Mounts Bay Road coming soon</span>
+          <span class="ticker-separator">|</span>
+          <span>Real-time Edge AI vehicle detection</span>
+          <span class="ticker-separator">|</span>
+          <span>SIMULATED DATA - Phase 1 of PoC is in development</span>
+          <span class="ticker-separator">|</span>
+          <span>Hardware deployment at Mounts Bay Road coming soon</span>
+          <span class="ticker-separator">|</span>
+          <span>Real-time Edge AI vehicle detection</span>
+        </div>
+      </div>
+    </div>
 
     <!-- ========================================
          HERO DASHBOARD - Option A Layout
@@ -248,7 +250,7 @@
           </svg>
           <span>Main Roads Western Australia - Live Traffic</span>
         </div>
-        <a href="https://travelmap.mainroads.wa.gov.au/" target="_blank" rel="noopener noreferrer" class="mainroads-external-link">
+        <a href="https://travelmap.mainroads.wa.gov.au/Home/Map" target="_blank" rel="noopener noreferrer" class="mainroads-external-link">
           Open Full Map ↗
         </a>
       </div>
@@ -268,7 +270,7 @@
         <iframe
           id="mainroads-iframe"
           src="about:blank"
-          data-src="https://travelmap.mainroads.wa.gov.au/"
+          data-src="https://travelmap.mainroads.wa.gov.au/Home/Map"
           title="Main Roads WA Live Traffic Map"
           loading="lazy"
           allow="geolocation"
@@ -406,7 +408,7 @@
 
     <!-- Historical Trends & Incident Alerts Section -->
     <div class="trends-alerts-section" id="section-trends">
-      <!-- Incident Alerts Banner -->
+      <!-- Traffic Alerts Mini-Map -->
       <div class="incident-alerts" id="incident-alerts">
         <div class="alerts-header">
           <svg class="alerts-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -417,10 +419,150 @@
           <span class="alerts-title">Traffic Alerts</span>
           <span class="alerts-count" id="alerts-count">0</span>
         </div>
-        <div class="alerts-list" id="alerts-list">
-          <div class="no-alerts">
-            <span class="no-alerts-icon">✓</span>
-            <span>No incidents detected - all corridors flowing normally</span>
+        <div class="alerts-split-view">
+          <!-- Left 2/3: Full Network Map -->
+          <div class="alerts-minimap" id="alerts-minimap">
+            <svg viewBox="0 0 500 380" class="minimap-svg" id="minimap-svg" preserveAspectRatio="xMidYMid meet">
+              <!-- Background -->
+              <rect width="500" height="380" fill="var(--bg)" rx="8"/>
+
+              <!-- Swan River (curved path through Perth) -->
+              <path d="M0 180 Q60 150, 140 165 Q220 180, 300 160 Q380 140, 440 150 Q480 155, 500 145"
+                    stroke="var(--primary)" stroke-width="35" fill="none" opacity="0.08"/>
+              <path d="M300 160 Q320 200, 350 240 Q380 280, 420 300"
+                    stroke="var(--primary)" stroke-width="25" fill="none" opacity="0.08"/>
+
+              <!-- === ARTERIAL ROADS === -->
+
+              <!-- Mounts Bay Road (CBD to Nedlands) - follows river -->
+              <path id="route-mountsbay" d="M420 130 L360 140 L300 150 L240 162 L180 175 L130 188"
+                    stroke="var(--success)" stroke-width="5" fill="none" stroke-linecap="round" class="minimap-route"/>
+
+              <!-- Stirling Highway - Nedlands to Claremont -->
+              <path id="route-stirling-nedlands" d="M130 188 L100 200 L70 215"
+                    stroke="var(--success)" stroke-width="5" fill="none" stroke-linecap="round" class="minimap-route"/>
+
+              <!-- Stirling Highway - Claremont to Cottesloe -->
+              <path id="route-stirling-claremont" d="M70 215 L50 235 L35 260"
+                    stroke="var(--success)" stroke-width="5" fill="none" stroke-linecap="round" class="minimap-route"/>
+
+              <!-- Stirling Highway - Mosman Park to Fremantle -->
+              <path id="route-stirling-mosman" d="M35 260 L25 290 L18 320 L15 355"
+                    stroke="var(--success)" stroke-width="5" fill="none" stroke-linecap="round" class="minimap-route"/>
+
+              <!-- === FREEWAYS === -->
+
+              <!-- Mitchell Freeway (CBD north to Karrinyup) -->
+              <path id="route-mitchell" d="M420 130 L425 105 L432 80 L440 55 L450 30 L462 8"
+                    stroke="var(--success)" stroke-width="6" fill="none" stroke-linecap="round" class="minimap-route freeway"/>
+
+              <!-- Kwinana Freeway (CBD south to Murdoch) -->
+              <path id="route-kwinana" d="M420 130 L430 160 L442 195 L455 235 L468 280 L480 330 L488 365"
+                    stroke="var(--success)" stroke-width="6" fill="none" stroke-linecap="round" class="minimap-route freeway"/>
+
+              <!-- === LOCATION LABELS === -->
+              <!-- Major locations -->
+              <text x="435" y="122" class="minimap-label-major">CBD</text>
+              <text x="465" y="18" class="minimap-label-minor">Karrinyup</text>
+              <text x="485" y="375" class="minimap-label-minor">Murdoch</text>
+              <text x="8" y="370" class="minimap-label-major">Fremantle</text>
+
+              <!-- Arterial road labels -->
+              <text x="280" y="142" class="minimap-label-road">Mounts Bay Rd</text>
+              <text x="55" y="248" class="minimap-label-road">Stirling Hwy</text>
+
+              <!-- Suburb markers -->
+              <circle cx="130" cy="188" r="4" fill="var(--text-muted)" opacity="0.4"/>
+              <text x="115" y="178" class="minimap-label-suburb">Nedlands</text>
+
+              <circle cx="70" cy="215" r="4" fill="var(--text-muted)" opacity="0.4"/>
+              <text x="82" y="212" class="minimap-label-suburb">Claremont</text>
+
+              <circle cx="35" cy="260" r="4" fill="var(--text-muted)" opacity="0.4"/>
+              <text x="48" y="265" class="minimap-label-suburb">Cottesloe</text>
+
+              <circle cx="25" cy="290" r="4" fill="var(--text-muted)" opacity="0.4"/>
+              <text x="38" y="295" class="minimap-label-suburb">Mosman Pk</text>
+
+              <!-- Freeway markers -->
+              <circle cx="440" cy="55" r="4" fill="var(--text-muted)" opacity="0.4"/>
+              <text x="418" y="50" class="minimap-label-suburb">Leederville</text>
+
+              <circle cx="455" cy="235" r="4" fill="var(--text-muted)" opacity="0.4"/>
+              <text x="433" y="230" class="minimap-label-suburb">Como</text>
+
+              <circle cx="468" cy="280" r="4" fill="var(--text-muted)" opacity="0.4"/>
+              <text x="446" y="275" class="minimap-label-suburb">Manning</text>
+
+              <!-- Direction indicators -->
+              <text x="475" y="45" class="minimap-direction">N ↑</text>
+              <text x="475" y="345" class="minimap-direction">S ↓</text>
+
+              <!-- Freeway labels -->
+              <text x="455" y="70" class="minimap-label-freeway">Mitchell Fwy</text>
+              <text x="470" y="255" class="minimap-label-freeway">Kwinana Fwy</text>
+
+              <!-- Alert dots container (populated by JS) -->
+              <g id="alert-dots"></g>
+            </svg>
+
+            <!-- Map legend -->
+            <div class="minimap-legend">
+              <span class="legend-item"><span class="legend-line arterial"></span> Arterial</span>
+              <span class="legend-item"><span class="legend-line freeway"></span> Freeway</span>
+            </div>
+          </div>
+
+          <!-- Right 1/3: Alert detail panel -->
+          <div class="alert-detail-panel" id="alert-detail-panel">
+            <div class="detail-header">
+              <svg class="detail-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="10" r="3"/>
+                <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/>
+              </svg>
+              <span>Incident Details</span>
+            </div>
+
+            <div class="detail-empty" id="detail-empty">
+              <div class="detail-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div class="detail-message">All Clear</div>
+              <div class="detail-submessage">No congestion detected</div>
+              <div class="detail-hint">Incidents will appear as dots on the map.<br/>Click any dot for details.</div>
+            </div>
+
+            <div class="detail-content" id="detail-content" style="display: none;">
+              <div class="detail-severity" id="detail-severity">
+                <span class="severity-dot"></span>
+                <span class="severity-label">Warning</span>
+              </div>
+              <div class="detail-location" id="detail-location">Stirling Hwy @ Eric St</div>
+              <div class="detail-speed" id="detail-speed">
+                <span class="speed-value">8</span>
+                <span class="speed-unit">km/h</span>
+              </div>
+              <div class="detail-stats">
+                <div class="detail-stat">
+                  <span class="stat-label">Direction</span>
+                  <span class="stat-value" id="detail-direction">Southbound</span>
+                </div>
+                <div class="detail-stat">
+                  <span class="stat-label">Corridor</span>
+                  <span class="stat-value" id="detail-corridor">Stirling Hwy</span>
+                </div>
+              </div>
+              <div class="detail-time" id="detail-time">Detected 2 min ago</div>
+              <button class="detail-dismiss" id="detail-dismiss">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+                Dismiss Alert
+              </button>
+            </div>
           </div>
         </div>
       </div>
