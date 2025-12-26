@@ -1,14 +1,27 @@
-# Perth Traffic Watch - Web Dashboard
+# SwanFlow - Web Dashboard
 
-Real-time traffic density visualization for Mounts Bay Road.
+Real-time traffic density visualization for Perth's CBD to Fremantle corridor.
 
 ## Features
 
+### Dashboard (`index.html`)
 - "Should I Drive?" instant recommendation
-- Interactive map with sensor locations
-- Traffic density color coding
-- Historical traffic chart
+- Interactive Leaflet map with corridor routes
+- Traffic density color coding (Green → Orange → Red → Dark Red)
+- Historical traffic chart (Chart.js)
 - Auto-refreshing data (every 60 seconds)
+- Theme switching (Cottesloe Beach / Indigenous Earth)
+- Mobile-responsive design
+
+### Knowledge Base (`knowledge.html`)
+- Technical documentation with interactive cards
+- Four categories: Algorithm, ML, Hardware, Infrastructure
+- Lucide icon integration for consistent styling
+- Compact filter bar for category navigation
+- Expandable/collapsible card sections
+- Code blocks with copy functionality
+- Full dark/light theme support
+- Keyboard navigation (Escape, Tab, Enter)
 
 ## Quick Start
 
@@ -65,6 +78,7 @@ const REFRESH_INTERVAL = 60000;                 // Refresh rate (ms)
 
 - **Leaflet** - Interactive map
 - **Chart.js** - Traffic charts
+- **Lucide** - Icon library (CDN)
 - **Vanilla JS** - No framework dependencies
 - **CSS Variables** - Easy theming
 

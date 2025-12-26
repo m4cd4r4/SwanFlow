@@ -96,6 +96,7 @@ Perfect for:
 - Multi-site support
 - Mobile-responsive
 - Auto-refresh (60s interval)
+- **Knowledge Base** — Technical documentation with interactive cards and Lucide icons
 
 ---
 
@@ -221,7 +222,24 @@ swanflow/
 │       ├── index.html
 │       ├── styles.css
 │       ├── app.js                # Dashboard logic (Chart.js)
+│       ├── knowledge.html        # Knowledge Base page
+│       ├── knowledge.css         # Knowledge page styles
+│       ├── knowledge.js          # Knowledge page interactions
 │       └── README.md             # Frontend setup guide
+│
+├── tests/
+│   └── e2e/
+│       ├── playwright.config.js  # Playwright configuration
+│       ├── pages/                # Page Object Models
+│       │   ├── DashboardPage.js
+│       │   └── KnowledgePage.js
+│       ├── dashboard.spec.js     # Dashboard tests
+│       ├── knowledge.spec.js     # Knowledge page tests
+│       ├── mobile-viewport.spec.js
+│       ├── accessibility.spec.js
+│       ├── performance.spec.js
+│       ├── visual-regression.spec.js
+│       └── README.md             # Test documentation
 │
 ├── docs/
 │   ├── corridor-architecture.md      # 3-stretch system architecture
@@ -491,6 +509,9 @@ See [docs/requirements-and-todos.md](docs/requirements-and-todos.md) for full ro
 | [docs/contributing.md](docs/contributing.md) | How to contribute |
 | [backend/README.md](backend/README.md) | Backend API setup |
 | [frontend/README.md](frontend/README.md) | Dashboard setup |
+| [tests/e2e/README.md](tests/e2e/README.md) | **E2E test suite: 120+ tests, Playwright, accessibility, performance** |
+| [**frontend/web-dashboard/knowledge.html**](frontend/web-dashboard/knowledge.html) | **Knowledge Base: Interactive documentation with Lucide icons** |
+| [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
 
 ---
 
@@ -560,6 +581,61 @@ Validate with manual counts.
 
 ---
 
+## Testing
+
+SwanFlow includes a comprehensive E2E test suite built with Playwright, covering the live production dashboard at [swanflow.com.au](https://swanflow.com.au).
+
+### Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Run all tests
+npm test
+
+# Run with UI
+npm run test:ui
+```
+
+### Test Categories
+
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run all 120+ tests |
+| `npm run test:chrome` | Desktop Chrome only |
+| `npm run test:mobile` | iPhone + Android viewports |
+| `npm run test:a11y` | Accessibility (WCAG 2.1 AA) |
+| `npm run test:perf` | Performance & Web Vitals |
+| `npm run test:visual` | Visual regression screenshots |
+| `npm run test:dashboard` | Dashboard functionality |
+| `npm run test:knowledge` | Knowledge page |
+
+### Test Coverage
+
+- **Dashboard Tests** — Theme switching, network tabs, map controls, terminal, journey visualization
+- **Knowledge Page** — Card interactions, filtering, navigation
+- **Mobile Viewports** — iPhone SE/13/14 Pro Max, Pixel 5, Galaxy S9+, iPad
+- **Accessibility** — WCAG 2.1 AA compliance, keyboard navigation, color contrast
+- **Performance** — Core Web Vitals (LCP, FID, CLS), load times, memory usage
+- **Visual Regression** — Full-page and component screenshots for both themes
+- **Network/API** — Request validation, mocking, error handling
+- **Links** — All internal/external links validated
+
+### Performance Budgets
+
+| Metric | Target | Description |
+|--------|--------|-------------|
+| LCP | < 2.5s | Largest Contentful Paint |
+| FID | < 100ms | First Input Delay |
+| CLS | < 0.1 | Cumulative Layout Shift |
+| FCP | < 1.8s | First Contentful Paint |
+| TTFB | < 800ms | Time to First Byte |
+
+See [tests/e2e/README.md](tests/e2e/README.md) for full documentation.
+
+---
+
 ## Tech Stack
 
 | Component | Technology |
@@ -569,6 +645,7 @@ Validate with manual counts.
 | **ML Model** | Edge Impulse FOMO, TensorFlow Lite Micro |
 | **Backend** | Node.js, Express.js, SQLite, better-sqlite3 |
 | **Frontend** | Vanilla JS, Chart.js, HTML5, CSS3 |
+| **Testing** | Playwright, axe-core (accessibility) |
 | **Deployment** | Vercel (frontend), VPS/Hetzner (backend) |
 
 ---
@@ -653,5 +730,5 @@ This project is being developed with academic publication in mind. Key documents
 ---
 
 **Status**: Proof of Concept (Phase 1)
-**Version**: 0.2.0
-**Last Updated**: 2025-12-19
+**Version**: 0.2.1
+**Last Updated**: 2025-12-26

@@ -143,6 +143,62 @@
   height: 18px;
 }
 
+/* Theme toggle icons (Lucide) */
+.knowledge-header .theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.knowledge-header .theme-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.knowledge-header .theme-btn:hover .icon-sun,
+.knowledge-header .theme-btn:hover .icon-moon {
+  color: white;
+}
+
+.knowledge-header .icon-sun,
+.knowledge-header .icon-moon {
+  width: 20px;
+  height: 20px;
+  color: var(--text);
+  transition: color 0.2s ease;
+}
+
+/* Show sun in dark mode, moon in light mode */
+.knowledge-header .icon-sun {
+  display: none;
+}
+
+.knowledge-header .icon-moon {
+  display: block;
+}
+
+[data-theme="dark"] .knowledge-header .icon-sun {
+  display: block;
+}
+
+[data-theme="dark"] .knowledge-header .icon-moon {
+  display: none;
+}
+
+/* Footer brand icon */
+.footer-brand .brand-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--primary);
+}
+
 .knowledge-header .theme-toggle {
   margin-left: 0.5rem;
 }
@@ -179,137 +235,115 @@
 }
 
 /* ============================================================================
-   HERO SECTION
+   FILTER BAR (under header)
    ============================================================================ */
 
-.knowledge-hero {
-  position: relative;
-  padding: 4rem 2rem;
-  background: var(--knowledge-hero-gradient);
-  overflow: hidden;
+.filter-bar {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  position: sticky;
+  top: 60px; /* Below header */
+  z-index: 99;
 }
 
-.hero-bg-pattern {
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(232, 155, 95, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 60% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 40%);
-  animation: heroPatternFloat 20s ease-in-out infinite;
-}
-
-@keyframes heroPatternFloat {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-10px) scale(1.02); }
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 900px;
+.filter-bar-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 1600px;
   margin: 0 auto;
-  text-align: center;
-  color: white;
 }
 
-.hero-badge {
-  display: inline-block;
-  padding: 0.4rem 1rem;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50px;
+.filter-label {
   font-size: 0.8rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 1.5rem;
-}
-
-.knowledge-hero h1 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 3.5rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-  letter-spacing: -1px;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  opacity: 0.9;
-  max-width: 600px;
-  margin: 0 auto 2rem;
-  line-height: 1.6;
-}
-
-.hero-stats {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.hero-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.hero-stat .stat-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-}
-
-.hero-stat .stat-label {
-  font-size: 0.8rem;
-  opacity: 0.8;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* ============================================================================
-   QUICK NAVIGATION
-   ============================================================================ */
-
-.quick-nav {
+.filter-buttons {
   display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1.5rem 2rem;
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
-.quick-nav-btn {
-  padding: 0.6rem 1.25rem;
-  background: transparent;
-  border: 2px solid var(--border);
-  border-radius: 50px;
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
-.quick-nav-btn:hover {
+.filter-btn [data-lucide] {
+  width: 14px;
+  height: 14px;
+}
+
+.filter-btn:hover {
   border-color: var(--primary);
   color: var(--primary);
   background: rgba(45, 139, 148, 0.05);
 }
 
-.quick-nav-btn.active {
+.filter-btn.active {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
+}
+
+.filter-btn.active [data-lucide] {
+  color: white;
+}
+
+/* Responsive Filter Bar */
+@media (max-width: 768px) {
+  .filter-bar {
+    padding: 0.5rem 1rem;
+    top: 52px;
+  }
+
+  .filter-label {
+    display: none;
+  }
+
+  .filter-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .filter-btn [data-lucide] {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-buttons {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .filter-buttons::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
 }
 
 /* ============================================================================
@@ -373,6 +407,12 @@
   height: 24px;
   stroke: white;
   color: white;
+}
+
+/* Lucide icon sizing for card icons */
+.card-icon-wrapper [data-lucide] {
+  width: 24px;
+  height: 24px;
 }
 
 .card-icon-wrapper.algorithm {
@@ -776,6 +816,15 @@
 
 .flow-icon {
   font-size: 1.5rem;
+  width: 28px;
+  height: 28px;
+  color: var(--primary);
+}
+
+.flow-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
 }
 
 .flow-label {
@@ -929,6 +978,9 @@
 
 .monitor-icon {
   font-size: 1.5rem;
+  width: 28px;
+  height: 28px;
+  color: var(--primary);
 }
 
 .monitor-label {
