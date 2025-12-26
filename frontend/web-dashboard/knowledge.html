@@ -11,7 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css?v=20251225-03">
-  <link rel="stylesheet" href="knowledge.css?v=20251225-23">
+  <link rel="stylesheet" href="knowledge.css?v=20251226-01">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <div class="knowledge-page">
@@ -28,65 +31,45 @@
         </div>
         <div class="header-actions">
           <a href="index.html" class="header-nav-btn" title="Dashboard">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="3" width="7" height="7" rx="1"/>
-              <rect x="3" y="14" width="7" height="7" rx="1"/>
-              <rect x="14" y="14" width="7" height="7" rx="1"/>
-            </svg>
+            <i data-lucide="layout-dashboard" class="nav-icon"></i>
             <span class="nav-text">Dashboard</span>
           </a>
           <a href="knowledge.html" class="header-nav-btn active" title="Technical Documentation">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg>
+            <i data-lucide="file-text" class="nav-icon"></i>
             <span class="nav-text">Technical Docs</span>
           </a>
           <div class="theme-toggle">
             <button type="button" id="theme-toggle-btn" class="theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
-              <span class="icon-sun">☀️</span>
-              <span class="icon-moon">🌙</span>
+              <i data-lucide="sun" class="icon-sun"></i>
+              <i data-lucide="moon" class="icon-moon"></i>
             </button>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Hero Section -->
-    <header class="knowledge-hero">
-      <div class="hero-bg-pattern"></div>
-      <div class="hero-content">
-        <div class="hero-badge">Technical Documentation</div>
-        <h1>SwanFlow Knowledge Base</h1>
-        <p class="hero-subtitle">Deep dive into the technology powering Perth's real-time traffic intelligence</p>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="stat-value">52</span>
-            <span class="stat-label">Sensor Sites</span>
-          </div>
-          <div class="hero-stat">
-            <span class="stat-value">48ms</span>
-            <span class="stat-label">Inference Time</span>
-          </div>
-          <div class="hero-stat">
-            <span class="stat-value">90.5%</span>
-            <span class="stat-label">F1 Score</span>
-          </div>
+    <!-- Filter Bar (immediately under header) -->
+    <div class="filter-bar">
+      <div class="filter-bar-content">
+        <span class="filter-label">Filter:</span>
+        <div class="filter-buttons">
+          <button type="button" class="filter-btn active" data-target="all">
+            <i data-lucide="layers"></i> All
+          </button>
+          <button type="button" class="filter-btn" data-target="algorithm">
+            <i data-lucide="git-branch"></i> Algorithm
+          </button>
+          <button type="button" class="filter-btn" data-target="ml">
+            <i data-lucide="brain"></i> ML & AI
+          </button>
+          <button type="button" class="filter-btn" data-target="hardware">
+            <i data-lucide="cpu"></i> Hardware
+          </button>
+          <button type="button" class="filter-btn" data-target="infrastructure">
+            <i data-lucide="cloud"></i> Infrastructure
+          </button>
         </div>
       </div>
-    </header>
-
-    <!-- Quick Navigation -->
-    <div class="quick-nav">
-      <button class="quick-nav-btn active" data-target="all">All Topics</button>
-      <button class="quick-nav-btn" data-target="algorithm">Algorithm</button>
-      <button class="quick-nav-btn" data-target="ml">ML & AI</button>
-      <button class="quick-nav-btn" data-target="hardware">Hardware</button>
-      <button class="quick-nav-btn" data-target="infrastructure">Infrastructure</button>
     </div>
 
     <!-- Knowledge Cards Grid -->
@@ -97,13 +80,7 @@
         <article class="knowledge-card" data-category="algorithm">
           <div class="card-header">
             <div class="card-icon-wrapper algorithm">
-              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.4V11h3a3 3 0 0 1 3 3v1"/>
-                <path d="M12 2a4 4 0 0 0-4 4c0 1.5.8 2.8 2 3.4V11H7a3 3 0 0 0-3 3v1"/>
-                <circle cx="12" cy="6" r="2"/>
-                <path d="M5 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm14 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/>
-                <path d="M12 14v4"/>
-              </svg>
+              <i data-lucide="git-branch" class="card-icon"></i>
             </div>
             <div class="card-title-group">
               <h2>Traffic Flow Algorithm</h2>
@@ -225,14 +202,7 @@ corridors: {
         <article class="knowledge-card" data-category="ml">
           <div class="card-header">
             <div class="card-icon-wrapper ml">
-              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="10" rx="2"/>
-                <circle cx="12" cy="5" r="3"/>
-                <path d="M12 8v3"/>
-                <circle cx="8" cy="16" r="1"/>
-                <circle cx="16" cy="16" r="1"/>
-                <path d="M9 19h6"/>
-              </svg>
+              <i data-lucide="brain" class="card-icon"></i>
             </div>
             <div class="card-title-group">
               <h2>Edge AI & ML Models</h2>
@@ -341,11 +311,7 @@ TfLiteTensor* input = interpreter->input(0);
         <article class="knowledge-card" data-category="hardware">
           <div class="card-header">
             <div class="card-icon-wrapper hardware">
-              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="4" width="16" height="16" rx="2"/>
-                <rect x="9" y="9" width="6" height="6"/>
-                <path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/>
-              </svg>
+              <i data-lucide="cpu" class="card-icon"></i>
             </div>
             <div class="card-title-group">
               <h2>Hardware Architecture</h2>
@@ -452,17 +418,7 @@ TfLiteTensor* input = interpreter->input(0);
         <article class="knowledge-card" data-category="infrastructure">
           <div class="card-header">
             <div class="card-icon-wrapper infrastructure">
-              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 3v6"/>
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M12 15v6"/>
-                <path d="M5.6 5.6l3.5 3.5"/>
-                <path d="M14.9 14.9l3.5 3.5"/>
-                <path d="M3 12h6"/>
-                <path d="M15 12h6"/>
-                <path d="M5.6 18.4l3.5-3.5"/>
-                <path d="M14.9 9.1l3.5-3.5"/>
-              </svg>
+              <i data-lucide="database" class="card-icon"></i>
             </div>
             <div class="card-title-group">
               <h2>Data Pipeline</h2>
@@ -477,22 +433,22 @@ TfLiteTensor* input = interpreter->input(0);
               <h3>Detection to Dashboard Flow</h3>
               <div class="flow-diagram">
                 <div class="flow-node">
-                  <span class="flow-icon">📷</span>
+                  <i data-lucide="camera" class="flow-icon"></i>
                   <span class="flow-label">ESP32-CAM</span>
                 </div>
-                <div class="flow-connector">&rarr;</div>
+                <div class="flow-connector"><i data-lucide="arrow-right" class="flow-arrow"></i></div>
                 <div class="flow-node">
-                  <span class="flow-icon">🔌</span>
+                  <i data-lucide="plug" class="flow-icon"></i>
                   <span class="flow-label">REST API</span>
                 </div>
-                <div class="flow-connector">&rarr;</div>
+                <div class="flow-connector"><i data-lucide="arrow-right" class="flow-arrow"></i></div>
                 <div class="flow-node">
-                  <span class="flow-icon">💾</span>
+                  <i data-lucide="hard-drive" class="flow-icon"></i>
                   <span class="flow-label">SQLite DB</span>
                 </div>
-                <div class="flow-connector">&rarr;</div>
+                <div class="flow-connector"><i data-lucide="arrow-right" class="flow-arrow"></i></div>
                 <div class="flow-node">
-                  <span class="flow-icon">📊</span>
+                  <i data-lucide="bar-chart-3" class="flow-icon"></i>
                   <span class="flow-label">Dashboard</span>
                 </div>
               </div>
@@ -575,15 +531,7 @@ CREATE TABLE sites (
         <article class="knowledge-card" data-category="algorithm">
           <div class="card-header">
             <div class="card-icon-wrapper algorithm">
-              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19h16"/>
-                <path d="M4 5h16"/>
-                <path d="M8 5v14"/>
-                <path d="M16 5v14"/>
-                <path d="M4 12h16" stroke-dasharray="3 3"/>
-                <circle cx="12" cy="9" r="1.5" fill="currentColor"/>
-                <circle cx="12" cy="15" r="1.5" fill="currentColor"/>
-              </svg>
+              <i data-lucide="route" class="card-icon"></i>
             </div>
             <div class="card-title-group">
               <h2>Corridor Intelligence</h2>
@@ -686,11 +634,7 @@ CREATE TABLE sites (
         <article class="knowledge-card" data-category="infrastructure">
           <div class="card-header">
             <div class="card-icon-wrapper infrastructure">
-              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 1 1 0 9Z"/>
-                <path d="M12 13v5"/>
-                <path d="M10 17l2 2 2-2"/>
-              </svg>
+              <i data-lucide="cloud" class="card-icon"></i>
             </div>
             <div class="card-title-group">
               <h2>Deployment & Infrastructure</h2>
@@ -763,22 +707,22 @@ CREATE TABLE sites (
               <h3>Monitoring & Health</h3>
               <div class="monitoring-grid">
                 <div class="monitor-item">
-                  <span class="monitor-icon">💓</span>
+                  <i data-lucide="heart-pulse" class="monitor-icon"></i>
                   <span class="monitor-label">Health Endpoint</span>
                   <span class="monitor-status">/api/health</span>
                 </div>
                 <div class="monitor-item">
-                  <span class="monitor-icon">📈</span>
+                  <i data-lucide="trending-up" class="monitor-icon"></i>
                   <span class="monitor-label">Uptime</span>
                   <span class="monitor-status">99.9% SLA</span>
                 </div>
                 <div class="monitor-item">
-                  <span class="monitor-icon">🔔</span>
+                  <i data-lucide="bell" class="monitor-icon"></i>
                   <span class="monitor-label">Alerts</span>
                   <span class="monitor-status">Discord webhook</span>
                 </div>
                 <div class="monitor-item">
-                  <span class="monitor-icon">📊</span>
+                  <i data-lucide="file-bar-chart" class="monitor-icon"></i>
                   <span class="monitor-label">Logging</span>
                   <span class="monitor-status">Docker logs</span>
                 </div>
@@ -808,7 +752,7 @@ ssh root@45.77.233.102 "docker logs -f swanflow-api --tail 100"</code></pre>
     <footer class="knowledge-footer">
       <div class="footer-content">
         <div class="footer-brand">
-          <span class="brand-icon">🦢</span>
+          <i data-lucide="bird" class="brand-icon"></i>
           <span>SwanFlow</span>
         </div>
         <p class="footer-text">Real-time traffic intelligence for Perth, Western Australia</p>

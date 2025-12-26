@@ -79,7 +79,8 @@
   // ============================================================================
 
   function initQuickNav() {
-    const navBtns = document.querySelectorAll('.quick-nav-btn');
+    // Support both .quick-nav-btn (legacy) and .filter-btn (new)
+    const navBtns = document.querySelectorAll('.quick-nav-btn, .filter-btn');
     const cards = document.querySelectorAll('.knowledge-card');
 
     navBtns.forEach(btn => {
@@ -108,10 +109,13 @@
           }
         });
 
-        // Smooth scroll to grid
+        // Smooth scroll to grid (only if not already visible)
         const grid = document.querySelector('.knowledge-grid');
         if (grid) {
-          grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const rect = grid.getBoundingClientRect();
+          if (rect.top > window.innerHeight || rect.bottom < 0) {
+            grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         }
       });
     });
@@ -356,10 +360,21 @@
   }
 
   // ============================================================================
+  // LUCIDE ICONS INITIALIZATION
+  // ============================================================================
+
+  function initLucideIcons() {
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  }
+
+  // ============================================================================
   // INITIALIZE ALL
   // ============================================================================
 
   function init() {
+    initLucideIcons();
     initTheme();
     initCardExpansion();
     initQuickNav();
