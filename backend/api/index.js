@@ -11,7 +11,6 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const Database = require('better-sqlite3');
 const { startSimulator } = require('./live-simulator');
-const { startFreewaySimulator } = require('./freeway-simulator');
 require('dotenv').config();
 
 const app = express();
@@ -416,176 +415,8 @@ app.get('/api/stats/:site/hourly', (req, res) => {
 });
 
 // ============================================================================
-// Freeway API Endpoints
+// Frontend Static Files
 // ============================================================================
-
-// GET /api/freeway/sites - Get all freeway monitoring sites
-app.get('/api/freeway/sites', (req, res) => {
-  try {
-    const { corridor } = req.query;
-    let query = 'SELECT * FROM freeway_sites WHERE active = 1';
-    const params = [];
-
-    if (corridor) {
-      query += ' AND corridor = ?';
-      params.push(corridor);
-    }
-
-    query += ' ORDER BY corridor, distance_from_bridge';
-    const sites = db.prepare(query).all(...params);
-
-    res.json({
-      success: true,
-      count: sites.length,
-      sites
-    });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
-
-// GET /api/freeway/stats/:siteId - Get stats for a specific freeway site
-app.get('/api/freeway/stats/:siteId', (req, res) => {
-  const { siteId } = req.params;
-  const { period = '24h' } = req.query;
-
-  try {
-    // Get site info
-    const site = db.prepare('SELECT * FROM freeway_sites WHERE id = ?').get(siteId);
-    if (!site) {
-      return res.status(404).json({ error: 'Site not found' });
-    }
-
-    // Calculate time threshold
-    let hours = 24;
-    if (period === '1h') hours = 1;
-    else if (period === '6h') hours = 6;
-    else if (period === '7d') hours = 24 * 7;
-
-    const thresholdMs = Date.now() - (hours * 60 * 60 * 1000);
-
-    const stats = db.prepare(`
-      SELECT
-        COUNT(*) as data_points,
-        AVG(hour_count) as avg_hourly_flow,
-        AVG(estimated_speed) as avg_speed,
-        AVG(occupancy) as avg_occupancy,
-        AVG(density) as avg_density,
-        MAX(hour_count) as peak_flow,
-        MIN(estimated_speed) as min_speed,
-        MAX(estimated_speed) as max_speed,
-        MIN(created_at) as first_seen,
-        MAX(created_at) as last_seen
-      FROM freeway_detections
-      WHERE site_id = ? AND timestamp > ?
-    `).get(siteId, thresholdMs);
-
-    res.json({
-      success: true,
-      site,
-      period,
-      stats
-    });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
-
-// GET /api/freeway/corridor/:corridor - Get all sites for a corridor
-app.get('/api/freeway/corridor/:corridor', (req, res) => {
-  const { corridor } = req.params;
-  const { direction } = req.query;
-
-  try {
-    let query = 'SELECT * FROM freeway_sites WHERE corridor = ? AND active = 1';
-    const params = [corridor];
-
-    if (direction) {
-      query += ' AND direction = ?';
-      params.push(direction);
-    }
-
-    query += ' ORDER BY distance_from_bridge';
-    const sites = db.prepare(query).all(...params);
-
-    // Get latest data for each site
-    const sitesWithData = sites.map(site => {
-      const latest = db.prepare(`
-        SELECT * FROM freeway_detections
-        WHERE site_id = ?
-        ORDER BY timestamp DESC
-        LIMIT 1
-      `).get(site.id);
-
-      return {
-        ...site,
-        latest_detection: latest
-      };
-    });
-
-    res.json({
-      success: true,
-      corridor,
-      direction: direction || 'all',
-      count: sitesWithData.length,
-      sites: sitesWithData
-    });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
-
-// GET /api/freeway/live - Get live conditions for all freeway sites
-app.get('/api/freeway/live', (req, res) => {
-  try {
-    const liveData = db.prepare(`
-      SELECT
-        fs.*,
-        fd.timestamp,
-        fd.hour_count,
-        fd.estimated_speed,
-        fd.occupancy,
-        fd.density,
-        fd.simulation_scenario
-      FROM freeway_sites fs
-      LEFT JOIN (
-        SELECT DISTINCT site_id, timestamp, hour_count, estimated_speed,
-               occupancy, density, simulation_scenario,
-               ROW_NUMBER() OVER (PARTITION BY site_id ORDER BY timestamp DESC) as rn
-        FROM freeway_detections
-      ) fd ON fs.id = fd.site_id AND fd.rn = 1
-      WHERE fs.active = 1
-      ORDER BY fs.corridor, fs.distance_from_bridge
-    `).all();
-
-    // Group by corridor
-    const mitchell = liveData.filter(d => d.corridor === 'mitchell');
-    const kwinana = liveData.filter(d => d.corridor === 'kwinana');
-
-    res.json({
-      success: true,
-      timestamp: Date.now(),
-      corridors: {
-        mitchell: {
-          name: 'Mitchell Freeway',
-          count: mitchell.length,
-          sites: mitchell
-        },
-        kwinana: {
-          name: 'Kwinana Freeway',
-          count: kwinana.length,
-          sites: kwinana
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Database error' });
-  }
-});
 
 // Serve frontend static files
 const path = require('path');
@@ -620,11 +451,8 @@ app.listen(PORT, () => {
   console.log(`  GET  /api/stats/:site/hourly`);
   console.log(`=================================\n`);
 
-  // Start live traffic simulator
+  // Start live traffic simulator for arterial roads
   startSimulator();
-
-  // Start freeway traffic simulator
-  startFreewaySimulator();
 });
 
 // Graceful shutdown

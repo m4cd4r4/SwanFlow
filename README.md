@@ -27,24 +27,18 @@ SwanFlow demonstrates that **citizen-led monitoring can provide functional, open
 
 SwanFlow is a DIY traffic monitoring system that:
 
-- **Monitors 6 km corridor** from CBD to Fremantle (3 stretches)
-- **24 monitoring sites** with bidirectional tracking (Northbound/Southbound)
+- **Monitors 6 km arterial corridor** from CBD to Fremantle (3 stretches)
+- **18 monitoring sites** with bidirectional tracking (Northbound/Southbound)
 - **Real-time speed estimation** using traffic flow theory
 - **Edge AI detection** using Edge Impulse FOMO (ML model on ESP32)
 - **Closed-segment monitoring** for accurate flow measurement
 - **Costs ~$223 AUD** per monitoring site (solar-powered)
 - **Runs 24/7** completely off-grid with solar power
 
-**Aspirational Expansion** (Phase 5):
-- **Mitchell & Kwinana Freeways** — 5km north and south of Narrows Bridge
-- **30 virtual sensors** at all on/off ramps
-- **Unique Feature Detection (UFD)** — privacy-preserving speed measurement
-- **Traffic simulator** for development and advocacy
-
 Perfect for:
-- **Commuter intelligence**: "Should I drive now?" recommendations
+- **Commuter intelligence**: Real-time arterial road monitoring
 - **Open data advocacy**: Demonstrating value of accessible traffic data
-- Traffic analysis (peak hours, congestion patterns, journey times)
+- **Proof of concept**: Closed-segment monitoring validation
 - Research projects (urban planning, transport optimisation)
 - Hobbyists (IoT, ML, embedded systems)
 - Community projects (local traffic advocacy)
@@ -293,8 +287,7 @@ swanflow/
 │
 ├── docs/
 │   ├── corridor-architecture.md      # 3-stretch system architecture
-│   ├── freeway-expansion-plan.md     # Phase 5: Mitchell & Kwinana Freeways
-│   ├── cost-effectiveness-analysis.md # $143 vs $500M comparison
+│   ├── cost-effectiveness-analysis.md # $223 vs $500M comparison
 │   ├── mainroads-api-investigation.md # API outage research
 │   ├── academic-paper-plan.md        # Research publication roadmap
 │   ├── ml-development-guide.md       # Edge Impulse training guide
@@ -311,33 +304,51 @@ swanflow/
 
 ## Monitored Stretches
 
-### CBD to Fremantle Corridor (6 km total)
+### CBD to Fremantle Arterial Corridor (6 km total)
 
-#### 1. **Mounts Bay Road** (PoC ✅)
+#### Prototype Options
+
+**Option A: Unidirectional Prototype (Recommended - Lowest Cost)**
+- **2 locations × 1 direction = 2 installations**
+- **Hardware**: Each location monitors BOTH LANES of ONE direction (e.g., outbound toward Fremantle)
+- **Cost**: **$446** (2 × $223)
+- **Example**: Crawley (entry) + Point Lewis (exit), both monitoring outbound traffic only
+- **Why Start Here**: Proves closed-segment concept at minimum cost, simpler data analysis
+
+**Option B: Bidirectional Prototype (Full Validation)**
+- **2 locations × 2 directions = 4 installations**
+- **Hardware**: Each location monitors both inbound AND outbound
+- **Cost**: **$892** (4 × $223)
+- **Example**: Crawley + Point Lewis, both directions
+- **Why Use This**: Full bidirectional flow measurement, complete validation
+
+#### 1. **Mounts Bay Road** (PoC Target)
 **Crawley → Point Lewis** (~1.5 km)
 
-- **Status**: Proof of Concept Complete
-- **Monitoring Sites**: Kings Park, Mill Point, Fraser Ave, Malcolm St (4 × 2 directions = 8 sites)
-- **Characteristics**: Waterfront arterial, minimal side access, ideal closed segment
-- **Why It Works**: No side streets → vehicles entering at Crawley are counted at Point Lewis
+- **Status**: Proof of Concept Target
+- **Monitoring Sites**: Crawley (entry), Point Lewis (exit)
+- **Characteristics**: Waterfront arterial, **zero side access**, perfect closed segment
+- **Why Optimized**: True closed segment needs only entry/exit points
+- **Unidirectional Cost**: $446 (2 sensors, one direction)
+- **Bidirectional Cost**: $892 (4 sensors, both directions)
 
-#### 2. **Stirling Highway - Swanbourne** (Phase 1 ✅)
+#### 2. **Stirling Highway - Swanbourne** (Phase 2)
 **Grant St → Eric St** (~1.5 km)
 
-- **Status**: Phase 1 Pilot Complete
-- **Monitoring Sites**: Grant St, Campbell Barracks, Eric St (3 × 2 directions = 6 sites)
+- **Status**: Future Expansion
+- **Monitoring Sites**: Grant St, Campbell Barracks, Eric St (3 × 2 directions = 6 sensors)
 - **Characteristics**: Campbell Barracks creates natural barrier, very few side access points
-- **Key Feature**: Army facility on one side = no civilian traffic entry/exit
+- **Key Feature**: Army facility on one side = minimal civilian traffic entry/exit
 
-#### 3. **Stirling Highway - Mosman Park** (Phase 1 ✅)
+#### 3. **Stirling Highway - Mosman Park** (Phase 3)
 **Forrest St → Victoria St** (~3 km)
 
-- **Status**: Phase 1 Pilot Complete
-- **Monitoring Sites**: Forrest St, Bay View Terrace, McCabe St, Victoria St (4 × 2 directions = 8 sites)
-- **Characteristics**: Longest stretch, residential arterial, tests algorithm robustness
-- **Purpose**: Validate algorithm with more complex side street access
+- **Status**: Future Expansion
+- **Monitoring Sites**: Forrest St, Bay View Terrace, McCabe St, Victoria St (4 × 2 directions = 8 sensors)
+- **Characteristics**: Longest stretch, residential arterial, tests algorithm with side streets
+- **Purpose**: Validate algorithm with more complex access patterns
 
-**Total**: 24 monitoring sites (11 locations × 2 directions each) across 3 stretches
+**Total**: 18 monitoring sites (9 locations × 2 directions each) across 3 arterial stretches
 
 **See**: [docs/corridor-architecture.md](docs/corridor-architecture.md) for detailed technical architecture
 
@@ -461,8 +472,9 @@ Dashboard → Fetch API → Chart.js → User
 | Metric | SwanFlow (Solar) | Main Roads WA Smart Freeway |
 |--------|--------------------|-----------------------------|
 | **Per-site cost** | ~$223 | ~$50,000+ |
-| **30-site deployment** | ~$6,690 | ~$1.5M+ |
-| **Full corridor** | ~$6,690 | $500M+ |
+| **Proof of concept (unidirectional)** | **$446** | ~$100,000+ |
+| **Proof of concept (bidirectional)** | $892 | ~$200,000+ |
+| **Full arterial corridor (18 sensors)** | $4,014 | ~$900,000+ |
 | **Data accessibility** | 100% open | APIs offline |
 | **Power requirements** | Off-grid (solar) | Mains power |
 | **Cost ratio** | 1 | **224x** |
@@ -510,10 +522,10 @@ Dashboard → Fetch API → Chart.js → User
 
 | Deployment | Hardware | Monthly Cost | Notes |
 |------------|----------|--------------|-------|
-| **Single Site** | $223 | $8 | M2M SIM only, 100% off-grid |
-| **5 Sites** | $1,000 | $12 | Data pooling, fully solar |
-| **10 Sites** | $2,000 | $15 | Bulk discounts apply |
-| **24 Sites (Full Corridor)** | $4,800 | $20 | Complete CBD-Fremantle monitoring |
+| **Phase 0: Unidirectional PoC** | **$446** | **$8** | **2 sensors, one direction only (RECOMMENDED START)** |
+| **Phase 1: Bidirectional PoC** | $892 | $8 | 4 sensors, both directions at 2 locations |
+| **Phase 2: + Swanbourne** | $2,230 | $12 | 10 sensors total (4+6) |
+| **Phase 3: Full Corridor** | $4,014 | $15 | 18 sensors, complete arterial monitoring |
 | **Backend + Frontend Hosting** | **$0** | **$0** | **Render.com + Vercel (FREE)** |
 
 **Key Cost Advantages:**
@@ -536,44 +548,54 @@ Dashboard → Fetch API → Chart.js → User
 
 ## Roadmap
 
-### Phase 1: Proof of Concept (Current)
+### Phase 0: Unidirectional PoC (RECOMMENDED START - Current)
+**Cost: $446 | Timeline: 2-4 weeks**
+
 - [x] Hardware BOM and shopping list
 - [x] Firmware structure (PlatformIO)
 - [x] Backend API (Express + SQLite)
 - [x] Web dashboard (Chart.js)
 - [x] Documentation
 - [ ] Edge Impulse model training
-- [ ] Field deployment at Mounts Bay Road
+- [ ] Order hardware for 2 locations (Crawley + Point Lewis)
+- [ ] Configure firmware for unidirectional monitoring (outbound only)
+- [ ] Field deployment: 2 locations, 1 direction
+- [ ] Validate closed-segment theory with simplest setup
 
-### Phase 2: Single Site Deployment (2-4 Weeks)
-- [ ] ML model training (300-500 images)
-- [ ] Firmware integration with FOMO
-- [ ] Site survey (Mounts Bay Road)
-- [ ] Installation and mounting
-- [ ] 24-hour field testing
-- [ ] Accuracy validation (>70%)
+**Success Criteria:**
+- ✅ Vehicles counted at Crawley entry = vehicles counted at Point Lewis exit (±10%)
+- ✅ Cost under $500
+- ✅ System runs 24/7 on solar power
 
-### Phase 3: Multi-Site Expansion (1-3 Months)
-- [ ] Survey 5-10 additional sites
-- [ ] Bulk hardware order
+### Phase 1: Bidirectional Expansion (1-2 Months)
+**Cost: $446 additional ($892 total) | Timeline: 2-4 weeks**
+
+- [ ] Add inbound monitoring to existing 2 locations
+- [ ] Validate bidirectional flow measurement
+- [ ] Compare inbound vs outbound traffic patterns
+
+### Phase 2: Swanbourne Expansion (2-3 Months)
+**Cost: $1,338 additional ($2,230 total)**
+
+- [ ] Survey Swanbourne stretch (Grant St → Eric St)
+- [ ] Install 3 additional locations (6 sensors)
 - [ ] Data pooling (shared SIM plan)
-- [ ] Staged rollout (1 site/week)
-- [ ] Central monitoring dashboard
+- [ ] Validate algorithm with multiple stretches
 
-### Phase 4: Advanced Features (3-6 Months)
+### Phase 3: Full Corridor (3-6 Months)
+**Cost: $1,784 additional ($4,014 total)**
+
+- [ ] Complete Mosman Park stretch (4 locations, 8 sensors)
+- [ ] 18 total sensors across 6 km
+- [ ] Complete arterial corridor monitoring
+
+### Phase 4: Enhanced Features (6-12 Months)
 - [ ] Multi-class detection (cars, trucks, motorcycles)
-- [ ] Direction detection (northbound vs. southbound)
-- [ ] Speed estimation (optional)
-- [ ] Alerts (email/SMS)
-- [ ] Solar power deployment
-- [ ] Mobile app (React Native)
-
-### Phase 5: Freeway Expansion (Aspirational)
-- [ ] **Traffic Simulator**: Mitchell & Kwinana Freeways (5km each from Narrows Bridge)
-- [ ] **30 Virtual Sensors**: All on/off ramps in monitoring zone
-- [ ] **Unique Feature Detection (UFD)**: Privacy-preserving speed sampling
-- [ ] **Unified Dashboard**: Combined arterial + freeway view with GPS navigation
-- [ ] **Open Data Advocacy**: Demonstrate value of citizen traffic monitoring
+- [ ] Improved speed estimation algorithms
+- [ ] Alerts (email/SMS for congestion)
+- [ ] Historical data analysis
+- [ ] Mobile-responsive dashboard improvements
+- [ ] API documentation for third-party access
 
 See [docs/requirements-and-todos.md](docs/requirements-and-todos.md) for full roadmap.
 
@@ -584,8 +606,7 @@ See [docs/requirements-and-todos.md](docs/requirements-and-todos.md) for full ro
 | Document | Description |
 |----------|-------------|
 | [**docs/corridor-architecture.md**](docs/corridor-architecture.md) | **3-stretch system architecture, algorithm details, ML integration** |
-| [**docs/freeway-expansion-plan.md**](docs/freeway-expansion-plan.md) | **Aspirational Phase 5: Mitchell & Kwinana Freeway simulation, UFD, advocacy** |
-| [**docs/cost-effectiveness-analysis.md**](docs/cost-effectiveness-analysis.md) | **$143 vs $500M: Citizen monitoring vs government infrastructure** |
+| [**docs/cost-effectiveness-analysis.md**](docs/cost-effectiveness-analysis.md) | **$223 vs $500M: Citizen monitoring vs government infrastructure** |
 | [**docs/academic-paper-plan.md**](docs/academic-paper-plan.md) | **Research publication roadmap: structure, venues, contributions** |
 | [**docs/mainroads-api-investigation.md**](docs/mainroads-api-investigation.md) | **API outage research: 16+ months offline, internal systems, Auditor General findings** |
 | [hardware/bom.md](hardware/bom.md) | Bill of materials |
@@ -814,8 +835,8 @@ This project is being developed with academic publication in mind. Key documents
 - [docs/cost-effectiveness-analysis.md](docs/cost-effectiveness-analysis.md) — Evidence-based cost comparison
 
 **Novel Contributions**:
-- **Unique Feature Detection (UFD)** — Privacy-preserving speed measurement
-- **350:1 Cost Framework** — Citizen vs government infrastructure
+- **Closed-Segment Monitoring Theory** — Entry/exit point tracking for arterial roads
+- **224:1 Cost Framework** — Citizen vs government infrastructure
 - **Open Data Accessibility Audit** — WA vs NSW comparison
 
 ---
