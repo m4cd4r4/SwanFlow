@@ -155,6 +155,27 @@ pio device monitor
 
 ### Phase 4: Deploy Backend
 
+**Option A: Render.com (Recommended - FREE)**
+
+The easiest and cheapest option - completely free hosting with auto-deployment:
+
+1. Create account at [render.com](https://render.com) (free tier)
+2. Connect your GitHub repository
+3. Create new "Web Service" from `render.yaml`
+4. Set environment variable: `API_KEY=your_secret_key`
+5. Deploy automatically on every GitHub push
+
+**Free Tier Includes:**
+- 750 hours/month (24/7 coverage)
+- HTTPS included
+- Auto-deploy from GitHub
+- 0.1 CPU, 512MB RAM (perfect for this project)
+- **Total cost: $0/month**
+
+Backend will be live at: `https://your-app.onrender.com`
+
+**Option B: Local Development**
+
 ```bash
 cd backend/api
 
@@ -173,14 +194,39 @@ Backend runs on [http://localhost:3000](http://localhost:3000)
 
 ### Phase 5: Launch Dashboard
 
+**Option A: Vercel (Recommended - FREE)**
+
+Deploy dashboard for free with HTTPS:
+
+```bash
+cd frontend/web-dashboard
+
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy (first time)
+vercel
+
+# Deploy updates
+vercel --prod
+```
+
+**Free Tier Includes:**
+- Unlimited bandwidth
+- HTTPS/SSL included
+- 100GB bandwidth
+- Auto-deploy from GitHub
+- **Total cost: $0/month**
+
+Dashboard will be live at: `https://your-app.vercel.app`
+
+**Option B: Local Development**
+
 ```bash
 cd frontend/web-dashboard
 
 # Serve locally (Python)
 python -m http.server 8080
-
-# Or deploy to Vercel (free)
-vercel
 ```
 
 Dashboard accessible at [http://localhost:8080](http://localhost:8080)
@@ -438,10 +484,35 @@ Dashboard → Fetch API → Chart.js → User
 - Data pooling: Share 5GB across 5 devices (~$12/month total)
 - **Total**: ~$600 hardware + $12/month
 
+**Backend/Frontend Hosting**: **$0** (Render.com + Vercel free tiers)
+
 ### Phase 3: Solar Power (Off-Grid)
 
 - 20W solar panel + battery: +$80/site
 - No ongoing power costs
+
+### Total Cost Summary
+
+| Deployment | Hardware | Monthly Cost | Notes |
+|------------|----------|--------------|-------|
+| **Single Site (Mains Power)** | $143 | $8 | M2M SIM only |
+| **Single Site (Solar)** | $223 | $8 | Off-grid capable |
+| **5 Sites (Mains Power)** | $600 | $12 | Data pooling |
+| **5 Sites (Solar)** | $1,000 | $12 | Fully off-grid |
+| **Backend + Frontend Hosting** | **$0** | **$0** | **Render.com + Vercel (FREE)** |
+
+**Key Cost Advantages:**
+- ✅ **No hosting costs** - Render.com & Vercel free tiers
+- ✅ **No server costs** - Fully cloud-hosted
+- ✅ **No SSL cert costs** - HTTPS included
+- ✅ **Auto-deployment** - Push to GitHub = instant deploy
+- ✅ **350:1 cost advantage** vs government infrastructure
+
+**Compare to Traditional Setup:**
+- VPS: ~$5-15/month
+- SSL Certificate: ~$50-200/year
+- Maintenance: Hours/month
+- **SwanFlow**: $0/month for hosting 🎉
 
 ---
 
@@ -646,7 +717,7 @@ See [tests/e2e/README.md](tests/e2e/README.md) for full documentation.
 | **Backend** | Node.js, Express.js, SQLite, better-sqlite3 |
 | **Frontend** | Vanilla JS, Chart.js, HTML5, CSS3 |
 | **Testing** | Playwright, axe-core (accessibility) |
-| **Deployment** | Vercel (frontend), VPS/Hetzner (backend) |
+| **Deployment** | **Vercel** (frontend - FREE), **Render.com** (backend - FREE) |
 
 ---
 
