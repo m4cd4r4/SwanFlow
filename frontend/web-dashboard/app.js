@@ -5,7 +5,7 @@
 // Configuration
 const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:3001'  // Local dev: local API server
-  : '';  // Production: Same domain (Vercel proxies /api/* to 45.77.233.102)
+  : 'https://perth-traffic-watch.onrender.com';  // Production: Render.com backend (HTTPS)
 
 const REFRESH_INTERVAL = 60000; // 60 seconds (normal mode)
 const LIVE_REFRESH_INTERVAL = 15000; // 15 seconds (live mode)
