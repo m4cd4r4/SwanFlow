@@ -47,47 +47,7 @@ const sites = [
   { name: 'Stirling Hwy @ McCabe St (Northbound)', multiplier: 1.0, direction: 'NB', type: 'arterial' },
   { name: 'Stirling Hwy @ McCabe St (Southbound)', multiplier: 1.1, direction: 'SB', type: 'arterial' },
   { name: 'Stirling Hwy @ Victoria St (Northbound)', multiplier: 0.95, direction: 'NB', type: 'arterial' },
-  { name: 'Stirling Hwy @ Victoria St (Southbound)', multiplier: 1.15, direction: 'SB', type: 'arterial' },
-
-  // ============================================================================
-  // FREEWAYS - Higher volume, stronger directional bias
-  // ============================================================================
-
-  // Mitchell Freeway (Narrows Interchange → Scarborough Beach Rd)
-  // Major north-south freeway through Perth CBD suburbs
-  { name: 'Mitchell Fwy @ Narrows (Northbound)', multiplier: 2.5, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Narrows (Southbound)', multiplier: 2.3, direction: 'SB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Malcolm St (Northbound)', multiplier: 2.4, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Malcolm St (Southbound)', multiplier: 2.2, direction: 'SB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Loftus St (Northbound)', multiplier: 2.3, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Loftus St (Southbound)', multiplier: 2.1, direction: 'SB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Newcastle St (Northbound)', multiplier: 2.2, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Newcastle St (Southbound)', multiplier: 2.0, direction: 'SB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Charles St (Northbound)', multiplier: 2.1, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Charles St (Southbound)', multiplier: 1.9, direction: 'SB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Vincent St (Northbound)', multiplier: 2.0, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Vincent St (Southbound)', multiplier: 1.8, direction: 'SB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Powis St (Northbound)', multiplier: 1.9, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Powis St (Southbound)', multiplier: 1.7, direction: 'SB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Hutton St (Northbound)', multiplier: 1.8, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Hutton St (Southbound)', multiplier: 1.6, direction: 'SB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Scarborough Beach Rd (Northbound)', multiplier: 1.7, direction: 'NB', type: 'freeway' },
-  { name: 'Mitchell Fwy @ Scarborough Beach Rd (Southbound)', multiplier: 1.5, direction: 'SB', type: 'freeway' },
-
-  // Kwinana Freeway (Narrows South → Leach Hwy)
-  // Major freeway heading south from CBD to Fremantle/Rockingham
-  { name: 'Kwinana Fwy @ Narrows South (Northbound)', multiplier: 2.4, direction: 'NB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Narrows South (Southbound)', multiplier: 2.2, direction: 'SB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Mill Point Rd (Northbound)', multiplier: 2.3, direction: 'NB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Mill Point Rd (Southbound)', multiplier: 2.1, direction: 'SB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ South Tce (Northbound)', multiplier: 2.2, direction: 'NB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ South Tce (Southbound)', multiplier: 2.0, direction: 'SB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Canning Hwy (Northbound)', multiplier: 2.1, direction: 'NB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Canning Hwy (Southbound)', multiplier: 1.9, direction: 'SB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Manning Rd (Northbound)', multiplier: 2.0, direction: 'NB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Manning Rd (Southbound)', multiplier: 1.8, direction: 'SB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Leach Hwy (Northbound)', multiplier: 1.9, direction: 'NB', type: 'freeway' },
-  { name: 'Kwinana Fwy @ Leach Hwy (Southbound)', multiplier: 1.7, direction: 'SB', type: 'freeway' }
+  { name: 'Stirling Hwy @ Victoria St (Southbound)', multiplier: 1.15, direction: 'SB', type: 'arterial' }
 ];
 
 // Traffic patterns by hour (base vehicles per minute)
@@ -99,15 +59,11 @@ const trafficPatterns = {
   20: 3.33, 21: 2.50, 22: 1.83, 23: 1.17
 };
 
-// Direction modifiers - freeways have stronger directional bias during rush hour
+// Direction modifiers for arterial roads during rush hour
 const directionModifiers = {
   arterial: {
     NB: { morning: 1.3, evening: 0.7 },
     SB: { morning: 0.7, evening: 1.3 }
-  },
-  freeway: {
-    NB: { morning: 1.5, evening: 0.5 },  // Stronger bias for freeways
-    SB: { morning: 0.5, evening: 1.5 }
   }
 };
 
@@ -127,16 +83,11 @@ function startSimulator() {
     return;
   }
 
-  const arterialCount = sites.filter(s => s.type === 'arterial').length;
-  const freewayCount = sites.filter(s => s.type === 'freeway').length;
-
   console.log('=================================');
   console.log('Live Traffic Simulator Started');
   console.log('=================================');
   console.log(`Update interval: ${UPDATE_INTERVAL / 1000}s`);
-  console.log(`Sites: ${sites.length} total`);
-  console.log(`  - Arterial: ${arterialCount}`);
-  console.log(`  - Freeway: ${freewayCount}`);
+  console.log(`Sites: ${sites.length} arterial monitoring sites`);
   console.log('Generating real-time traffic data...\n');
 
   // Run immediately on start
@@ -179,15 +130,13 @@ function simulateTrafficUpdate() {
   `);
 
   let updatedCount = 0;
-  let arterialUpdated = 0;
-  let freewayUpdated = 0;
 
   for (const site of sites) {
     const result = updateTotalStmt.get(site.name);
     const currentTotal = result?.max_total || 0;
 
-    // Get modifiers based on road type
-    const roadType = site.type || 'arterial';
+    // All sites are arterial roads
+    const roadType = 'arterial';
     const modifiers = directionModifiers[roadType];
 
     let rate = baseRate * site.multiplier;
@@ -219,14 +168,12 @@ function simulateTrafficUpdate() {
     try {
       insertStmt.run(site.name, timestamp, newTotal, hourCount, minuteCount, confidence, uptime);
       updatedCount++;
-      if (roadType === 'freeway') freewayUpdated++;
-      else arterialUpdated++;
     } catch (err) {
       // Site might not exist in sites table, skip silently
     }
   }
 
-  console.log(`[SIMULATOR] Updated ${updatedCount} sites (${arterialUpdated} arterial, ${freewayUpdated} freeway) at hour ${hour} (base rate: ${baseRate.toFixed(2)} veh/min)`);
+  console.log(`[SIMULATOR] Updated ${updatedCount} arterial sites at hour ${hour} (base rate: ${baseRate.toFixed(2)} veh/min)`);
 }
 
 // Graceful shutdown
