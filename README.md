@@ -10,11 +10,11 @@ Monitor traffic flow in real-time using affordable IoT hardware and machine lear
 
 ---
 
-## The $143 vs $50,000 Question
+## The $223 vs $50,000 Question
 
 Main Roads Western Australia has invested over **$500 million** in Smart Freeway infrastructure with **1,400+ sensors** collecting real-time traffic data. Yet their public APIs have been **offline since August 2023** with no restoration timeline.
 
-SwanFlow demonstrates that **citizen-led monitoring can provide functional, open traffic data for ~$143 per site** — a 350:1 cost advantage.
+SwanFlow demonstrates that **citizen-led monitoring can provide functional, open traffic data for ~$223 per site** (solar-powered, off-grid) — a 224:1 cost advantage.
 
 > **This project is both a technical proof-of-concept and an advocacy tool for open traffic data.**
 
@@ -32,8 +32,8 @@ SwanFlow is a DIY traffic monitoring system that:
 - **Real-time speed estimation** using traffic flow theory
 - **Edge AI detection** using Edge Impulse FOMO (ML model on ESP32)
 - **Closed-segment monitoring** for accurate flow measurement
-- **Costs ~$143 AUD** per monitoring site
-- **Runs 24/7** on mains or solar power
+- **Costs ~$223 AUD** per monitoring site (solar-powered)
+- **Runs 24/7** completely off-grid with solar power
 
 **Aspirational Expansion** (Phase 5):
 - **Mitchell & Kwinana Freeways** — 5km north and south of Narrows Bridge
@@ -70,10 +70,11 @@ Perfect for:
 ### Hardware
 - **ESP32-CAM** (OV2640 camera) - $8-12
 - **SIM7000A** (4G LTE module) - $15-20
+- **20W Solar Panel + 12V Battery** - ~$80
 - **Edge Impulse FOMO** (on-device ML inference)
 - **MicroSD** for local image buffering
 - **Weatherproof** (IP65 junction box)
-- **Solar-powered** (optional, off-grid)
+- **100% off-grid** with solar power (no mains required)
 
 ### Firmware
 - PlatformIO (Arduino framework)
@@ -111,18 +112,21 @@ See [hardware/shopping-lists.md](hardware/shopping-lists.md) for complete shoppi
 - 1x SIM7000A LTE module
 - 1x USB-to-TTL programmer
 - 2x MicroSD cards (8-16GB)
+- 1x 20W solar panel
+- 1x 12V 7Ah battery
+- 1x Solar charge controller
 
 **Bunnings** (same day):
 - IP65 junction box
 - Cable glands
 - Mounting bracket
-- Outdoor power cable
+- Solar panel mounting hardware
 
 **M2M SIM Card**:
 - Register at [m2msim.com.au](https://m2msim.com.au)
 - 1GB/month plan (~$5-8/month)
 
-**Total Budget**: ~$143 AUD (Phase 1)
+**Total Budget**: ~$223 AUD (Phase 1 - Solar-Powered)
 
 ### Phase 2: Train ML Model (While Hardware Ships)
 
@@ -454,65 +458,79 @@ Dashboard → Fetch API → Chart.js → User
 
 ### SwanFlow vs Government Infrastructure
 
-| Metric | SwanFlow | Main Roads WA Smart Freeway |
+| Metric | SwanFlow (Solar) | Main Roads WA Smart Freeway |
 |--------|--------------------|-----------------------------|
-| **Per-site cost** | ~$143 | ~$50,000+ |
-| **30-site deployment** | ~$4,500 | ~$1.5M+ |
-| **Full corridor** | ~$4,500 | $500M+ |
+| **Per-site cost** | ~$223 | ~$50,000+ |
+| **30-site deployment** | ~$6,690 | ~$1.5M+ |
+| **Full corridor** | ~$6,690 | $500M+ |
 | **Data accessibility** | 100% open | APIs offline |
-| **Cost ratio** | 1 | **350x** |
+| **Power requirements** | Off-grid (solar) | Mains power |
+| **Cost ratio** | 1 | **224x** |
 
 **See**: [docs/cost-effectiveness-analysis.md](docs/cost-effectiveness-analysis.md) for detailed analysis.
 
-### Phase 1: Single Site (Proof of Concept)
+### Phase 1: Single Site (Proof of Concept - Solar-Powered)
 
 | Component | Cost (AUD) |
 |-----------|------------|
 | ESP32-CAM | $12 |
 | SIM7000A LTE module | $20 |
+| 20W Solar panel | $35 |
+| 12V 7Ah battery | $30 |
+| Solar charge controller | $15 |
 | MicroSD card | $8 |
 | USB-to-TTL programmer | $10 |
 | Junction box + mounting | $40 |
-| Power supply/adapter | $15 |
+| Solar mounting hardware | $15 |
 | Cables, glands, misc | $30 |
 | M2M SIM (first month) | $8 |
-| **Total** | **~$143** |
+| **Total** | **~$223** |
 
-### Phase 2: Multi-Site (5 sites)
+**Key Advantages:**
+- ✅ **100% off-grid** - No mains power required
+- ✅ **Zero power costs** - Free energy from the sun
+- ✅ **Deploy anywhere** - Not limited by power outlet locations
+- ✅ **Storm resilient** - Continues operating during power outages
 
-- Bulk discounts: ~$120/site
+### Phase 2: Multi-Site (5 sites - All Solar-Powered)
+
+- Bulk discounts: ~$200/site
 - Data pooling: Share 5GB across 5 devices (~$12/month total)
-- **Total**: ~$600 hardware + $12/month
+- **Total**: ~$1,000 hardware + $12/month
 
 **Backend/Frontend Hosting**: **$0** (Render.com + Vercel free tiers)
 
-### Phase 3: Solar Power (Off-Grid)
+**Advantages at Scale:**
+- ✅ **No trenching costs** - No power cable installation
+- ✅ **No electrician fees** - Self-contained solar system
+- ✅ **Flexible placement** - Deploy anywhere with sunlight
+- ✅ **Easy relocation** - Move sites without rewiring
 
-- 20W solar panel + battery: +$80/site
-- No ongoing power costs
-
-### Total Cost Summary
+### Total Cost Summary (All Solar-Powered)
 
 | Deployment | Hardware | Monthly Cost | Notes |
 |------------|----------|--------------|-------|
-| **Single Site (Mains Power)** | $143 | $8 | M2M SIM only |
-| **Single Site (Solar)** | $223 | $8 | Off-grid capable |
-| **5 Sites (Mains Power)** | $600 | $12 | Data pooling |
-| **5 Sites (Solar)** | $1,000 | $12 | Fully off-grid |
+| **Single Site** | $223 | $8 | M2M SIM only, 100% off-grid |
+| **5 Sites** | $1,000 | $12 | Data pooling, fully solar |
+| **10 Sites** | $2,000 | $15 | Bulk discounts apply |
+| **24 Sites (Full Corridor)** | $4,800 | $20 | Complete CBD-Fremantle monitoring |
 | **Backend + Frontend Hosting** | **$0** | **$0** | **Render.com + Vercel (FREE)** |
 
 **Key Cost Advantages:**
 - ✅ **No hosting costs** - Render.com & Vercel free tiers
 - ✅ **No server costs** - Fully cloud-hosted
+- ✅ **No power costs** - 100% solar-powered
+- ✅ **No electrician costs** - Self-contained solar system
 - ✅ **No SSL cert costs** - HTTPS included
 - ✅ **Auto-deployment** - Push to GitHub = instant deploy
-- ✅ **350:1 cost advantage** vs government infrastructure
+- ✅ **224:1 cost advantage** vs government infrastructure
 
 **Compare to Traditional Setup:**
 - VPS: ~$5-15/month
 - SSL Certificate: ~$50-200/year
-- Maintenance: Hours/month
-- **SwanFlow**: $0/month for hosting 🎉
+- Power bill: ~$5-10/month per site
+- Electrician for install: ~$200-500 per site
+- **SwanFlow**: $0/month for hosting & power 🎉
 
 ---
 
@@ -643,12 +661,14 @@ Validate with manual counts.
 - Requires WiFi access point nearby
 - Update firmware to use WiFi instead of LTE
 
-### Q: What about solar power?
+### Q: Why solar power by default?
 
-**A**: Absolutely!
-- 20W solar panel + 12V battery
-- Runs 24/7 off-grid
-- Add ~$80 to hardware cost
+**A**: Solar makes SwanFlow truly independent:
+- **No power outlet needed** - Deploy anywhere
+- **Zero ongoing power costs** - Free energy
+- **Storm resilient** - Continues during outages
+- **Easy relocation** - No rewiring required
+- **Lower total cost** - No electrician fees (~$200-500/site saved)
 
 ---
 
