@@ -306,31 +306,38 @@ swanflow/
 
 ### CBD to Fremantle Arterial Corridor (6 km total)
 
-#### Prototype Options
+#### Prototype Configuration: Bidirectional Co-Located Installation
 
-**Option A: Unidirectional Prototype (Recommended - Lowest Cost)**
-- **2 locations × 1 direction = 2 installations**
-- **Hardware**: Each location monitors BOTH LANES of ONE direction (e.g., outbound toward Fremantle)
-- **Cost**: **$446** (2 × $223)
-- **Example**: Crawley (entry) + Point Lewis (exit), both monitoring outbound traffic only
-- **Why Start Here**: Proves closed-segment concept at minimum cost, simpler data analysis
+**Primary Approach: Bidirectional Co-Located (RECOMMENDED)**
+- **2 locations with co-located cameras = 4 sensors**
+- **Hardware per location**: 2 × ESP32-CAM modules sharing solar panel, battery, and mounting infrastructure
+- **Cost**: **$540 total** ($270 per location)
+- **Example**: Crawley + Point Lewis, each with 2 cameras (inbound + outbound)
+- **Why This Approach**:
+  - ✅ Tests complete bidirectional flow measurement
+  - ✅ 40% cheaper than separate installations ($892)
+  - ✅ Only $94 more than unidirectional ($446)
+  - ✅ Easier permitting (can approach private property owners)
+  - ✅ Modular design: each camera fully independent, shares power only
+  - ✅ Single mounting structure per location reduces installation complexity
 
-**Option B: Bidirectional Prototype (Full Validation)**
-- **2 locations × 2 directions = 4 installations**
-- **Hardware**: Each location monitors both inbound AND outbound
-- **Cost**: **$892** (4 × $223)
-- **Example**: Crawley + Point Lewis, both directions
-- **Why Use This**: Full bidirectional flow measurement, complete validation
+**Hardware Breakdown per Co-Located Location ($270)**:
+- **Shared infrastructure** ($150): 20W solar panel ($35), 12V battery ($30), charge controller ($15), large junction box ($50), mounting bracket ($20)
+- **Per-camera modules** (×2 = $120): ESP32-CAM ($12), SIM7000A 4G modem ($20), MicroSD card ($8), programmer ($10), wiring/cables ($10)
+
+**Alternative: Unidirectional Prototype (Documentation Only)**
+- 2 locations × 1 direction = 2 installations at $223 each = **$446**
+- Monitors one direction only (e.g., outbound to Fremantle)
+- Simpler but doesn't test full bidirectional capability
 
 #### 1. **Mounts Bay Road** (PoC Target)
 **Crawley → Point Lewis** (~1.5 km)
 
 - **Status**: Proof of Concept Target
-- **Monitoring Sites**: Crawley (entry), Point Lewis (exit)
+- **Monitoring Sites**: Crawley (entry), Point Lewis (exit) — 2 co-located installations
 - **Characteristics**: Waterfront arterial, **zero side access**, perfect closed segment
 - **Why Optimized**: True closed segment needs only entry/exit points
-- **Unidirectional Cost**: $446 (2 sensors, one direction)
-- **Bidirectional Cost**: $892 (4 sensors, both directions)
+- **PoC Cost**: **$540** (2 co-located locations, 4 cameras total, both directions)
 
 #### 2. **Stirling Highway - Swanbourne** (Phase 2)
 **Grant St → Eric St** (~1.5 km)
@@ -472,12 +479,12 @@ Dashboard → Fetch API → Chart.js → User
 | Metric | SwanFlow (Solar) | Main Roads WA Smart Freeway |
 |--------|--------------------|-----------------------------|
 | **Per-site cost** | ~$223 | ~$50,000+ |
-| **Proof of concept (unidirectional)** | **$446** | ~$100,000+ |
-| **Proof of concept (bidirectional)** | $892 | ~$200,000+ |
+| **Per co-located location** | **$270** | ~$100,000+ |
+| **Proof of concept (bidirectional co-located)** | **$540** | ~$200,000+ |
 | **Full arterial corridor (18 sensors)** | $4,014 | ~$900,000+ |
 | **Data accessibility** | 100% open | APIs offline |
 | **Power requirements** | Off-grid (solar) | Mains power |
-| **Cost ratio** | 1 | **224x** |
+| **Cost ratio** | 1 | **185-224x** |
 
 **See**: [docs/cost-effectiveness-analysis.md](docs/cost-effectiveness-analysis.md) for detailed analysis.
 
@@ -522,10 +529,9 @@ Dashboard → Fetch API → Chart.js → User
 
 | Deployment | Hardware | Monthly Cost | Notes |
 |------------|----------|--------------|-------|
-| **Phase 0: Unidirectional PoC** | **$446** | **$8** | **2 sensors, one direction only (RECOMMENDED START)** |
-| **Phase 1: Bidirectional PoC** | $892 | $8 | 4 sensors, both directions at 2 locations |
-| **Phase 2: + Swanbourne** | $2,230 | $12 | 10 sensors total (4+6) |
-| **Phase 3: Full Corridor** | $4,014 | $15 | 18 sensors, complete arterial monitoring |
+| **Phase 0: Bidirectional PoC (Co-Located)** | **$540** | **$8** | **2 co-located locations, 4 sensors, both directions (RECOMMENDED START)** |
+| **Phase 1: + Swanbourne (Co-Located)** | $1,350 additional ($1,890 total) | $12 | 3 co-located locations added (6 sensors) |
+| **Phase 2: Full Corridor** | $2,124 additional ($4,014 total) | $15 | 18 sensors, complete arterial monitoring |
 | **Backend + Frontend Hosting** | **$0** | **$0** | **Render.com + Vercel (FREE)** |
 
 **Key Cost Advantages:**
@@ -548,8 +554,8 @@ Dashboard → Fetch API → Chart.js → User
 
 ## Roadmap
 
-### Phase 0: Unidirectional PoC (RECOMMENDED START - Current)
-**Cost: $446 | Timeline: 2-4 weeks**
+### Phase 0: Bidirectional Co-Located PoC (RECOMMENDED START - Current)
+**Cost: $540 | Timeline: 2-4 weeks**
 
 - [x] Hardware BOM and shopping list
 - [x] Firmware structure (PlatformIO)
@@ -557,33 +563,29 @@ Dashboard → Fetch API → Chart.js → User
 - [x] Web dashboard (Chart.js)
 - [x] Documentation
 - [ ] Edge Impulse model training
-- [ ] Order hardware for 2 locations (Crawley + Point Lewis)
-- [ ] Configure firmware for unidirectional monitoring (outbound only)
-- [ ] Field deployment: 2 locations, 1 direction
-- [ ] Validate closed-segment theory with simplest setup
+- [ ] Order hardware for 2 co-located locations (Crawley + Point Lewis)
+- [ ] Configure firmware for bidirectional monitoring
+- [ ] Build co-located mounting infrastructure (shared solar/battery)
+- [ ] Field deployment: 2 locations, 4 cameras (2 per location)
+- [ ] Validate bidirectional flow measurement
 
 **Success Criteria:**
-- ✅ Vehicles counted at Crawley entry = vehicles counted at Point Lewis exit (±10%)
-- ✅ Cost under $500
+- ✅ Inbound vehicles at Crawley ≈ Outbound vehicles at Point Lewis (±10%)
+- ✅ Outbound vehicles at Crawley ≈ Inbound vehicles at Point Lewis (±10%)
+- ✅ Cost under $600
 - ✅ System runs 24/7 on solar power
+- ✅ Co-located cameras operate independently
 
-### Phase 1: Bidirectional Expansion (1-2 Months)
-**Cost: $446 additional ($892 total) | Timeline: 2-4 weeks**
-
-- [ ] Add inbound monitoring to existing 2 locations
-- [ ] Validate bidirectional flow measurement
-- [ ] Compare inbound vs outbound traffic patterns
-
-### Phase 2: Swanbourne Expansion (2-3 Months)
-**Cost: $1,338 additional ($2,230 total)**
+### Phase 1: Swanbourne Expansion (2-3 Months)
+**Cost: $1,350 additional ($1,890 total)**
 
 - [ ] Survey Swanbourne stretch (Grant St → Eric St)
-- [ ] Install 3 additional locations (6 sensors)
+- [ ] Install 3 additional co-located locations (6 sensors)
 - [ ] Data pooling (shared SIM plan)
 - [ ] Validate algorithm with multiple stretches
 
-### Phase 3: Full Corridor (3-6 Months)
-**Cost: $1,784 additional ($4,014 total)**
+### Phase 2: Full Corridor (3-6 Months)
+**Cost: $2,124 additional ($4,014 total)**
 
 - [ ] Complete Mosman Park stretch (4 locations, 8 sensors)
 - [ ] 18 total sensors across 6 km

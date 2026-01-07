@@ -17,7 +17,7 @@ let liveRefreshTimer = null;
 let previousTotalCount = 0;
 let currentPeriod = '24h';
 let currentTheme = 'light';
-let currentNetwork = 'arterial'; // 'arterial', 'freeway', 'all', or 'terminal'
+let currentNetwork = 'arterial'; // 'arterial' or 'terminal'
 let refreshTimer = null;
 let trafficChart = null;
 let trafficMap = null;
@@ -131,44 +131,6 @@ const CORRIDOR_STRETCHES = [
     direction: 'Both',
     type: 'arterial',
     sitePatterns: ['Stirling Hwy @ Forrest', 'Stirling Hwy @ Bay View', 'Stirling Hwy @ McCabe', 'Stirling Hwy @ Victoria']
-  },
-
-  // Freeways
-  {
-    id: 'mitchell-northbound',
-    name: 'Mitchell Freeway (Northbound)',
-    description: 'Narrows → Scarborough Beach Rd',
-    direction: 'Northbound',
-    type: 'freeway',
-    sitePatterns: ['Mitchell Fwy'],
-    directionFilter: 'Northbound'
-  },
-  {
-    id: 'mitchell-southbound',
-    name: 'Mitchell Freeway (Southbound)',
-    description: 'Scarborough Beach Rd → Narrows',
-    direction: 'Southbound',
-    type: 'freeway',
-    sitePatterns: ['Mitchell Fwy'],
-    directionFilter: 'Southbound'
-  },
-  {
-    id: 'kwinana-northbound',
-    name: 'Kwinana Freeway (Northbound)',
-    description: 'Leach Hwy → Narrows',
-    direction: 'Northbound',
-    type: 'freeway',
-    sitePatterns: ['Kwinana Fwy'],
-    directionFilter: 'Northbound'
-  },
-  {
-    id: 'kwinana-southbound',
-    name: 'Kwinana Freeway (Southbound)',
-    description: 'Narrows → Leach Hwy',
-    direction: 'Southbound',
-    type: 'freeway',
-    sitePatterns: ['Kwinana Fwy'],
-    directionFilter: 'Southbound'
   }
 ];
 
@@ -216,38 +178,16 @@ async function fetchSites() {
   }
 }
 
-async function fetchFreewaySites() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/freeway/sites`);
-    const data = await response.json();
-
-    if (data.success && data.sites.length > 0) {
-      return data.sites;
-    }
-
-    return [];
-  } catch (error) {
-    console.error('Error fetching freeway sites:', error);
-    setStatus('error', 'Connection error');
-    return [];
-  }
-}
-
 async function fetchAllNetworkSites() {
   try {
-    const [arterialSites, freewaySites] = await Promise.all([
-      fetchSites(),
-      fetchFreewaySites()
-    ]);
+    const arterialSites = await fetchSites();
 
     return {
-      arterial: arterialSites,
-      freeway: freewaySites,
-      all: [...arterialSites, ...freewaySites]
+      arterial: arterialSites
     };
   } catch (error) {
     console.error('Error fetching all network sites:', error);
-    return { arterial: [], freeway: [], all: [] };
+    return { arterial: [] };
   }
 }
 
@@ -595,51 +535,11 @@ const siteCoordinates = {
   'Stirling Hwy @ Victoria St (Northbound)': [-32.035, 115.751],
   'Stirling Hwy @ Victoria St (Southbound)': [-32.035, 115.751],
 
-  // Mitchell Freeway - OSM-accurate site coordinates
-  // Freeway runs from Narrows (~-31.96) north to Karrinyup (~-31.90)
-  'Mitchell Fwy @ Narrows (Northbound)': [-31.9617, 115.8474],
-  'Mitchell Fwy @ Narrows (Southbound)': [-31.9617, 115.8472],
-  'Mitchell Fwy @ Malcolm St (Northbound)': [-31.9570, 115.8494],
-  'Mitchell Fwy @ Malcolm St (Southbound)': [-31.9570, 115.8492],
-  'Mitchell Fwy @ Loftus St (Northbound)': [-31.9527, 115.8483],
-  'Mitchell Fwy @ Loftus St (Southbound)': [-31.9527, 115.8485],
-  'Mitchell Fwy @ Newcastle St (Northbound)': [-31.9447, 115.8491],
-  'Mitchell Fwy @ Newcastle St (Southbound)': [-31.9447, 115.8489],
-  'Mitchell Fwy @ Charles St (Northbound)': [-31.9412, 115.8440],
-  'Mitchell Fwy @ Charles St (Southbound)': [-31.9412, 115.8438],
-  'Mitchell Fwy @ Vincent St (Northbound)': [-31.9379, 115.8390],
-  'Mitchell Fwy @ Vincent St (Southbound)': [-31.9379, 115.8388],
-  'Mitchell Fwy @ Powis St (Northbound)': [-31.9324, 115.8356],
-  'Mitchell Fwy @ Powis St (Southbound)': [-31.9324, 115.8354],
-  'Mitchell Fwy @ Hutton St (Northbound)': [-31.9261, 115.8303],
-  'Mitchell Fwy @ Hutton St (Southbound)': [-31.9261, 115.8301],
-  'Mitchell Fwy @ Scarborough Beach Rd (Northbound)': [-31.9139, 115.8228],
-  'Mitchell Fwy @ Scarborough Beach Rd (Southbound)': [-31.9139, 115.8226],
-
-  // Kwinana Freeway - OSM-accurate site coordinates
-  // Freeway runs from Narrows (~-31.96) south to Murdoch (~-32.10)
-  'Kwinana Fwy @ Narrows South (Northbound)': [-31.9649, 115.8465],
-  'Kwinana Fwy @ Narrows South (Southbound)': [-31.9649, 115.8468],
-  'Kwinana Fwy @ Mill Point Rd (Northbound)': [-31.9715, 115.8476],
-  'Kwinana Fwy @ Mill Point Rd (Southbound)': [-31.9715, 115.8478],
-  'Kwinana Fwy @ South Tce (Northbound)': [-31.9761, 115.8483],
-  'Kwinana Fwy @ South Tce (Southbound)': [-31.9761, 115.8485],
-  'Kwinana Fwy @ Canning Hwy (Northbound)': [-31.9848, 115.8519],
-  'Kwinana Fwy @ Canning Hwy (Southbound)': [-31.9848, 115.8521],
-  'Kwinana Fwy @ Manning Rd (Northbound)': [-32.0149, 115.8579],
-  'Kwinana Fwy @ Manning Rd (Southbound)': [-32.0149, 115.8581],
-  'Kwinana Fwy @ Leach Hwy (Northbound)': [-32.0315, 115.8598],
-  'Kwinana Fwy @ Leach Hwy (Southbound)': [-32.0315, 115.8600],
-
   // Corridor stretch center points (for panToSite when stretch ID is selected)
   'mounts-bay-eastbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
   'mounts-bay-westbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
   'stirling-north': [-31.9920, 115.7670],         // Eric St, Cottesloe
-  'stirling-south': [-32.0150, 115.7550],         // Center of Mosman Park section
-  'mitchell-northbound': [-31.9400, 115.8400],    // Center of Mitchell Freeway (OSM)
-  'mitchell-southbound': [-31.9400, 115.8400],    // Center of Mitchell Freeway (OSM)
-  'kwinana-northbound': [-31.9900, 115.8520],     // Center of Kwinana Freeway (OSM)
-  'kwinana-southbound': [-31.9900, 115.8520],     // Center of Kwinana Freeway (OSM)
+  'stirling-south': [-32.0150, 115.7550]          // Center of Mosman Park section
 };
 
 let highlightMarker = null;
@@ -877,9 +777,7 @@ const routeCorridorMap = {
   'stirling-highway': ['Stirling Hwy / Mounts Bay Rd', 'Stirling Highway - Claremont/Cottesloe', 'Stirling Highway - Mosman Park'],
   'stirling-mounts-bay': 'Stirling Hwy / Mounts Bay Rd',
   'stirling-claremont': 'Stirling Highway - Claremont/Cottesloe',
-  'stirling-mosman': 'Stirling Highway - Mosman Park',
-  'mitchell-freeway': 'Mitchell Freeway',
-  'kwinana-freeway': 'Kwinana Freeway'
+  'stirling-mosman': 'Stirling Highway - Mosman Park'
 };
 
 // Corridor center coordinates for map panning
@@ -887,9 +785,7 @@ const corridorCenters = {
   'stirling-highway': { lat: -31.985, lng: 115.795, zoom: 13 },
   'stirling-mounts-bay': { lat: -31.972, lng: 115.830, zoom: 14 },
   'stirling-claremont': { lat: -31.988, lng: 115.775, zoom: 14 },
-  'stirling-mosman': { lat: -32.015, lng: 115.755, zoom: 14 },
-  'mitchell-freeway': { lat: -31.935, lng: 115.850, zoom: 13 },
-  'kwinana-freeway': { lat: -31.990, lng: 115.866, zoom: 13 }
+  'stirling-mosman': { lat: -32.015, lng: 115.755, zoom: 14 }
 };
 
 // Currently selected route for filtering
@@ -901,9 +797,7 @@ const routeDisplayNames = {
   'stirling-highway': 'Stirling Highway Corridor',
   'stirling-mounts-bay': 'Mounts Bay Road',
   'stirling-claremont': 'Stirling Hwy - Claremont',
-  'stirling-mosman': 'Stirling Hwy - Mosman Park',
-  'mitchell-freeway': 'Mitchell Freeway',
-  'kwinana-freeway': 'Kwinana Freeway'
+  'stirling-mosman': 'Stirling Hwy - Mosman Park'
 };
 
 /**
@@ -970,8 +864,6 @@ function recalculateCorridorStatus(routeValue) {
       return namesToMatch.some(corridor => {
         if (corridor.includes('Stirling') && site.name.includes('Stirling')) return true;
         if (corridor.includes('Mounts Bay') && site.name.includes('Mounts Bay')) return true;
-        if (corridor.includes('Mitchell') && site.name.includes('Mitchell')) return true;
-        if (corridor.includes('Kwinana') && site.name.includes('Kwinana')) return true;
         return false;
       });
     });
@@ -980,13 +872,12 @@ function recalculateCorridorStatus(routeValue) {
   if (relevantSites.length === 0) return;
 
   // Calculate average speed for relevant sites
-  const isFreeway = routeValue && (routeValue.includes('mitchell') || routeValue.includes('kwinana'));
   let totalSpeed = 0;
   let siteCount = 0;
 
   relevantSites.forEach(site => {
     const hourlyCount = site.current_hourly || 0;
-    const speed = isFreeway ? estimateFreewaySpeed(hourlyCount) : estimateSpeed(hourlyCount);
+    const speed = estimateSpeed(hourlyCount);
     totalSpeed += speed;
     siteCount++;
   });
@@ -1314,98 +1205,38 @@ function estimateSpeed(hourlyCount) {
 }
 
 /**
- * Estimate speed for freeway traffic (100 km/h limit)
- * Uses different flow-density relationship than arterials
- * @param {number} hourlyCount - Vehicles per hour (flow rate)
- * @returns {number} Estimated speed in km/h
- */
-function estimateFreewaySpeed(hourlyCount) {
-  if (!hourlyCount || hourlyCount < 10) {
-    return 100; // Minimal traffic, freeway speed limit
-  }
-
-  // For 3-lane freeway with 100 km/h limit:
-  // Higher capacity, different flow-density curve
-
-  let density; // vehicles per km
-
-  if (hourlyCount < 300) {
-    // Very light: Flow at speed limit
-    density = hourlyCount / 100;
-  } else if (hourlyCount < 500) {
-    // Light: Flow ~400 veh/h at 90 km/h
-    density = hourlyCount / 90;
-  } else if (hourlyCount < 700) {
-    // Moderate: Flow ~600 veh/h at 70 km/h
-    density = hourlyCount / 70;
-  } else if (hourlyCount < 900) {
-    // Heavy: Flow ~800 veh/h at 45 km/h
-    density = hourlyCount / 45;
-  } else {
-    // Gridlock: Flow drops significantly
-    density = hourlyCount / 25 + (hourlyCount - 900) * 0.15;
-  }
-
-  // Calculate speed: Flow / Density
-  const calculatedSpeed = hourlyCount / density;
-
-  // Bound to realistic freeway range
-  return Math.max(10, Math.min(105, calculatedSpeed));
-}
-
-/**
  * Get color for traffic visualization based on estimated speed
  * Green = flowing at/near speed limit (good)
  * Red = heavy congestion (bad)
  *
  * @param {number} hourlyCount - Vehicles per hour
- * @param {string} roadType - 'arterial' or 'freeway'
+ * @param {string} roadType - 'arterial' (freeway removed)
  * @returns {string} Hex color code
  */
 function getTrafficColor(hourlyCount, roadType = 'arterial') {
-  const speed = roadType === 'freeway'
-    ? estimateFreewaySpeed(hourlyCount)
-    : estimateSpeed(hourlyCount);
+  const speed = estimateSpeed(hourlyCount);
 
-  if (roadType === 'freeway') {
-    // Freeway thresholds (100 km/h limit)
-    if (speed >= 80) return '#10b981'; // Green - flowing
-    if (speed >= 50) return '#f59e0b'; // Orange - moderate
-    if (speed >= 25) return '#ef4444'; // Red - heavy
-    return '#991b1b'; // Dark red - gridlock
-  } else {
-    // Arterial thresholds (60 km/h limit)
-    if (speed >= 50) return '#10b981'; // Green - flowing
-    if (speed >= 30) return '#f59e0b'; // Orange - moderate
-    if (speed >= 15) return '#ef4444'; // Red - heavy
-    return '#991b1b'; // Dark red - gridlock
-  }
+  // Arterial thresholds (60 km/h limit)
+  if (speed >= 50) return '#10b981'; // Green - flowing
+  if (speed >= 30) return '#f59e0b'; // Orange - moderate
+  if (speed >= 15) return '#ef4444'; // Red - heavy
+  return '#991b1b'; // Dark red - gridlock
 }
 
 /**
  * Get traffic density level description
  * @param {number} hourlyCount - Vehicles per hour
- * @param {string} roadType - 'arterial' or 'freeway'
+ * @param {string} roadType - 'arterial' (freeway removed)
  * @returns {string} Traffic level description
  */
 function getTrafficLevel(hourlyCount, roadType = 'arterial') {
-  const speed = roadType === 'freeway'
-    ? estimateFreewaySpeed(hourlyCount)
-    : estimateSpeed(hourlyCount);
+  const speed = estimateSpeed(hourlyCount);
 
-  if (roadType === 'freeway') {
-    // Freeway thresholds (100 km/h limit)
-    if (speed >= 80) return 'Flowing';
-    if (speed >= 50) return 'Moderate';
-    if (speed >= 25) return 'Heavy';
-    return 'Gridlock';
-  } else {
-    // Arterial thresholds (60 km/h limit)
-    if (speed >= 50) return 'Flowing';
-    if (speed >= 30) return 'Moderate';
-    if (speed >= 15) return 'Heavy';
-    return 'Gridlock';
-  }
+  // Arterial thresholds (60 km/h limit)
+  if (speed >= 50) return 'Flowing';
+  if (speed >= 30) return 'Moderate';
+  if (speed >= 15) return 'Heavy';
+  return 'Gridlock';
 }
 
 // Flow animation state
@@ -1836,7 +1667,7 @@ function updateMapTiles() {
 // Traffic Flow Visualization
 // ============================================================================
 
-// Flow corridor configurations for different network types
+// Flow corridor configurations for arterial network only (freeways removed)
 const flowCorridorConfigs = {
   arterial: {
     title: 'Mounts Bay Road Traffic Flow',
@@ -1845,55 +1676,6 @@ const flowCorridorConfigs = {
       { id: 2, name: 'Mill Point', sitePrefix: 'Mounts Bay Rd @ Mill Point' },
       { id: 3, name: 'Fraser Ave', sitePrefix: 'Mounts Bay Rd @ Fraser Ave' },
       { id: 4, name: 'Malcolm St', sitePrefix: 'Mounts Bay Rd @ Malcolm St' }
-    ]
-  },
-  freeway: {
-    title: 'Perth Freeway Traffic Flow',
-    corridors: [
-      {
-        name: 'Mitchell Freeway',
-        sites: [
-          { id: 1, name: 'Narrows', sitePrefix: 'Narrows Interchange' },
-          { id: 2, name: 'Loftus St', sitePrefix: 'Loftus Street' },
-          { id: 3, name: 'Vincent St', sitePrefix: 'Vincent Street' },
-          { id: 4, name: 'Scarborough', sitePrefix: 'Scarborough Beach Road' }
-        ]
-      },
-      {
-        name: 'Kwinana Freeway',
-        sites: [
-          { id: 5, name: 'Narrows S', sitePrefix: 'Narrows South' },
-          { id: 6, name: 'Canning Hwy', sitePrefix: 'Canning Highway' },
-          { id: 7, name: 'Manning Rd', sitePrefix: 'Manning Road' },
-          { id: 8, name: 'Leach Hwy', sitePrefix: 'Leach Highway' }
-        ]
-      }
-    ]
-  },
-  all: {
-    title: 'All Perth Traffic Flow',
-    corridors: [
-      {
-        name: 'Arterial: Mounts Bay Rd',
-        sites: [
-          { id: 1, name: 'Kings Park', sitePrefix: 'Mounts Bay Rd @ Kings Park' },
-          { id: 2, name: 'Malcolm St', sitePrefix: 'Mounts Bay Rd @ Malcolm St' }
-        ]
-      },
-      {
-        name: 'Mitchell Freeway',
-        sites: [
-          { id: 3, name: 'Narrows', sitePrefix: 'Narrows Interchange' },
-          { id: 4, name: 'Scarborough', sitePrefix: 'Scarborough Beach Road' }
-        ]
-      },
-      {
-        name: 'Kwinana Freeway',
-        sites: [
-          { id: 5, name: 'Narrows S', sitePrefix: 'Narrows South' },
-          { id: 6, name: 'Leach Hwy', sitePrefix: 'Leach Highway' }
-        ]
-      }
     ]
   }
 };
@@ -1936,10 +1718,10 @@ function renderConnectorHTML(siteId) {
 }
 
 /**
- * Renders the flow corridor based on the current network
+ * Renders the flow corridor (arterial network only)
  */
 function renderFlowCorridor(network) {
-  const config = flowCorridorConfigs[network] || flowCorridorConfigs.arterial;
+  const config = flowCorridorConfigs.arterial;
   const titleEl = document.getElementById('flow-title');
   const corridorEl = document.getElementById('flow-corridor');
 
@@ -1952,69 +1734,36 @@ function renderFlowCorridor(network) {
 
   let html = '';
 
-  if (network === 'arterial') {
-    // Simple single corridor for arterial
-    config.sites.forEach((site, index) => {
-      html += renderFlowSiteHTML(site);
-      if (index < config.sites.length - 1) {
-        html += renderConnectorHTML(site.id);
-      }
-    });
-  } else {
-    // Multi-corridor layout for freeway and all
-    config.corridors.forEach((corridor, corridorIndex) => {
-      html += `<div class="flow-corridor-section">`;
-      html += `<div class="corridor-label">${corridor.name}</div>`;
-      html += `<div class="flow-corridor-inner">`;
-
-      corridor.sites.forEach((site, siteIndex) => {
-        html += renderFlowSiteHTML(site);
-        if (siteIndex < corridor.sites.length - 1) {
-          html += renderConnectorHTML(site.id);
-        }
-      });
-
-      html += `</div></div>`;
-
-      // Add separator between corridors (except for last)
-      if (corridorIndex < config.corridors.length - 1) {
-        html += `<div class="corridor-separator"></div>`;
-      }
-    });
-  }
+  // Single corridor for arterial
+  config.sites.forEach((site, index) => {
+    html += renderFlowSiteHTML(site);
+    if (index < config.sites.length - 1) {
+      html += renderConnectorHTML(site.id);
+    }
+  });
 
   corridorEl.innerHTML = html;
 }
 
 /**
- * Gets the flow map for the current network configuration
+ * Gets the flow map for arterial network
  */
 function getFlowMapForNetwork(network) {
-  const config = flowCorridorConfigs[network] || flowCorridorConfigs.arterial;
+  const config = flowCorridorConfigs.arterial;
   const flowMap = {};
 
-  if (network === 'arterial') {
-    config.sites.forEach(site => {
-      flowMap[`${site.sitePrefix} (Northbound)`] = { id: site.id, dir: 'nb' };
-      flowMap[`${site.sitePrefix} (Southbound)`] = { id: site.id, dir: 'sb' };
-    });
-  } else {
-    config.corridors.forEach(corridor => {
-      corridor.sites.forEach(site => {
-        flowMap[`${site.sitePrefix} (Northbound)`] = { id: site.id, dir: 'nb' };
-        flowMap[`${site.sitePrefix} (Southbound)`] = { id: site.id, dir: 'sb' };
-      });
-    });
-  }
+  config.sites.forEach(site => {
+    flowMap[`${site.sitePrefix} (Northbound)`] = { id: site.id, dir: 'nb' };
+    flowMap[`${site.sitePrefix} (Southbound)`] = { id: site.id, dir: 'sb' };
+  });
 
   return flowMap;
 }
 
 function updateFlowCorridor(sites) {
   const flowMap = getFlowMapForNetwork(currentNetwork);
-  const config = flowCorridorConfigs[currentNetwork] || flowCorridorConfigs.arterial;
-  const maxSiteId = currentNetwork === 'arterial' ? 4 :
-                    currentNetwork === 'freeway' ? 8 : 6;
+  const config = flowCorridorConfigs.arterial;
+  const maxSiteId = 4; // Arterial network has 4 sites
 
   sites.forEach(site => {
     const mapping = flowMap[site.name];
