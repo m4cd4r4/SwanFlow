@@ -11,18 +11,18 @@
       "use": "@vercel/static"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/landing",
-      "dest": "/frontend/landing/index.html"
+      "source": "/landing",
+      "destination": "/frontend/landing/index.html"
     },
     {
-      "src": "/landing/(.*)",
-      "dest": "/frontend/landing/$1"
+      "source": "/landing/:path*",
+      "destination": "/frontend/landing/:path*"
     },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/web-dashboard/$1"
+      "source": "/:path*",
+      "destination": "/frontend/web-dashboard/:path*"
     }
   ],
   "headers": [
