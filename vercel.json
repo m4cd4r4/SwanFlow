@@ -3,6 +3,10 @@
   "name": "swanflow",
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/frontend/web-dashboard/index.html"
+    },
+    {
       "source": "/landing",
       "destination": "/frontend/landing/index.html"
     },
