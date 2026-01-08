@@ -434,6 +434,7 @@ header h1 {
   display: grid;
   grid-template-columns: 1fr 8px 320px 8px 280px;
   gap: 0;
+  height: calc(100vh - 180px);
   min-height: 500px;
   background: var(--card-bg);
   border-radius: 12px;
@@ -471,7 +472,7 @@ header h1 {
 .hero-map-column {
   background: var(--bg);
   position: relative;
-  min-height: 500px;
+  height: 100%;
 }
 
 .hero-map-column #traffic-map {
