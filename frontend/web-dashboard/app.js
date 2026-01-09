@@ -2541,16 +2541,20 @@ async function switchNetwork(network) {
       }, 150);
     }
 
-    // Fetch incidents and display as markers on the map
-    fetchMainRoadsIncidents().then(() => {
-      addMainRoadsIncidentsToMap();
-      displayMainRoadsIncidents(); // Also update the alerts panel
-    });
-
-    // Invalidate map size after layout change
+    // Invalidate map size FIRST, then fetch and display incidents
     setTimeout(() => {
-      if (trafficMap) trafficMap.invalidateSize();
-    }, 100);
+      if (trafficMap) {
+        trafficMap.invalidateSize();
+        // Set a default Perth view while loading incidents
+        trafficMap.setView([-31.95, 115.86], 11);
+      }
+
+      // Now fetch incidents and display as markers
+      fetchMainRoadsIncidents().then(() => {
+        addMainRoadsIncidentsToMap();
+        displayMainRoadsIncidents();
+      });
+    }, 150);
     return;
   } else if (network === 'terminal') {
     // Show terminal feed, no iframe needed
