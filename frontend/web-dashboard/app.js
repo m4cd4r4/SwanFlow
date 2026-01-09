@@ -1135,6 +1135,24 @@ function initMap() {
   trafficMap._baseMaps = baseMaps;
   trafficMap._currentBaseLayer = defaultLayer;
 
+  // Add ResizeObserver to fix map tile rendering when container resizes
+  const mapContainer = document.getElementById('traffic-map');
+  if (mapContainer && typeof ResizeObserver !== 'undefined') {
+    const resizeObserver = new ResizeObserver(() => {
+      if (trafficMap) {
+        trafficMap.invalidateSize();
+      }
+    });
+    resizeObserver.observe(mapContainer);
+  }
+
+  // Also listen for window resize
+  window.addEventListener('resize', () => {
+    if (trafficMap) {
+      trafficMap.invalidateSize();
+    }
+  });
+
   // Set up map view selector buttons
   const viewButtons = document.querySelectorAll('.map-view-btn');
   const viewMap = {
