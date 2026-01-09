@@ -24,6 +24,7 @@ let trafficMap = null;
 let siteMarkers = {};
 let roadPolylines = []; // Array to store road segment polylines (now stores dot markers)
 let allSitesData = [];
+let mainroadsIncidentLayer = null; // Layer group for Main Roads WA incident markers
 
 // Terminal state
 let terminalInterval = null;
@@ -2512,20 +2513,18 @@ async function switchNetwork(network) {
   const mainContent = document.querySelectorAll('.controls, .map-stats-row, .flow-container, .chart-container, .table-container');
 
   if (network === 'mainroads') {
-    // Show only Main Roads live map, hide terminal and main content
-    if (mainroadsContainer) {
-      mainroadsContainer.style.display = 'block';
-      // Lazy load the iframe only when shown
-      const iframe = document.getElementById('mainroads-iframe');
-      const loading = document.getElementById('mainroads-loading');
-      if (iframe && iframe.src === 'about:blank') {
-        iframe.src = iframe.dataset.src;
-        iframe.onload = () => {
-          if (loading) loading.style.display = 'none';
-        };
-      }
-    }
+    // Show main map with Main Roads incident markers overlaid
+    // Hide the iframe portal - we display incidents directly on our map
+    if (mainroadsContainer) mainroadsContainer.style.display = 'none';
     if (terminalContainer) terminalContainer.style.display = 'none';
+
+    // Show hero section (map) but hide some controls/charts
+    const heroSection = document.querySelector('.hero-section');
+    const mapStatsRow = document.querySelector('.map-stats-row');
+    if (heroSection) heroSection.style.display = '';
+    if (mapStatsRow) mapStatsRow.style.display = 'none';
+
+    // Hide other main content elements
     mainContent.forEach(el => el.style.display = 'none');
     stopTerminal();
 
@@ -2536,28 +2535,26 @@ async function switchNetwork(network) {
       setTimeout(() => {
         const infoText = networkInfo.querySelector('p');
         if (infoText) {
-          infoText.textContent = 'Main Roads Western Australia - Official live traffic incident map';
+          infoText.textContent = 'Main Roads WA live incidents - displayed on SwanFlow map';
         }
         networkInfo.classList.remove('transitioning');
       }, 150);
     }
-    // Fetch and display real Main Roads incidents
-    fetchMainRoadsIncidents().then(() => displayMainRoadsIncidents());
+
+    // Fetch incidents and display as markers on the map
+    fetchMainRoadsIncidents().then(() => {
+      addMainRoadsIncidentsToMap();
+      displayMainRoadsIncidents(); // Also update the alerts panel
+    });
+
+    // Invalidate map size after layout change
+    setTimeout(() => {
+      if (trafficMap) trafficMap.invalidateSize();
+    }, 100);
     return;
   } else if (network === 'terminal') {
-    // Show terminal AND Main Roads live map, hide main content
-    if (mainroadsContainer) {
-      mainroadsContainer.style.display = 'block';
-      // Lazy load the iframe only when shown
-      const iframe = document.getElementById('mainroads-iframe');
-      const loading = document.getElementById('mainroads-loading');
-      if (iframe && iframe.src === 'about:blank') {
-        iframe.src = iframe.dataset.src;
-        iframe.onload = () => {
-          if (loading) loading.style.display = 'none';
-        };
-      }
-    }
+    // Show terminal feed, no iframe needed
+    if (mainroadsContainer) mainroadsContainer.style.display = 'none';
     if (terminalContainer) terminalContainer.style.display = 'block';
     mainContent.forEach(el => el.style.display = 'none');
     startTerminal();
@@ -2569,13 +2566,14 @@ async function switchNetwork(network) {
       setTimeout(() => {
         const infoText = networkInfo.querySelector('p');
         if (infoText) {
-          infoText.textContent = 'Main Roads WA live incident map + SwanFlow simulation feed';
+          infoText.textContent = 'Live terminal feed - SwanFlow vehicle detection simulation';
         }
         networkInfo.classList.remove('transitioning');
       }, 150);
     }
-    // Fetch and display real Main Roads incidents
-    fetchMainRoadsIncidents().then(() => displayMainRoadsIncidents());
+
+    // Remove incident markers when leaving mainroads view
+    removeMainRoadsIncidentsFromMap();
     return;
   } else {
     // Hide terminal and Main Roads, show main content
@@ -2583,6 +2581,9 @@ async function switchNetwork(network) {
     if (mainroadsContainer) mainroadsContainer.style.display = 'none';
     mainContent.forEach(el => el.style.display = '');
     stopTerminal();
+
+    // Remove Main Roads incident markers from map
+    removeMainRoadsIncidentsFromMap();
 
     // Remove Main Roads styling from incident alerts and restore simulated data display
     const alertsContainer = document.getElementById('incident-alerts');
@@ -3485,6 +3486,141 @@ function initMainRoadsMonitoring() {
 
   // Refresh every 5 minutes (Main Roads updates aren't super frequent)
   setInterval(fetchMainRoadsIncidents, 5 * 60 * 1000);
+}
+
+/**
+ * Add Main Roads WA incidents as markers on the Leaflet map
+ * Called when switching to 'mainroads' network tab
+ */
+function addMainRoadsIncidentsToMap() {
+  if (!trafficMap) return;
+
+  // Clear existing incident layer
+  if (mainroadsIncidentLayer) {
+    trafficMap.removeLayer(mainroadsIncidentLayer);
+  }
+
+  // Create new layer group
+  mainroadsIncidentLayer = L.layerGroup().addTo(trafficMap);
+
+  // Filter for Perth metro area incidents with valid geometry
+  const validIncidents = mainroadsIncidents.filter(inc =>
+    inc.geometry && inc.geometry.lat && inc.geometry.lng &&
+    (inc.region === 'Metropolitan' ||
+     inc.suburb?.toLowerCase().includes('perth') ||
+     ['South West', 'Metro'].some(r => inc.region?.includes(r)) ||
+     // Include all incidents within Perth metro bounds
+     (inc.geometry.lat > -32.5 && inc.geometry.lat < -31.5 &&
+      inc.geometry.lng > 115.5 && inc.geometry.lng < 116.2))
+  );
+
+  if (validIncidents.length === 0) {
+    console.log('[MainRoads Map] No incidents with valid geometry in Perth metro');
+    return;
+  }
+
+  console.log(`[MainRoads Map] Adding ${validIncidents.length} incident markers`);
+
+  // Define marker icons based on incident type
+  const getIncidentIcon = (incident) => {
+    const closureType = (incident.closureType || '').toLowerCase();
+    const incidentType = (incident.type || '').toLowerCase();
+
+    let color, symbol;
+
+    if (closureType.includes('closed')) {
+      color = '#dc2626'; // Red
+      symbol = '✕';
+    } else if (closureType.includes('caution') || incidentType.includes('hazard')) {
+      color = '#f59e0b'; // Amber
+      symbol = '⚠';
+    } else if (incidentType.includes('accident') || incidentType.includes('crash')) {
+      color = '#ef4444'; // Red
+      symbol = '🚗';
+    } else if (incidentType.includes('roadwork')) {
+      color = '#f97316'; // Orange
+      symbol = '🚧';
+    } else {
+      color = '#3b82f6'; // Blue
+      symbol = 'ℹ';
+    }
+
+    return L.divIcon({
+      className: 'mainroads-incident-marker',
+      html: `<div class="incident-marker-inner" style="background:${color}">${symbol}</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16]
+    });
+  };
+
+  // Add markers for each incident
+  validIncidents.forEach(incident => {
+    const marker = L.marker([incident.geometry.lat, incident.geometry.lng], {
+      icon: getIncidentIcon(incident)
+    });
+
+    // Format timestamp
+    const updateTime = incident.updateDate
+      ? new Date(incident.updateDate).toLocaleString('en-AU', {
+          timeZone: 'Australia/Perth',
+          day: 'numeric',
+          month: 'short',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        })
+      : 'Unknown';
+
+    // Build popup content
+    const popupContent = `
+      <div class="mainroads-popup">
+        <div class="popup-header">
+          <span class="popup-badge ${(incident.closureType || '').toLowerCase().replace(/\s/g, '-')}">${incident.closureType || incident.type || 'Incident'}</span>
+        </div>
+        <div class="popup-title">${incident.location || incident.road || 'Unknown location'}</div>
+        ${incident.road ? `<div class="popup-road">${incident.road}</div>` : ''}
+        ${incident.suburb ? `<div class="popup-suburb">${incident.suburb}, ${incident.region || 'WA'}</div>` : ''}
+        ${incident.trafficCondition ? `<div class="popup-condition"><strong>Condition:</strong> ${incident.trafficCondition}</div>` : ''}
+        ${incident.trafficImpact ? `<div class="popup-impact"><strong>Impact:</strong> ${incident.trafficImpact}</div>` : ''}
+        <div class="popup-time">Updated: ${updateTime}</div>
+        ${incident.moreInfoUrl ? `<a href="${incident.moreInfoUrl}" target="_blank" rel="noopener" class="popup-link">More info →</a>` : ''}
+        <div class="popup-source">Source: Main Roads WA</div>
+      </div>
+    `;
+
+    marker.bindPopup(popupContent, {
+      maxWidth: 300,
+      className: 'mainroads-incident-popup'
+    });
+
+    marker.addTo(mainroadsIncidentLayer);
+  });
+
+  // Fit map to show all incidents if there are any
+  if (validIncidents.length > 0) {
+    const bounds = L.latLngBounds(
+      validIncidents.map(inc => [inc.geometry.lat, inc.geometry.lng])
+    );
+    // Pad bounds and fit
+    trafficMap.fitBounds(bounds.pad(0.2), { maxZoom: 13 });
+  }
+
+  // Update UI count
+  const alertsCount = document.getElementById('alerts-count');
+  if (alertsCount) {
+    alertsCount.textContent = validIncidents.length;
+  }
+}
+
+/**
+ * Remove Main Roads incident markers from map
+ */
+function removeMainRoadsIncidentsFromMap() {
+  if (mainroadsIncidentLayer && trafficMap) {
+    trafficMap.removeLayer(mainroadsIncidentLayer);
+    mainroadsIncidentLayer = null;
+  }
 }
 
 // ============================================================================

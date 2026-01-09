@@ -4181,6 +4181,155 @@ body.map-fullscreen {
 }
 
 /* ============================================================================
+   Main Roads WA Incident Markers on Map
+   ============================================================================ */
+
+/* Incident marker styling */
+.mainroads-incident-marker {
+  background: transparent;
+  border: none;
+}
+
+.incident-marker-inner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.incident-marker-inner:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(255, 255, 255, 0.9);
+}
+
+/* Popup styling */
+.mainroads-incident-popup .leaflet-popup-content-wrapper {
+  background: #0c2340;
+  color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 2px solid #f39c12;
+}
+
+.mainroads-incident-popup .leaflet-popup-tip {
+  background: #0c2340;
+  border-top: 2px solid #f39c12;
+}
+
+.mainroads-incident-popup .leaflet-popup-close-button {
+  color: #f39c12;
+  font-size: 20px;
+}
+
+.mainroads-incident-popup .leaflet-popup-close-button:hover {
+  color: #ffffff;
+}
+
+.mainroads-popup {
+  padding: 0.5rem;
+  min-width: 200px;
+}
+
+.mainroads-popup .popup-header {
+  margin-bottom: 0.5rem;
+}
+
+.mainroads-popup .popup-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #3b82f6;
+  color: white;
+}
+
+.mainroads-popup .popup-badge.closed {
+  background: #dc2626;
+}
+
+.mainroads-popup .popup-badge.caution {
+  background: #f59e0b;
+  color: #1a1a1a;
+}
+
+.mainroads-popup .popup-badge.open {
+  background: #22c55e;
+}
+
+.mainroads-popup .popup-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
+}
+
+.mainroads-popup .popup-road {
+  font-size: 0.85rem;
+  color: #7fb3d5;
+  margin-bottom: 0.25rem;
+}
+
+.mainroads-popup .popup-suburb {
+  font-size: 0.75rem;
+  color: #aab4c2;
+  margin-bottom: 0.5rem;
+}
+
+.mainroads-popup .popup-condition,
+.mainroads-popup .popup-impact {
+  font-size: 0.8rem;
+  color: #d0d7de;
+  margin-bottom: 0.25rem;
+}
+
+.mainroads-popup .popup-condition strong,
+.mainroads-popup .popup-impact strong {
+  color: #f39c12;
+}
+
+.mainroads-popup .popup-time {
+  font-size: 0.7rem;
+  color: #8b9299;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #2d3748;
+}
+
+.mainroads-popup .popup-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #f39c12;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mainroads-popup .popup-link:hover {
+  color: #f5b041;
+  text-decoration: underline;
+}
+
+.mainroads-popup .popup-source {
+  font-size: 0.65rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* ============================================================================
    Enhanced Mobile Responsive Improvements
    ============================================================================ */
 
