@@ -4,7 +4,7 @@
 
 // Configuration
 const API_BASE_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:3001'  // Local dev: local API server
+  ? 'http://localhost:3000'  // Local dev: local API server
   : 'https://perth-traffic-watch.onrender.com';  // Production: Render.com backend (HTTPS)
 
 const REFRESH_INTERVAL = 60000; // 60 seconds (normal mode)
@@ -25,6 +25,22 @@ let siteMarkers = {};
 let roadPolylines = []; // Array to store road segment polylines (now stores dot markers)
 let allSitesData = [];
 let mainroadsIncidentLayer = null; // Layer group for Main Roads WA incident markers
+let mainroadsRoadworksLayer = null; // Layer group for Main Roads WA roadworks markers
+let mainroadsClosuresLayer = null; // Layer group for Main Roads WA road closures polylines
+let mainroadsEventsLayer = null; // Layer group for Main Roads WA events markers
+
+// Main Roads WA data arrays
+let mainroadsRoadworks = [];
+let mainroadsClosures = [];
+let mainroadsEvents = [];
+
+// Layer visibility state
+let layerVisibility = {
+  incidents: true,
+  roadworks: true,
+  closures: true,
+  events: true
+};
 
 // Terminal state
 let terminalInterval = null;
@@ -3472,14 +3488,14 @@ function truncateText(text, maxLength) {
 }
 
 /**
- * Initialize Main Roads WA incident monitoring
+ * Initialize Main Roads WA data monitoring (incidents, roadworks, closures, events)
  */
 function initMainRoadsMonitoring() {
-  // Fetch immediately
-  fetchMainRoadsIncidents();
+  // Fetch all layers immediately
+  fetchAllMainRoadsData();
 
   // Refresh every 5 minutes (Main Roads updates aren't super frequent)
-  setInterval(fetchMainRoadsIncidents, 5 * 60 * 1000);
+  setInterval(fetchAllMainRoadsData, 5 * 60 * 1000);
 }
 
 /**
@@ -3621,6 +3637,327 @@ function removeMainRoadsIncidentsFromMap() {
     trafficMap.removeLayer(mainroadsIncidentLayer);
     mainroadsIncidentLayer = null;
   }
+}
+
+// ============================================================================
+// MAIN ROADS WA - ROADWORKS, CLOSURES, EVENTS
+// ============================================================================
+
+/**
+ * Convert Web Mercator (EPSG:3857) to WGS84 (EPSG:4326)
+ */
+function webMercatorToWGS84(x, y) {
+  const lng = (x * 180) / 20037508.34;
+  const lat = (Math.atan(Math.exp((y * Math.PI) / 20037508.34)) * 360) / Math.PI - 90;
+  return { lat, lng };
+}
+
+/**
+ * Fetch roadworks from Main Roads WA API (Layer 2)
+ */
+async function fetchMainRoadsRoadworks() {
+  const API_URL = 'https://services2.arcgis.com/cHGEnmsJ165IBJRM/arcgis/rest/services/WebEoc_Roadworks/FeatureServer/2/query';
+  const params = new URLSearchParams({
+    where: "1=1", outFields: "*", returnGeometry: "true", f: "json", resultRecordCount: "100"
+  });
+
+  try {
+    const response = await fetch(`${API_URL}?${params}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+
+    if (data.features) {
+      mainroadsRoadworks = data.features.map(f => {
+        const geom = f.geometry ? webMercatorToWGS84(f.geometry.x, f.geometry.y) : null;
+        return {
+          id: f.attributes.Id, road: f.attributes.Road, localRoadName: f.attributes.LocalRoadName,
+          suburb: f.attributes.Suburb, region: f.attributes.Region, workType: f.attributes.WorkType,
+          description: f.attributes.Descriptio, trafficImpact: f.attributes.TrafficImp,
+          dateStarted: f.attributes.DateStarte, estimatedCompletion: f.attributes.EstimatedC,
+          moreInfoUrl: f.attributes.SeeMoreUrl, geometry: geom
+        };
+      });
+      console.log(`[MainRoads API] Fetched ${mainroadsRoadworks.length} roadworks`);
+    }
+    return mainroadsRoadworks;
+  } catch (error) {
+    console.error('[MainRoads API] Error fetching roadworks:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch road closures from Main Roads WA API (Layer 4 - polylines)
+ */
+async function fetchMainRoadsClosures() {
+  const API_URL = 'https://services2.arcgis.com/cHGEnmsJ165IBJRM/arcgis/rest/services/WebEoc_RoadClosures/FeatureServer/4/query';
+  const params = new URLSearchParams({
+    where: "1=1", outFields: "*", returnGeometry: "true", f: "json", resultRecordCount: "100"
+  });
+
+  try {
+    const response = await fetch(`${API_URL}?${params}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+
+    if (data.features) {
+      mainroadsClosures = data.features.map(f => {
+        let paths = [];
+        if (f.geometry && f.geometry.paths) {
+          paths = f.geometry.paths.map(path =>
+            path.map(coord => {
+              const converted = webMercatorToWGS84(coord[0], coord[1]);
+              return [converted.lat, converted.lng];
+            })
+          );
+        }
+        return {
+          id: f.attributes.Id, location: f.attributes.Location, road: f.attributes.Road,
+          suburb: f.attributes.Suburb, region: f.attributes.Region, incidentType: f.attributes.IncidentTy,
+          closureType: f.attributes.ClosureTyp, trafficImpact: f.attributes.TrafficImp,
+          updateDate: f.attributes.UpdateDate, moreInfoUrl: f.attributes.SeeMoreUrl, paths: paths
+        };
+      });
+      console.log(`[MainRoads API] Fetched ${mainroadsClosures.length} road closures`);
+    }
+    return mainroadsClosures;
+  } catch (error) {
+    console.error('[MainRoads API] Error fetching closures:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch events from Main Roads WA API (Layer 0)
+ */
+async function fetchMainRoadsEvents() {
+  const API_URL = 'https://services2.arcgis.com/cHGEnmsJ165IBJRM/arcgis/rest/services/WebEoc_Events/FeatureServer/0/query';
+  const params = new URLSearchParams({
+    where: "1=1", outFields: "*", returnGeometry: "true", f: "json", resultRecordCount: "100"
+  });
+
+  try {
+    const response = await fetch(`${API_URL}?${params}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+
+    if (data.features) {
+      mainroadsEvents = data.features.map(f => {
+        const geom = f.geometry ? webMercatorToWGS84(f.geometry.x, f.geometry.y) : null;
+        return {
+          id: f.attributes.Id, road: f.attributes.Road, localRoadName: f.attributes.LocalRoadN,
+          suburb: f.attributes.Suburb, region: f.attributes.Region, eventType: f.attributes.EventType,
+          eventName: f.attributes.EventName, description: f.attributes.EventDescr,
+          trafficImpact: f.attributes.TrafficImp, dateStart: f.attributes.DateTimeSt,
+          dateEnd: f.attributes.DateTimeEn, moreInfoUrl: f.attributes.SeeMoreUrl, geometry: geom
+        };
+      });
+      console.log(`[MainRoads API] Fetched ${mainroadsEvents.length} events`);
+    }
+    return mainroadsEvents;
+  } catch (error) {
+    console.error('[MainRoads API] Error fetching events:', error);
+    return [];
+  }
+}
+
+/**
+ * Add roadworks markers to map
+ */
+function addRoadworksToMap() {
+  if (!trafficMap || !layerVisibility.roadworks) return;
+  if (mainroadsRoadworksLayer) trafficMap.removeLayer(mainroadsRoadworksLayer);
+  mainroadsRoadworksLayer = L.layerGroup().addTo(trafficMap);
+
+  const perthRoadworks = mainroadsRoadworks.filter(rw =>
+    rw.geometry && (rw.region === 'Metro' || rw.region === 'Metropolitan' ||
+    (rw.geometry.lat > -32.5 && rw.geometry.lat < -31.5 && rw.geometry.lng > 115.5 && rw.geometry.lng < 116.2))
+  );
+
+  perthRoadworks.forEach(rw => {
+    const icon = L.divIcon({
+      className: 'mainroads-marker roadwork-marker',
+      html: `<div class="marker-inner" style="background:#f97316">🚧</div>`,
+      iconSize: [32, 32], iconAnchor: [16, 16]
+    });
+
+    const marker = L.marker([rw.geometry.lat, rw.geometry.lng], { icon });
+    marker.bindPopup(`
+      <div class="mainroads-popup">
+        <div class="popup-badge" style="background:#f97316">${rw.workType || 'Roadwork'}</div>
+        <div class="popup-title">${rw.localRoadName || rw.road}</div>
+        <div class="popup-suburb">${rw.suburb || ''}, ${rw.region || 'WA'}</div>
+        ${rw.description ? `<div class="popup-desc">${rw.description}</div>` : ''}
+        ${rw.trafficImpact ? `<div class="popup-impact">${rw.trafficImpact}</div>` : ''}
+        ${rw.estimatedCompletion ? `<div class="popup-date">Est. completion: ${rw.estimatedCompletion}</div>` : ''}
+        <div class="popup-source">Main Roads WA</div>
+      </div>
+    `, { maxWidth: 300 });
+    marker.addTo(mainroadsRoadworksLayer);
+  });
+  console.log(`[MainRoads Map] Added ${perthRoadworks.length} roadwork markers`);
+}
+
+/**
+ * Add road closures polylines to map
+ */
+function addClosuresToMap() {
+  if (!trafficMap || !layerVisibility.closures) return;
+  if (mainroadsClosuresLayer) trafficMap.removeLayer(mainroadsClosuresLayer);
+  mainroadsClosuresLayer = L.layerGroup().addTo(trafficMap);
+
+  const perthClosures = mainroadsClosures.filter(cl => {
+    if (!cl.paths || cl.paths.length === 0) return false;
+    const fp = cl.paths[0][0];
+    return cl.region === 'Metro' || cl.region === 'Metropolitan' ||
+           (fp && fp[0] > -32.5 && fp[0] < -31.5 && fp[1] > 115.5 && fp[1] < 116.2);
+  });
+
+  perthClosures.forEach(cl => {
+    const isClosed = (cl.closureType || '').toLowerCase().includes('closed');
+    const color = isClosed ? '#dc2626' : '#f59e0b';
+    const dashArray = isClosed ? null : '10, 5';
+
+    cl.paths.forEach(path => {
+      const polyline = L.polyline(path, { color, weight: 5, opacity: 0.8, dashArray });
+      polyline.bindPopup(`
+        <div class="mainroads-popup">
+          <div class="popup-badge" style="background:${color}">${cl.closureType || 'Closure'}</div>
+          <div class="popup-title">${cl.location || cl.road}</div>
+          <div class="popup-suburb">${cl.suburb || ''}, ${cl.region || 'WA'}</div>
+          ${cl.incidentType ? `<div class="popup-type">${cl.incidentType}</div>` : ''}
+          ${cl.trafficImpact ? `<div class="popup-impact">${cl.trafficImpact}</div>` : ''}
+          ${cl.updateDate ? `<div class="popup-date">Updated: ${cl.updateDate}</div>` : ''}
+          <div class="popup-source">Main Roads WA</div>
+        </div>
+      `, { maxWidth: 300 });
+      polyline.addTo(mainroadsClosuresLayer);
+    });
+  });
+  console.log(`[MainRoads Map] Added ${perthClosures.length} closure polylines`);
+}
+
+/**
+ * Add events markers to map
+ */
+function addEventsToMap() {
+  if (!trafficMap || !layerVisibility.events) return;
+  if (mainroadsEventsLayer) trafficMap.removeLayer(mainroadsEventsLayer);
+  mainroadsEventsLayer = L.layerGroup().addTo(trafficMap);
+
+  const perthEvents = mainroadsEvents.filter(ev =>
+    ev.geometry && (ev.region === 'Metro' || ev.region === 'Metropolitan' ||
+    (ev.geometry.lat > -32.5 && ev.geometry.lat < -31.5 && ev.geometry.lng > 115.5 && ev.geometry.lng < 116.2))
+  );
+
+  perthEvents.forEach(ev => {
+    const eventType = (ev.eventType || '').toLowerCase();
+    let emoji = '🎪';
+    if (eventType.includes('sport')) emoji = '🏟️';
+    else if (eventType.includes('music') || eventType.includes('festival')) emoji = '🎵';
+    else if (eventType.includes('celebration')) emoji = '🎉';
+    else if (eventType.includes('race')) emoji = '🚴';
+
+    const icon = L.divIcon({
+      className: 'mainroads-marker event-marker',
+      html: `<div class="marker-inner" style="background:#8b5cf6">${emoji}</div>`,
+      iconSize: [32, 32], iconAnchor: [16, 16]
+    });
+
+    const marker = L.marker([ev.geometry.lat, ev.geometry.lng], { icon });
+    marker.bindPopup(`
+      <div class="mainroads-popup">
+        <div class="popup-badge" style="background:#8b5cf6">${ev.eventType || 'Event'}</div>
+        <div class="popup-title">${ev.eventName || 'Event'}</div>
+        <div class="popup-road">${ev.localRoadName || ev.road || ''}</div>
+        <div class="popup-suburb">${ev.suburb || ''}, ${ev.region || 'WA'}</div>
+        ${ev.description ? `<div class="popup-desc">${ev.description}</div>` : ''}
+        ${ev.dateStart ? `<div class="popup-date">Start: ${ev.dateStart}</div>` : ''}
+        ${ev.dateEnd ? `<div class="popup-date">End: ${ev.dateEnd}</div>` : ''}
+        <div class="popup-source">Main Roads WA</div>
+      </div>
+    `, { maxWidth: 300 });
+    marker.addTo(mainroadsEventsLayer);
+  });
+  console.log(`[MainRoads Map] Added ${perthEvents.length} event markers`);
+}
+
+/**
+ * Toggle layer visibility
+ */
+function toggleMainRoadsLayer(layerType, visible) {
+  layerVisibility[layerType] = visible;
+
+  if (layerType === 'incidents') {
+    visible ? addMainRoadsIncidentsToMap() : removeMainRoadsIncidentsFromMap();
+  } else if (layerType === 'roadworks') {
+    if (visible) addRoadworksToMap();
+    else if (mainroadsRoadworksLayer) { trafficMap.removeLayer(mainroadsRoadworksLayer); mainroadsRoadworksLayer = null; }
+  } else if (layerType === 'closures') {
+    if (visible) addClosuresToMap();
+    else if (mainroadsClosuresLayer) { trafficMap.removeLayer(mainroadsClosuresLayer); mainroadsClosuresLayer = null; }
+  } else if (layerType === 'events') {
+    if (visible) addEventsToMap();
+    else if (mainroadsEventsLayer) { trafficMap.removeLayer(mainroadsEventsLayer); mainroadsEventsLayer = null; }
+  }
+
+  const btn = document.querySelector(`[data-layer="${layerType}"]`);
+  if (btn) btn.classList.toggle('active', visible);
+}
+
+/**
+ * Fetch all Main Roads WA data and display on map
+ */
+async function fetchAllMainRoadsData() {
+  console.log('[MainRoads] Fetching all data layers...');
+  await Promise.all([
+    fetchMainRoadsIncidents(),
+    fetchMainRoadsRoadworks(),
+    fetchMainRoadsClosures(),
+    fetchMainRoadsEvents()
+  ]);
+
+  if (layerVisibility.incidents) addMainRoadsIncidentsToMap();
+  if (layerVisibility.roadworks) addRoadworksToMap();
+  if (layerVisibility.closures) addClosuresToMap();
+  if (layerVisibility.events) addEventsToMap();
+
+  updateLayerCounts();
+}
+
+/**
+ * Update layer count badges
+ */
+function updateLayerCounts() {
+  const perthFilter = (item) => {
+    if (item.geometry) {
+      return item.region === 'Metro' || item.region === 'Metropolitan' ||
+             (item.geometry.lat > -32.5 && item.geometry.lat < -31.5 &&
+              item.geometry.lng > 115.5 && item.geometry.lng < 116.2);
+    }
+    if (item.paths && item.paths.length > 0) {
+      const fp = item.paths[0][0];
+      return item.region === 'Metro' || item.region === 'Metropolitan' ||
+             (fp && fp[0] > -32.5 && fp[0] < -31.5 && fp[1] > 115.5 && fp[1] < 116.2);
+    }
+    return false;
+  };
+
+  const counts = {
+    incidents: mainroadsIncidents.filter(i => i.geometry && perthFilter(i)).length,
+    roadworks: mainroadsRoadworks.filter(perthFilter).length,
+    closures: mainroadsClosures.filter(perthFilter).length,
+    events: mainroadsEvents.filter(perthFilter).length
+  };
+
+  Object.entries(counts).forEach(([type, count]) => {
+    const el = document.getElementById(`${type}-count`);
+    if (el) el.textContent = count;
+  });
+
+  const totalCount = counts.incidents + counts.closures;
+  const alertsCount = document.getElementById('alerts-count');
+  if (alertsCount) alertsCount.textContent = totalCount;
 }
 
 // ============================================================================

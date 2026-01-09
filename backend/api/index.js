@@ -138,8 +138,8 @@ app.use(helmet({
       scriptSrc: ["'self'", "https://unpkg.com", "https://cdn.jsdelivr.net"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "https://router.project-osrm.org"]
+      imgSrc: ["'self'", "data:", "https:", "blob:", "https://*.basemaps.cartocdn.com", "https://server.arcgisonline.com", "https://*.tile.openstreetmap.org", "https://*.arcgisonline.com"],
+      connectSrc: ["'self'", "https://router.project-osrm.org", "https://services2.arcgis.com", "https://*.basemaps.cartocdn.com", "https://server.arcgisonline.com", "https://*.tile.openstreetmap.org", "https://*.arcgisonline.com"]
     }
   }
 }));
