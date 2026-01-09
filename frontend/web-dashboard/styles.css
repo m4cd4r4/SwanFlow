@@ -427,12 +427,12 @@ header h1 {
 
 /* ============================================================================
    HERO DASHBOARD - Option A Layout
-   5-column grid: Map | Handle | Status | Handle | Stats
+   3-column grid: Map | Handle | Status
    ============================================================================ */
 
 .hero-dashboard {
   display: grid;
-  grid-template-columns: 1fr 8px 320px 8px 280px;
+  grid-template-columns: 1fr 8px 320px;
   gap: 0;
   height: calc(100vh - 180px);
   min-height: 500px;
@@ -446,26 +446,17 @@ header h1 {
   transition: grid-template-columns 0.3s ease;
 }
 
-/* COLLAPSED STATE - Stats completely hidden, map expands */
-.hero-dashboard.stats-collapsed {
-  grid-template-columns: 1fr 8px 320px 0 0;
+/* FULLSCREEN STATE - Map expands to full width */
+.hero-dashboard.map-fullscreen {
+  grid-template-columns: 1fr 0 0;
 }
 
-.hero-dashboard.stats-collapsed .hero-stats-column {
+.hero-dashboard.map-fullscreen .hero-status-column,
+.hero-dashboard.map-fullscreen .hero-resize-handle {
   width: 0;
   padding: 0;
   opacity: 0;
   overflow: hidden;
-}
-
-/* Hide the second resize handle when collapsed */
-.hero-dashboard.stats-collapsed .hero-resize-handle:last-of-type {
-  width: 0;
-  overflow: hidden;
-}
-
-.hero-dashboard.stats-collapsed .hero-expand-btn {
-  display: flex;
 }
 
 /* Map Column */
@@ -617,6 +608,207 @@ header h1 {
   gap: 0.5rem;
   font-size: 0.9rem;
   color: var(--text);
+}
+
+/* Integrated Metrics Grid (in status column) */
+.hero-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.hero-metric-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-metric-item .metric-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.hero-metric-item .metric-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Layer Toggles Inline (in status column) */
+.layer-toggles-inline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.layer-toggles-inline .layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+
+.layer-toggles-inline .layer-toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.layer-toggles-inline .layer-toggle.active {
+  color: white;
+}
+
+.layer-toggles-inline .layer-toggle[data-layer="incidents"].active {
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.2);
+}
+
+.layer-toggles-inline .layer-toggle[data-layer="roadworks"].active {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.2);
+}
+
+.layer-toggles-inline .layer-toggle[data-layer="closures"].active {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.layer-toggles-inline .layer-toggle[data-layer="events"].active {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.layer-toggles-inline .toggle-icon {
+  font-size: 0.9rem;
+}
+
+.layer-toggles-inline .toggle-label {
+  display: none;
+}
+
+.layer-toggles-inline .toggle-count {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+  font-size: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Show labels on wider screens */
+@media (min-width: 500px) {
+  .layer-toggles-inline .toggle-label {
+    display: inline;
+  }
+}
+
+/* Layer Toggles Container (in stats column) */
+.layer-toggles-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.layer-toggles-container .layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+
+.layer-toggles-container .layer-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.layer-toggles-container .layer-toggle.active {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.layer-toggles-container .layer-toggle[data-layer="incidents"].active {
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.15);
+}
+
+.layer-toggles-container .layer-toggle[data-layer="roadworks"].active {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.15);
+}
+
+.layer-toggles-container .layer-toggle[data-layer="closures"].active {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.layer-toggles-container .layer-toggle[data-layer="events"].active {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.15);
+}
+
+.layer-toggle .toggle-icon {
+  font-size: 1rem;
+}
+
+.layer-toggle .toggle-label {
+  flex: 1;
+}
+
+.layer-toggle .toggle-count {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.layer-source-info {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.layer-source-info .source-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.layer-source-info .source-update {
+  font-size: 0.6rem;
+  color: var(--text-muted);
 }
 
 /* Stats Column (Right) */
@@ -4327,6 +4519,108 @@ body.map-fullscreen {
   color: #6b7280;
   margin-top: 0.5rem;
   font-style: italic;
+}
+
+.mainroads-popup .popup-desc {
+  font-size: 0.8rem;
+  color: #d0d7de;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.mainroads-popup .popup-type {
+  font-size: 0.8rem;
+  color: #a3bffa;
+  margin-bottom: 0.25rem;
+}
+
+.mainroads-popup .popup-date {
+  font-size: 0.75rem;
+  color: #8b9299;
+  margin-top: 0.25rem;
+}
+
+/* New marker styles for roadworks, closures, events */
+.mainroads-marker {
+  background: transparent;
+  border: none;
+}
+
+.mainroads-marker .marker-inner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mainroads-marker .marker-inner:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(255, 255, 255, 0.9);
+}
+
+/* Layer toggle controls */
+.layer-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.1);
+  color: #aab4c2;
+}
+
+.layer-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.layer-toggle.active {
+  color: white;
+}
+
+.layer-toggle[data-layer="incidents"].active {
+  background: rgba(220, 38, 38, 0.3);
+  border-color: #dc2626;
+}
+
+.layer-toggle[data-layer="roadworks"].active {
+  background: rgba(249, 115, 22, 0.3);
+  border-color: #f97316;
+}
+
+.layer-toggle[data-layer="closures"].active {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #ef4444;
+}
+
+.layer-toggle[data-layer="events"].active {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: #8b5cf6;
+}
+
+.layer-toggle .toggle-count {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
 }
 
 /* ============================================================================

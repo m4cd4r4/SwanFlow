@@ -110,52 +110,34 @@
 
       <!-- Status Column (Center) -->
       <div class="hero-status-column" id="section-hero">
-        <div class="hero-status-label">Perth CBD → Fremantle Corridor</div>
+        <div class="hero-status-label">STIRLING HIGHWAY CORRIDOR</div>
         <div class="hero-status-value" id="corridor-status">Loading...</div>
         <div class="hero-status-speed">Average Speed: <span id="avg-speed-hero">--</span> km/h</div>
         <div class="hero-status-recommendation" id="drive-recommendation">
           <span class="rec-icon">✓</span>
           <span class="rec-text">Calculating...</span>
         </div>
-      </div>
 
-      <!-- Resize Handle 2 -->
-      <div class="hero-resize-handle" title="Drag to resize"></div>
-
-      <!-- Stats Column (Right) -->
-      <div class="hero-stats-column" id="stats-column">
-        <div class="hero-stats-header">
-          <span class="hero-stats-title">Live Metrics</span>
-          <button type="button" class="hero-collapse-btn" id="collapse-stats-btn" title="Hide stats">◀</button>
-        </div>
-
-        <div class="hero-stat-card" role="group" aria-labelledby="stat-total-label">
-          <h3 id="stat-total-label">Total Vehicles</h3>
-          <div class="stat-value" id="total-count" aria-live="polite">-</div>
-          <div class="stat-label">Since deployment</div>
-        </div>
-
-        <div class="hero-stat-card" role="group" aria-labelledby="stat-hourly-label">
-          <h3 id="stat-hourly-label">Average Hourly</h3>
-          <div class="stat-value" id="avg-hourly" aria-live="polite">-</div>
-          <div class="stat-label">Vehicles per hour</div>
-        </div>
-
-        <div class="hero-stat-card" role="group" aria-labelledby="stat-confidence-label">
-          <h3 id="stat-confidence-label">Detection Confidence</h3>
-          <div class="stat-value" id="avg-confidence" aria-live="polite">-</div>
-          <div class="stat-label">Average accuracy</div>
-        </div>
-
-        <div class="hero-stat-card" role="group" aria-labelledby="stat-update-label">
-          <h3 id="stat-update-label">Last Update</h3>
-          <div class="stat-value" id="last-update" aria-live="polite">-</div>
-          <div class="stat-label">Time since last data</div>
+        <!-- Integrated Live Metrics -->
+        <div class="hero-metrics-grid">
+          <div class="hero-metric-item">
+            <span class="metric-label">Total Vehicles</span>
+            <span class="metric-value" id="total-count">-</span>
+          </div>
+          <div class="hero-metric-item">
+            <span class="metric-label">Avg Hourly</span>
+            <span class="metric-value" id="avg-hourly">-</span>
+          </div>
+          <div class="hero-metric-item">
+            <span class="metric-label">Confidence</span>
+            <span class="metric-value" id="avg-confidence">-</span>
+          </div>
+          <div class="hero-metric-item">
+            <span class="metric-label">Last Update</span>
+            <span class="metric-value" id="last-update">-</span>
+          </div>
         </div>
       </div>
-
-      <!-- Expand Button (shown when collapsed) -->
-      <button type="button" class="hero-expand-btn" id="expand-stats-btn" title="Show stats">▶</button>
     </div>
 
     <!-- Network Selector (Arterial vs Live Feed) -->
