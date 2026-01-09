@@ -2585,6 +2585,12 @@ async function switchNetwork(network) {
     // Remove Main Roads incident markers from map
     removeMainRoadsIncidentsFromMap();
 
+    // Reset map view to Perth corridor
+    if (trafficMap) {
+      trafficMap.setView([-31.965, 115.82], 13);
+      setTimeout(() => trafficMap.invalidateSize(), 100);
+    }
+
     // Remove Main Roads styling from incident alerts and restore simulated data display
     const alertsContainer = document.getElementById('incident-alerts');
     if (alertsContainer) {
@@ -2651,7 +2657,7 @@ async function loadSitesForNetwork(network) {
     sites = allSites.all;
   }
 
-  if (sites.length === 0) {
+  if (!sites || sites.length === 0) {
     siteSelect.innerHTML = '<option value="">No sites available</option>';
     setStatus('error', 'No monitoring sites found');
     return;
@@ -3597,13 +3603,19 @@ function addMainRoadsIncidentsToMap() {
     marker.addTo(mainroadsIncidentLayer);
   });
 
-  // Fit map to show all incidents if there are any
+  // Center map on Perth with incidents visible (don't zoom out too far)
   if (validIncidents.length > 0) {
-    const bounds = L.latLngBounds(
-      validIncidents.map(inc => [inc.geometry.lat, inc.geometry.lng])
-    );
-    // Pad bounds and fit
-    trafficMap.fitBounds(bounds.pad(0.2), { maxZoom: 13 });
+    // Calculate center of incidents
+    const lats = validIncidents.map(inc => inc.geometry.lat);
+    const lngs = validIncidents.map(inc => inc.geometry.lng);
+    const centerLat = lats.reduce((a, b) => a + b, 0) / lats.length;
+    const centerLng = lngs.reduce((a, b) => a + b, 0) / lngs.length;
+
+    // Pan to incident center but keep reasonable zoom for Perth metro
+    trafficMap.setView([centerLat, centerLng], 11);
+  } else {
+    // No incidents - show default Perth view
+    trafficMap.setView([-31.965, 115.82], 12);
   }
 
   // Update UI count
