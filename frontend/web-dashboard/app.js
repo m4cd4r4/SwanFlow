@@ -2651,30 +2651,37 @@ async function switchNetwork(network) {
 async function loadSitesForNetwork(network) {
   setStatus('loading', 'Loading sites...');
 
-  let sites = [];
+  let rawSites = [];
   if (network === 'arterial') {
-    sites = await fetchSites();
+    rawSites = await fetchSites();
   } else if (network === 'freeway') {
-    sites = await fetchFreewaySites();
+    rawSites = await fetchFreewaySites();
   } else {
     const allSites = await fetchAllNetworkSites();
-    sites = allSites.all;
+    rawSites = allSites.all;
   }
 
-  if (!sites || sites.length === 0) {
+  if (!rawSites || rawSites.length === 0) {
     siteSelect.innerHTML = '<option value="">No sites available</option>';
     setStatus('error', 'No monitoring sites found');
     return;
   }
 
-  // Populate site selector
-  siteSelect.innerHTML = sites.map(site =>
-    `<option value="${site.name}">${site.name}</option>`
+  // Store raw sites for data lookups
+  window.allRawSites = rawSites;
+
+  // Consolidate into corridor stretches for simpler UX
+  const stretches = consolidateSitesToStretches(rawSites);
+
+  // Populate site selector with stretches (simplified dropdown)
+  siteSelect.innerHTML = stretches.map(stretch =>
+    `<option value="${stretch.id}" data-sites="${stretch.sites.map(s => s.name).join('|')}">${stretch.name}</option>`
   ).join('');
 
-  // Set default site
-  currentSite = sites[0].name;
+  // Set default stretch
+  currentSite = stretches[0].id;
   siteSelect.value = currentSite;
+  window.currentStretch = stretches[0];
 
   // Load dashboard for new site
   await loadDashboard();
