@@ -2905,6 +2905,15 @@ async function init() {
   // Initialize map
   initMap();
 
+  // Force map to recalculate size multiple times during initial load
+  if (trafficMap) {
+    setTimeout(() => trafficMap.invalidateSize(), 100);
+    setTimeout(() => trafficMap.invalidateSize(), 300);
+    setTimeout(() => trafficMap.invalidateSize(), 500);
+    setTimeout(() => trafficMap.invalidateSize(), 1000);
+    setTimeout(() => trafficMap.invalidateSize(), 2000);
+  }
+
   // Render initial flow corridor (arterial by default)
   renderFlowCorridor(currentNetwork);
 
@@ -3930,6 +3939,13 @@ async function fetchAllMainRoadsData() {
   if (layerVisibility.events) addEventsToMap();
 
   updateLayerCounts();
+
+  // Force map to recalculate size after adding all markers
+  if (trafficMap) {
+    trafficMap.invalidateSize();
+    setTimeout(() => trafficMap.invalidateSize(), 100);
+    setTimeout(() => trafficMap.invalidateSize(), 500);
+  }
 }
 
 /**
