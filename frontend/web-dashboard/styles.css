@@ -1494,6 +1494,36 @@ header h1 {
   margin-bottom: 2rem;
 }
 
+/* Inline Journey Time Trends (in journey-grid) */
+.historical-trends.inline-trends {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+  margin-bottom: 0;
+}
+
+.historical-trends.inline-trends .trends-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.historical-trends.inline-trends .trends-header h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.historical-trends.inline-trends .trends-grid {
+  display: block;
+}
+
+.historical-trends.inline-trends .trend-card {
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
 /* Column labels */
 .journey-arterial h2::before {
   content: '🚗 ';
