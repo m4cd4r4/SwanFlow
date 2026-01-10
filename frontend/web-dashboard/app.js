@@ -1135,23 +1135,39 @@ function initMap() {
   trafficMap._baseMaps = baseMaps;
   trafficMap._currentBaseLayer = defaultLayer;
 
-  // Add ResizeObserver to fix map tile rendering when container resizes
+  // Add ResizeObserver with debounce to fix map tile rendering
   const mapContainer = document.getElementById('traffic-map');
+  let resizeTimeout;
   if (mapContainer && typeof ResizeObserver !== 'undefined') {
     const resizeObserver = new ResizeObserver(() => {
-      if (trafficMap) {
-        trafficMap.invalidateSize();
-      }
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (trafficMap) {
+          trafficMap.invalidateSize();
+        }
+      }, 100);
     });
     resizeObserver.observe(mapContainer);
   }
 
-  // Also listen for window resize
+  // Also listen for window resize with debounce
+  let windowResizeTimeout;
   window.addEventListener('resize', () => {
-    if (trafficMap) {
+    clearTimeout(windowResizeTimeout);
+    windowResizeTimeout = setTimeout(() => {
+      if (trafficMap) {
+        trafficMap.invalidateSize();
+      }
+    }, 100);
+  });
+
+  // Force tile layer refresh after initial load
+  setTimeout(() => {
+    if (trafficMap && trafficMap._currentBaseLayer) {
+      trafficMap._currentBaseLayer.redraw();
       trafficMap.invalidateSize();
     }
-  });
+  }, 500);
 
   // Set up map view selector buttons
   const viewButtons = document.querySelectorAll('.map-view-btn');
@@ -2922,15 +2938,6 @@ async function init() {
 
   // Initialize map
   initMap();
-
-  // Force map to recalculate size multiple times during initial load
-  if (trafficMap) {
-    setTimeout(() => trafficMap.invalidateSize(), 100);
-    setTimeout(() => trafficMap.invalidateSize(), 300);
-    setTimeout(() => trafficMap.invalidateSize(), 500);
-    setTimeout(() => trafficMap.invalidateSize(), 1000);
-    setTimeout(() => trafficMap.invalidateSize(), 2000);
-  }
 
   // Render initial flow corridor (arterial by default)
   renderFlowCorridor(currentNetwork);
