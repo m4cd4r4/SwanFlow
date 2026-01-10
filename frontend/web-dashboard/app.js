@@ -278,10 +278,10 @@ async function fetchHourlyData(site, hours = 24) {
     allData.flat().forEach(item => {
       const hour = item.hour;
       if (!hourlyMap.has(hour)) {
-        hourlyMap.set(hour, { hour, count: 0, sites: 0 });
+        hourlyMap.set(hour, { hour, avg_count: 0, sites: 0 });
       }
       const existing = hourlyMap.get(hour);
-      existing.count += item.count || 0;
+      existing.avg_count += item.avg_count || 0;
       existing.sites += 1;
     });
 
