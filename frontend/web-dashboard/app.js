@@ -16,7 +16,7 @@ let isLiveMode = false;
 let liveRefreshTimer = null;
 let previousTotalCount = 0;
 let currentPeriod = '24h';
-let currentTheme = 'light';
+let currentTheme = 'dark';
 let currentNetwork = 'arterial'; // 'arterial' or 'terminal'
 let refreshTimer = null;
 let trafficChart = null;
@@ -1110,7 +1110,7 @@ function initMap() {
 
   // Set default based on theme
   const isDark = currentTheme === 'dark';
-  const defaultLayer = isDark ? baseMaps['Dark Mode'] : baseMaps['Street Map'];
+  const defaultLayer = baseMaps['Street Map'];
   defaultLayer.addTo(trafficMap);
 
   // Add scale control (bottom left)
