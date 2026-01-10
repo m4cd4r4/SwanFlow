@@ -116,22 +116,12 @@ function formatPerthTime(dateInput, format = 'short') {
 const CORRIDOR_STRETCHES = [
   // Arterial Roads
   {
-    id: 'mounts-bay-eastbound',
-    name: 'Mounts Bay Road (Eastbound)',
-    description: 'Kings Park → CBD',
-    direction: 'Northbound',
+    id: 'mounts-bay',
+    name: 'Mounts Bay Road',
+    description: 'Kings Park ↔ CBD',
+    direction: 'Both',
     type: 'arterial',
-    sitePatterns: ['Mounts Bay Rd'],
-    directionFilter: 'Northbound'
-  },
-  {
-    id: 'mounts-bay-westbound',
-    name: 'Mounts Bay Road (Westbound)',
-    description: 'CBD → Kings Park',
-    direction: 'Southbound',
-    type: 'arterial',
-    sitePatterns: ['Mounts Bay Rd'],
-    directionFilter: 'Southbound'
+    sitePatterns: ['Mounts Bay Rd']
   },
   {
     id: 'stirling-north',
@@ -553,8 +543,7 @@ const siteCoordinates = {
   'Stirling Hwy @ Victoria St (Southbound)': [-32.035, 115.751],
 
   // Corridor stretch center points (for panToSite when stretch ID is selected)
-  'mounts-bay-eastbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
-  'mounts-bay-westbound': [-31.9705, 115.8340],   // Center of Mounts Bay Road
+  'mounts-bay': [-31.9705, 115.8340],   // Center of Mounts Bay Road
   'stirling-north': [-31.9920, 115.7670],         // Eric St, Cottesloe
   'stirling-south': [-32.0150, 115.7550]          // Center of Mosman Park section
 };
