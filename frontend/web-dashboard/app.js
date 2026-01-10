@@ -3657,10 +3657,10 @@ function addMainRoadsIncidentsToMap() {
     const centerLng = lngs.reduce((a, b) => a + b, 0) / lngs.length;
 
     // Pan to incident center but keep reasonable zoom for Perth metro
-    trafficMap.setView([centerLat, centerLng], 11);
+    // DISABLED: trafficMap.setView([centerLat, centerLng], 11);
   } else {
     // No incidents - show default Perth view
-    trafficMap.setView([-31.965, 115.82], 12);
+    // DISABLED: trafficMap.setView([-31.965, 115.82], 12);
   }
 
   // Update UI count
