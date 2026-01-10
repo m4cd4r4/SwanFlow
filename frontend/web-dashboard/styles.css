@@ -5864,3 +5864,120 @@ body.map-fullscreen {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+/* ============================================
+   Simulated Data Feed (Collapsible Section)
+   ============================================ */
+.sim-data-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 2rem auto;
+  max-width: 1200px;
+  overflow: hidden;
+}
+
+.sim-data-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  transition: background 0.2s ease;
+}
+
+.sim-data-toggle:hover {
+  background: rgba(var(--primary-rgb), 0.05);
+}
+
+.sim-data-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.sim-pulse {
+  width: 10px;
+  height: 10px;
+  background: #3b82f6;
+  border-radius: 50%;
+  animation: sim-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sim-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.sim-chevron {
+  transition: transform 0.3s ease;
+  color: var(--text-muted);
+}
+
+.sim-data-section.expanded .sim-chevron {
+  transform: rotate(180deg);
+}
+
+.sim-data-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.sim-data-section.expanded .sim-data-content {
+  max-height: 300px;
+}
+
+.sim-data-terminal {
+  background: #0f172a;
+  padding: 1rem 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  max-height: 280px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.sim-line {
+  color: #94a3b8;
+  white-space: nowrap;
+  padding: 2px 0;
+}
+
+.sim-line.system {
+  color: #60a5fa;
+}
+
+.sim-line.detection {
+  color: #22c55e;
+}
+
+.sim-line.warning {
+  color: #f59e0b;
+}
+
+.sim-line .timestamp {
+  color: #64748b;
+  margin-right: 0.5rem;
+}
+
+.sim-line .site {
+  color: #a78bfa;
+}
+
+.sim-line .count {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.sim-line .speed {
+  color: #60a5fa;
+}

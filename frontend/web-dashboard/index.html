@@ -12,7 +12,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-  <link rel="stylesheet" href="styles.css?v=20260110-02">
+  <link rel="stylesheet" href="styles.css?v=20260110-03">
   <link rel="stylesheet" href="knowledge.css?v=20260110-01">
 
   <!-- Lucide Icons -->
@@ -361,6 +361,26 @@
       </table>
     </div>
 
+
+    <!-- Simulated Data Feed (Collapsible) -->
+    <div class="sim-data-section" id="sim-data-section">
+      <button type="button" class="sim-data-toggle" id="sim-data-toggle">
+        <span class="sim-data-title">
+          <span class="sim-pulse"></span>
+          View Simulated Data Feed
+        </span>
+        <svg class="sim-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
+      <div class="sim-data-content" id="sim-data-content">
+        <div class="sim-data-terminal" id="sim-data-output">
+          <div class="sim-line system">[SYS] SwanFlow Simulator v1.0</div>
+          <div class="sim-line system">[SYS] Monitoring Stirling Highway corridor...</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer>
       <p>Powered by Edge Impulse FOMO + ESP32-CAM | Data refreshes every 60 seconds</p>
@@ -433,6 +453,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="app.js?v=20260110-05"></script>
+  <script src="app.js?v=20260110-06"></script>
 </body>
 </html>

@@ -4672,3 +4672,99 @@ function initMobileStatsDrawer() {
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(initHeroDashboard, 150);
 });
+
+// ============================================
+// Simulated Data Feed (Collapsible Section)
+// ============================================
+(function initSimDataFeed() {
+  const section = document.getElementById('sim-data-section');
+  const toggle = document.getElementById('sim-data-toggle');
+  const output = document.getElementById('sim-data-output');
+
+  if (!section || !toggle || !output) return;
+
+  // Toggle expand/collapse
+  toggle.addEventListener('click', () => {
+    section.classList.toggle('expanded');
+
+    // Start generating data when expanded
+    if (section.classList.contains('expanded') && !section.dataset.started) {
+      section.dataset.started = 'true';
+      startSimDataFeed();
+    }
+  });
+
+  // Site names for simulation
+  const sites = [
+    'Mounts Bay Rd - Parliament',
+    'Stirling Hwy - Claremont',
+    'Stirling Hwy - Mosman Park',
+    'Stirling Hwy - Cottesloe',
+    'Stirling Hwy - Nedlands',
+    'Canning Hwy - Applecross'
+  ];
+
+  // Generate simulated detection
+  function generateDetection() {
+    const site = sites[Math.floor(Math.random() * sites.length)];
+    const count = Math.floor(Math.random() * 8) + 1;
+    const speed = Math.floor(Math.random() * 30) + 40;
+    const confidence = (Math.random() * 0.15 + 0.85).toFixed(2);
+    const now = new Date();
+    const timestamp = now.toTimeString().split(' ')[0];
+
+    return {
+      timestamp,
+      site,
+      count,
+      speed,
+      confidence
+    };
+  }
+
+  // Add line to terminal
+  function addLine(html, className = '') {
+    const line = document.createElement('div');
+    line.className = 'sim-line ' + className;
+    line.innerHTML = html;
+    output.appendChild(line);
+
+    // Keep max 50 lines
+    while (output.children.length > 50) {
+      output.removeChild(output.firstChild);
+    }
+
+    // Auto-scroll to bottom
+    output.scrollTop = output.scrollHeight;
+  }
+
+  // Start the simulated feed
+  function startSimDataFeed() {
+    addLine('[SYS] Starting live detection stream...', 'system');
+
+    // Generate detections at random intervals
+    function scheduleNext() {
+      const delay = Math.random() * 2000 + 500; // 0.5-2.5 seconds
+      setTimeout(() => {
+        if (!section.classList.contains('expanded')) {
+          // Pause when collapsed
+          return;
+        }
+
+        const det = generateDetection();
+        addLine(
+          `<span class="timestamp">${det.timestamp}</span>` +
+          `<span class="site">[${det.site}]</span> ` +
+          `Detected <span class="count">${det.count}</span> vehicles @ ` +
+          `<span class="speed">${det.speed} km/h</span> ` +
+          `(conf: ${det.confidence})`,
+          'detection'
+        );
+
+        scheduleNext();
+      }, delay);
+    }
+
+    scheduleNext();
+  }
+})();
