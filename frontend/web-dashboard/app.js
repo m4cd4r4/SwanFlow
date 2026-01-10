@@ -2351,7 +2351,9 @@ function updateStatsCards(stats) {
 }
 
 function updateChart(hourlyData) {
-  const ctx = document.getElementById('traffic-chart').getContext('2d');
+  const chartEl = document.getElementById('traffic-chart');
+  if (!chartEl) return; // Chart was removed from page
+  const ctx = chartEl.getContext('2d');
 
   // Extract labels and data
   // Backend returns hours in UTC - append 'Z' to parse correctly
@@ -3004,8 +3006,12 @@ async function init() {
   siteSelect.value = currentSite;
   window.currentStretch = stretches[0];
 
-  // Load initial data
-  await loadDashboard();
+  // Load initial data (wrap in try-catch to not break other init)
+  try {
+    await loadDashboard();
+  } catch (err) {
+    console.error('Error loading dashboard:', err);
+  }
 
   // Highlight routes for initial site
   highlightRouteForSite(currentSite);
@@ -3567,6 +3573,8 @@ function truncateText(text, maxLength) {
  * Initialize Main Roads WA data monitoring (incidents, roadworks, closures, events)
  */
 function initMainRoadsMonitoring() {
+  console.log('[MainRoads] Initializing Main Roads WA monitoring...');
+
   // Setup layer toggle click handlers
   document.querySelectorAll('.layer-toggle[data-layer]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -3577,6 +3585,7 @@ function initMainRoadsMonitoring() {
   });
 
   // Fetch all layers immediately
+  console.log('[MainRoads] Fetching data...');
   fetchAllMainRoadsData();
 
   // Refresh every 5 minutes (Main Roads updates aren't super frequent)
