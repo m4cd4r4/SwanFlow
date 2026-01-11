@@ -3019,7 +3019,7 @@ async function init() {
 
   // Setup event listeners
   // Fullscreen button
-  const fullscreenBtn = document.getElementById('fullscreen-btn');
+  const fullscreenBtn = document.getElementById('fullscreen-toggle-btn');
   if (fullscreenBtn) {
     fullscreenBtn.addEventListener('click', toggleMapFullscreen);
   }
