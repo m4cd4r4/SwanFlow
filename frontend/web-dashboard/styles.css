@@ -105,6 +105,12 @@ header {
   margin-right: -2rem;
   padding: 1rem 2rem;
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
 .header-content {
@@ -5996,4 +6002,35 @@ body.map-fullscreen {
 
 .table-container h2 .sim-pulse {
   flex-shrink: 0;
+}
+
+/* ============================================================================
+   COMPACT HEADER ON SCROLL
+   ============================================================================ */
+
+/* Main dashboard header compact state */
+header.scrolled {
+  padding: 0.5rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+header.scrolled h1 {
+  font-size: 1.5rem;
+  transition: font-size 0.3s ease;
+}
+
+header.scrolled .brand-logo {
+  height: 36px;
+  transition: height 0.3s ease;
+}
+
+[data-theme="dark"] header.scrolled {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Ticker banner compact state */
+header.scrolled + .ticker-banner {
+  padding: 0.2rem 0;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
 }

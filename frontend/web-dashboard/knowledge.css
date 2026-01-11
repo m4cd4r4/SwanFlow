@@ -44,9 +44,10 @@
   padding: 0.75rem 2rem;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1100;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
 .knowledge-header .header-content {
@@ -1282,4 +1283,31 @@
 
 .knowledge-card.hidden {
   display: none;
+}
+
+/* Compact Header on Scroll */
+.knowledge-header.scrolled {
+  padding: 0.4rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.knowledge-header.scrolled .brand-logo {
+  height: 32px;
+  transition: height 0.3s ease;
+}
+
+.knowledge-header.scrolled .brand h1 {
+  font-size: 1.4rem;
+  transition: font-size 0.3s ease;
+}
+
+.knowledge-header.scrolled .subtitle {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+[data-theme="dark"] .knowledge-header.scrolled {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
