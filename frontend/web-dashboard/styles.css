@@ -1470,10 +1470,10 @@ header h1 {
    Road segment timeline with travel times
    ============================================ */
 
-/* Two-column grid wrapper for arterial + freeway */
+/* Full-width journey container */
 .journey-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
