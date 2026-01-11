@@ -4736,3 +4736,39 @@ window.addEventListener('DOMContentLoaded', () => {
 
   scheduleNext();
 })();
+// ============================================================================
+// COMPACT HEADER ON SCROLL
+// ============================================================================
+(function() {
+  let lastScroll = 0;
+  const scrollThreshold = 50; // Pixels scrolled before header becomes compact
+  
+  // Support both knowledge page header and main dashboard header
+  const header = document.querySelector('.knowledge-header') || document.querySelector('header');
+  
+  if (!header) return; // Exit if header doesn't exist
+  
+  function handleScroll() {
+    const currentScroll = window.scrollY || window.pageYOffset;
+    
+    if (currentScroll > scrollThreshold) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+    
+    lastScroll = currentScroll;
+  }
+  
+  // Throttle scroll events for better performance
+  let scrollTimeout;
+  window.addEventListener('scroll', function() {
+    if (scrollTimeout) {
+      window.cancelAnimationFrame(scrollTimeout);
+    }
+    scrollTimeout = window.requestAnimationFrame(handleScroll);
+  }, { passive: true });
+  
+  // Check initial state on page load
+  handleScroll();
+})();
