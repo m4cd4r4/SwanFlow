@@ -2039,11 +2039,15 @@ function updateJourneyTimelineForNetwork(sites, network, suffix = '') {
   });
 
   let totalTime = 0;
+  // Calculate corridor-specific default speed
+  const totalDistance = config.segments.filter((s,i) => i < config.segments.length-1).reduce((sum,s) => sum + s.distanceToNext, 0);
+  const corridorDefaultSpeed = Math.round((totalDistance / config.normalTime) * 60);
+
   let overallSpeedSum = 0;
   let speedCount = 0;
 
   config.segments.forEach((segment, index) => {
-    let avgSpeed = 55; // Default speed
+    let avgSpeed = corridorDefaultSpeed; // Use corridor-specific default speed
 
     if (segment.sitePrefix && siteDataMap[segment.sitePrefix]) {
       const speeds = siteDataMap[segment.sitePrefix].speeds;
