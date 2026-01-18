@@ -122,6 +122,26 @@ body {
 }
 
 /* ============================================
+   HEADER LOGO FIX
+   Ensure theme-aware logo switching works
+   ============================================ */
+.brand-logo.light-logo {
+  display: none !important;
+}
+
+.brand-logo.dark-logo {
+  display: block !important;
+}
+
+[data-theme="dark"] .brand-logo.light-logo {
+  display: block !important;
+}
+
+[data-theme="dark"] .brand-logo.dark-logo {
+  display: none !important;
+}
+
+/* ============================================
    HERO SECTION
    ============================================ */
 .lp-hero {
