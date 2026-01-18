@@ -653,6 +653,295 @@ body {
 }
 
 /* ============================================
+   HARDWARE SECTION
+   ============================================ */
+.lp-hardware {
+  padding: var(--lp-section-padding);
+  background: linear-gradient(180deg, transparent 0%, rgba(102, 126, 234, 0.05) 100%);
+}
+
+.lp-hardware-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.lp-spline-container {
+  position: relative;
+}
+
+.spline-placeholder {
+  background: var(--lp-glass-bg);
+  border: 1px solid var(--lp-border);
+  border-radius: var(--lp-border-radius);
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.placeholder-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.exploded-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.exploded-preview .component {
+  background: var(--lp-surface);
+  border: 1px solid var(--lp-border);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.exploded-preview .component:hover {
+  border-color: var(--lp-primary);
+  transform: translateX(8px);
+}
+
+.exploded-preview .component-label {
+  font-family: var(--lp-font-mono);
+  font-size: 0.9rem;
+  color: var(--lp-text);
+}
+
+.placeholder-note {
+  color: var(--lp-text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Component List with Code Blocks */
+.lp-component-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.component-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+  background: var(--lp-glass-bg);
+  border: 1px solid var(--lp-border);
+  border-radius: var(--lp-border-radius);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.component-item:hover {
+  border-color: var(--lp-primary);
+  transform: translateY(-2px);
+}
+
+.component-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lp-surface);
+  border-radius: 12px;
+}
+
+.component-info h4 {
+  font-family: var(--lp-font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.component-info p {
+  color: var(--lp-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Terminal Code Block */
+.component-code {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 0.75rem;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+
+.code-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.code-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.code-dots .red { background: #ff5f57; }
+.code-dots .yellow { background: #febc2e; }
+.code-dots .green { background: #28c840; }
+
+.code-filename {
+  font-family: var(--lp-font-mono);
+  font-size: 0.75rem;
+  color: #8b949e;
+}
+
+.code-content {
+  padding: 0.75rem;
+  overflow-x: auto;
+}
+
+.code-content pre {
+  margin: 0;
+  font-family: var(--lp-font-mono);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #c9d1d9;
+}
+
+.code-content .comment { color: #8b949e; }
+.code-content .keyword { color: #ff7b72; }
+.code-content .string { color: #a5d6ff; }
+.code-content .number { color: #79c0ff; }
+.code-content .function { color: #d2a8ff; }
+
+.component-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+.more-info-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--lp-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.more-info-link:hover {
+  color: var(--lp-text);
+}
+
+.more-info-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ============================================
+   VALUES SECTION
+   ============================================ */
+.lp-values {
+  padding: 4rem 2rem;
+}
+
+.lp-value-card {
+  background: var(--lp-glass-bg);
+  border: 1px solid var(--lp-border);
+  border-radius: var(--lp-border-radius);
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.lp-value-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--lp-primary);
+}
+
+.value-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.lp-value-card h3 {
+  font-family: var(--lp-font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.lp-value-card p {
+  color: var(--lp-text-muted);
+  font-size: 0.95rem;
+}
+
+/* ============================================
+   FEATURES CTA
+   ============================================ */
+.features-cta {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+/* ============================================
+   ADVOCACY SECTION
+   ============================================ */
+.lp-advocacy {
+  padding: 4rem 2rem;
+}
+
+.lp-advocacy-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 1px solid var(--lp-border);
+  border-radius: var(--lp-border-radius);
+  padding: 3rem;
+}
+
+.advocacy-content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.advocacy-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.advocacy-text h3 {
+  font-family: var(--lp-font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.advocacy-text p {
+  color: var(--lp-text-muted);
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+
+.advocacy-note {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 1024px) {
@@ -671,6 +960,10 @@ body {
   }
 
   .opensource-content {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-hardware-showcase {
     grid-template-columns: 1fr;
   }
 
@@ -693,6 +986,12 @@ body {
     align-items: center;
   }
 
+  .advocacy-content {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
   .lp-hero-cta {
     flex-direction: column;
   }
@@ -704,5 +1003,21 @@ body {
 
   .cta-buttons {
     flex-direction: column;
+  }
+
+  .component-item {
+    grid-template-columns: 1fr;
+  }
+
+  .component-icon {
+    margin: 0 auto;
+  }
+
+  .component-info {
+    text-align: center;
+  }
+
+  .component-footer {
+    justify-content: center;
   }
 }
