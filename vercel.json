@@ -4,19 +4,19 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/frontend/web-dashboard/index.html"
-    },
-    {
-      "source": "/landing",
       "destination": "/frontend/landing/index.html"
     },
     {
-      "source": "/landing/:path*",
-      "destination": "/frontend/landing/:path*"
+      "source": "/dashboard",
+      "destination": "/frontend/web-dashboard/index.html"
+    },
+    {
+      "source": "/dashboard/:path*",
+      "destination": "/frontend/web-dashboard/:path*"
     },
     {
       "source": "/:path*",
-      "destination": "/frontend/web-dashboard/:path*"
+      "destination": "/frontend/landing/:path*"
     }
   ],
   "headers": [
@@ -37,7 +37,7 @@
       ]
     },
     {
-      "source": "/landing",
+      "source": "/dashboard",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
         { "key": "Pragma", "value": "no-cache" },
