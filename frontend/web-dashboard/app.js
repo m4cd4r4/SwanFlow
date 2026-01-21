@@ -857,8 +857,8 @@ function handleRouteSelection(routeValue) {
  * Recalculate and update corridor status based on selected route
  */
 function recalculateCorridorStatus(routeValue) {
-  // Get relevant sites based on selection
-  const allSites = window.allRawSites || [];
+  // Get relevant sites based on selection - use allSitesData which has current_hourly stats
+  const allSites = window.allSitesData || [];
   let relevantSites = allSites;
 
   if (routeValue && routeCorridorMap[routeValue]) {
@@ -877,32 +877,27 @@ function recalculateCorridorStatus(routeValue) {
 
   if (relevantSites.length === 0) return;
 
-  // Calculate average speed for relevant sites
-  let totalSpeed = 0;
-  let siteCount = 0;
+  // Calculate speeds for all sites and find worst case (slowest)
+  const speeds = relevantSites.map(site => estimateSpeed(site.current_hourly || 0));
+  const minSpeed = speeds.length > 0 ? Math.min(...speeds) : 60;
+  const avgSpeed = speeds.length > 0 ? Math.round(speeds.reduce((a, b) => a + b, 0) / speeds.length) : 60;
 
-  relevantSites.forEach(site => {
-    const hourlyCount = site.current_hourly || 0;
-    const speed = estimateSpeed(hourlyCount);
-    totalSpeed += speed;
-    siteCount++;
-  });
-
-  const avgSpeed = siteCount > 0 ? Math.round(totalSpeed / siteCount) : 60;
-
-  // Update the hero status display with calculated values
-  updateHeroStatusWithSpeed(avgSpeed, relevantSites.length);
+  // Update the hero status display with worst-case speed (matches map)
+  updateHeroStatusWithSpeed(minSpeed, avgSpeed, relevantSites.length);
 }
 
 /**
  * Update hero status card with pre-calculated speed
+ * @param {number} minSpeed - Worst case (slowest) speed for status/recommendation
+ * @param {number} avgSpeed - Average speed for display
+ * @param {number} siteCount - Number of sites
  */
-function updateHeroStatusWithSpeed(avgSpeed, siteCount) {
-  // Update corridor status text
+function updateHeroStatusWithSpeed(minSpeed, avgSpeed, siteCount) {
+  // Update corridor status text - use minSpeed (worst case) with getTrafficColor thresholds
   let statusText;
-  if (avgSpeed >= 55) statusText = 'Flowing';
-  else if (avgSpeed >= 35) statusText = 'Moderate';
-  else if (avgSpeed >= 20) statusText = 'Heavy';
+  if (minSpeed >= 50) statusText = 'Flowing';
+  else if (minSpeed >= 30) statusText = 'Moderate';
+  else if (minSpeed >= 15) statusText = 'Heavy';
   else statusText = 'Gridlock';
 
   const corridorStatus = document.getElementById('corridor-status');
@@ -914,7 +909,7 @@ function updateHeroStatusWithSpeed(avgSpeed, siteCount) {
     corridorStatus.textContent = statusText;
   }
 
-  // Update average speed
+  // Update average speed display
   const avgSpeedElement = document.getElementById('avg-speed-hero');
   if (avgSpeedElement) {
     const newSpeed = avgSpeed.toString();
@@ -925,15 +920,15 @@ function updateHeroStatusWithSpeed(avgSpeed, siteCount) {
     avgSpeedElement.textContent = newSpeed;
   }
 
-  // Update recommendation
+  // Update recommendation - use minSpeed (worst case) with getTrafficColor thresholds
   const recommendationElement = document.getElementById('drive-recommendation');
   if (recommendationElement) {
     let icon, text, bgColor;
-    if (avgSpeed >= 50) {
+    if (minSpeed >= 50) {
       icon = '✓'; text = 'Excellent - flowing freely'; bgColor = 'rgba(16, 185, 129, 0.3)';
-    } else if (avgSpeed >= 35) {
+    } else if (minSpeed >= 30) {
       icon = '⚠️'; text = 'Moderate - allow extra time'; bgColor = 'rgba(245, 158, 11, 0.3)';
-    } else if (avgSpeed >= 20) {
+    } else if (minSpeed >= 15) {
       icon = '🚗'; text = 'Heavy - consider alternatives'; bgColor = 'rgba(239, 68, 68, 0.3)';
     } else {
       icon = '⛔'; text = 'Gridlock - avoid if possible'; bgColor = 'rgba(153, 27, 27, 0.3)';
@@ -1241,7 +1236,7 @@ function estimateSpeed(hourlyCount) {
   const calculatedSpeed = hourlyCount / density;
 
   // Bound to realistic range
-  return Math.max(5, Math.min(65, calculatedSpeed));
+  return Math.max(5, Math.min(60, calculatedSpeed));  // Cap at 60 km/h speed limit
 }
 
 /**
@@ -1282,6 +1277,18 @@ function getTrafficLevel(hourlyCount, roadType = 'arterial') {
 // Flow animation state
 let flowAnimationFrame = null;
 let flowOffset = 0;
+
+// Get flow animation speed based on traffic level
+// Green (flowing) = fast, Yellow (moderate) = medium, Red (heavy) = slow
+function getFlowAnimationSpeed(trafficLevel) {
+  switch (trafficLevel) {
+    case 'Flowing': return 0.8;   // Fast - green traffic
+    case 'Moderate': return 0.4;  // Medium - yellow traffic
+    case 'Heavy': return 0.2;     // Slow - red traffic
+    case 'Gridlock': return 0.1;  // Very slow - dark red
+    default: return 0.5;
+  }
+}
 
 // Road waypoints for each corridor (precise road geometry from OSM)
 const corridorWaypoints = {
@@ -1595,8 +1602,10 @@ function updateMapMarkers(sites) {
           lineJoin: 'round'
         }).addTo(trafficMap);
 
-        // Store for animation
+        // Store for animation with speed based on traffic level
         flowLine._flowDirection = dir;
+        flowLine._flowSpeed = getFlowAnimationSpeed(trafficLevel);
+        flowLine._flowOffset = 0; // Individual offset for this line
         flowLine._corridorInfo = {
           name: displayName,
           shortName: corridorKey,
@@ -1621,13 +1630,15 @@ function startFlowAnimation() {
   }
 
   function animate() {
-    flowOffset = (flowOffset + 0.5) % 20;
-
     roadPolylines.forEach(layer => {
       if (layer instanceof L.Polyline && layer.options.dashArray) {
+        // Use per-line speed (green=fast, yellow=medium, red=slow)
+        const speed = layer._flowSpeed || 0.5;
+        layer._flowOffset = ((layer._flowOffset || 0) + speed) % 20;
+
         const dir = layer._flowDirection;
         // Reverse animation direction for southbound
-        const offset = dir === 'SB' ? -flowOffset : flowOffset;
+        const offset = dir === 'SB' ? -layer._flowOffset : layer._flowOffset;
         layer.setStyle({ dashOffset: offset });
       }
     });
@@ -2200,10 +2211,20 @@ function updateJourneyTimeline(sites) {
 function updateHeroStatusCard(sites) {
   if (!sites || sites.length === 0) return;
 
-  const totalTraffic = sites.reduce((sum, site) => sum + (site.current_hourly || 0), 0);
-  const avgTraffic = Math.round(totalTraffic / sites.length);
-  const avgSpeed = Math.round(estimateSpeed(avgTraffic));
-  const trafficLevel = getTrafficLevel(avgTraffic);
+  // Calculate speeds for each site and find the worst (slowest) speed
+  // This ensures hero status matches the worst segment shown on the map
+  const siteSpeeds = sites.map(site => estimateSpeed(site.current_hourly || 0));
+  const minSpeed = siteSpeeds.length > 0 ? Math.min(...siteSpeeds) : 60;  // Worst case (slowest)
+  const avgSpeed = siteSpeeds.length > 0
+    ? Math.round(siteSpeeds.reduce((a, b) => a + b, 0) / siteSpeeds.length)
+    : 60;
+
+  // Use highest traffic count for status (matches worst segment on map)
+  const maxTraffic = sites.reduce((worst, site) => {
+    const hourly = site.current_hourly || 0;
+    return hourly > worst ? hourly : worst;
+  }, 0);
+  const trafficLevel = getTrafficLevel(maxTraffic);
 
   const corridorStatus = document.getElementById('corridor-status');
   if (corridorStatus) {
@@ -2227,11 +2248,12 @@ function updateHeroStatusCard(sites) {
   const recommendationElement = document.getElementById('drive-recommendation');
   if (recommendationElement) {
     let icon, text, bgColor;
-    if (avgSpeed >= 50) {
+    // Use minSpeed (worst segment) to match map visuals - thresholds align with getTrafficColor
+    if (minSpeed >= 50) {
       icon = '✓'; text = 'Excellent - flowing freely'; bgColor = 'rgba(16, 185, 129, 0.3)';
-    } else if (avgSpeed >= 35) {
+    } else if (minSpeed >= 30) {
       icon = '⚠️'; text = 'Moderate - allow extra time'; bgColor = 'rgba(245, 158, 11, 0.3)';
-    } else if (avgSpeed >= 20) {
+    } else if (minSpeed >= 15) {
       icon = '🚗'; text = 'Heavy - consider alternatives'; bgColor = 'rgba(239, 68, 68, 0.3)';
     } else {
       icon = '⛔'; text = 'Gridlock - avoid if possible'; bgColor = 'rgba(153, 27, 27, 0.3)';
@@ -4695,7 +4717,7 @@ window.addEventListener('DOMContentLoaded', () => {
   function generateDetection() {
     const site = sites[Math.floor(Math.random() * sites.length)];
     const count = Math.floor(Math.random() * 8) + 1;
-    const speed = Math.floor(Math.random() * 30) + 40;
+    const speed = Math.floor(Math.random() * 21) + 40;  // 40-60 km/h (60 km/h speed limit)
     const confidence = (Math.random() * 0.15 + 0.85).toFixed(2);
     const now = new Date();
     const timestamp = now.toTimeString().split(' ')[0];
