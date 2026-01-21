@@ -1236,7 +1236,7 @@ function estimateSpeed(hourlyCount) {
   const calculatedSpeed = hourlyCount / density;
 
   // Bound to realistic range
-  return Math.max(5, Math.min(65, calculatedSpeed));
+  return Math.max(5, Math.min(60, calculatedSpeed));  // Cap at 60 km/h speed limit
 }
 
 /**
@@ -4717,7 +4717,7 @@ window.addEventListener('DOMContentLoaded', () => {
   function generateDetection() {
     const site = sites[Math.floor(Math.random() * sites.length)];
     const count = Math.floor(Math.random() * 8) + 1;
-    const speed = Math.floor(Math.random() * 30) + 40;
+    const speed = Math.floor(Math.random() * 21) + 40;  // 40-60 km/h (60 km/h speed limit)
     const confidence = (Math.random() * 0.15 + 0.85).toFixed(2);
     const now = new Date();
     const timestamp = now.toTimeString().split(' ')[0];
