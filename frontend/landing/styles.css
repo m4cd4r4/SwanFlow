@@ -122,6 +122,71 @@ body {
 }
 
 /* ============================================
+   HEADER STYLING (match dashboard)
+   ============================================ */
+
+/* Add edge/border around nav button group */
+.knowledge-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--lp-bg-secondary);
+  border: 1px solid var(--lp-border);
+  border-radius: 12px;
+  padding: 0.25rem;
+}
+
+.knowledge-header .header-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--lp-text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.knowledge-header .header-nav-btn:hover {
+  background: var(--lp-surface);
+  color: var(--lp-primary);
+}
+
+.knowledge-header .header-nav-btn.active {
+  background: var(--lp-primary);
+  color: white;
+}
+
+.knowledge-header .header-nav-btn .nav-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.knowledge-header .theme-toggle {
+  margin-left: 0.25rem;
+}
+
+.knowledge-header .theme-btn {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--lp-text-muted);
+  transition: all 0.2s ease;
+}
+
+.knowledge-header .theme-btn:hover {
+  background: var(--lp-surface);
+  color: var(--lp-primary);
+}
+
+/* ============================================
    HEADER LOGO FIX
    Ensure theme-aware logo switching works
    ============================================ */
@@ -150,7 +215,7 @@ body {
   align-items: center;
   position: relative;
   overflow: hidden;
-  padding: 4rem 0;
+  padding: 2rem 0;
 }
 
 .hero-bg {
@@ -245,9 +310,26 @@ body {
   font-weight: 600;
   font-size: 1rem;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.lp-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.lp-btn:hover::before {
+  left: 100%;
 }
 
 .lp-btn-primary {
@@ -395,6 +477,28 @@ body {
 }
 
 /* ============================================
+   SECTION VISUAL BREAKS
+   ============================================ */
+section {
+  position: relative;
+}
+
+section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(80%, 600px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lp-border), transparent);
+}
+
+section:last-of-type::after {
+  display: none;
+}
+
+/* ============================================
    DEMO SECTION
    ============================================ */
 .lp-demo {
@@ -508,8 +612,20 @@ body {
 }
 
 .feature-icon {
-  font-size: 2.5rem;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(var(--lp-primary-rgb), 0.12) 0%, rgba(var(--lp-primary-rgb), 0.04) 100%);
+  border-radius: 14px;
   margin-bottom: 1rem;
+}
+
+.feature-lucide {
+  width: 26px;
+  height: 26px;
+  color: var(--lp-primary);
 }
 
 .lp-feature-card h3 {
@@ -545,6 +661,7 @@ body {
   overflow: hidden;
 }
 
+/* Commented out - conflicts with page header .knowledge-header
 .knowledge-header {
   display: flex;
   align-items: center;
@@ -563,6 +680,7 @@ body {
   font-size: 1.25rem;
   font-weight: 600;
 }
+*/
 
 .knowledge-content {
   padding: 1.5rem;
@@ -633,8 +751,20 @@ body {
 }
 
 .research-icon {
-  font-size: 3rem;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(var(--lp-primary-rgb), 0.15) 0%, rgba(var(--lp-primary-rgb), 0.05) 100%);
+  border-radius: 14px;
   flex-shrink: 0;
+}
+
+.research-lucide {
+  width: 28px;
+  height: 28px;
+  color: var(--lp-primary);
 }
 
 .github-text h3, .research-text h3 {
@@ -748,57 +878,51 @@ body {
   align-items: start;
 }
 
-.lp-spline-container {
-  position: relative;
+/* Hardware 3D Image Stack */
+.lp-hardware-stack {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  position: sticky;
+  top: 100px;
 }
 
-.spline-placeholder {
+.hardware-stack-item {
   background: var(--lp-glass-bg);
   border: 1px solid var(--lp-border);
   border-radius: var(--lp-border-radius);
-  min-height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
-}
-
-.placeholder-content {
-  text-align: center;
-  padding: 2rem;
-}
-
-.exploded-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.exploded-preview .component {
-  background: var(--lp-surface);
-  border: 1px solid var(--lp-border);
-  border-radius: 8px;
-  padding: 1rem 1.5rem;
   transition: all 0.3s ease;
   position: relative;
 }
 
-.exploded-preview .component:hover {
+.hardware-stack-item:hover {
   border-color: var(--lp-primary);
-  transform: translateX(8px);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(var(--lp-primary-rgb), 0.15);
 }
 
-.exploded-preview .component-label {
+.hardware-stack-item img {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1rem;
+}
+
+[data-theme="dark"] .hardware-stack-item img {
+  background: linear-gradient(135deg, #1e2a35 0%, #15202b 100%);
+}
+
+.hardware-stack-label {
+  padding: 0.75rem;
+  text-align: center;
   font-family: var(--lp-font-mono);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--lp-text);
-}
-
-.placeholder-note {
-  color: var(--lp-text-muted);
-  font-size: 0.85rem;
-  font-style: italic;
+  background: var(--lp-surface);
+  border-top: 1px solid var(--lp-border);
 }
 
 /* Component List with Code Blocks */
@@ -826,7 +950,6 @@ body {
 }
 
 .component-icon {
-  font-size: 2rem;
   width: 50px;
   height: 50px;
   display: flex;
@@ -834,6 +957,12 @@ body {
   justify-content: center;
   background: var(--lp-surface);
   border-radius: 12px;
+}
+
+.component-lucide {
+  width: 24px;
+  height: 24px;
+  color: var(--lp-primary);
 }
 
 .component-info h4 {
@@ -891,14 +1020,17 @@ body {
 .code-content {
   padding: 0.75rem;
   overflow-x: auto;
+  max-width: 100%;
 }
 
 .code-content pre {
   margin: 0;
   font-family: var(--lp-font-mono);
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 1.5vw, 0.8rem);
   line-height: 1.5;
   color: #c9d1d9;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .code-content .comment { color: #8b949e; }
@@ -922,15 +1054,24 @@ body {
   color: var(--lp-primary);
   text-decoration: none;
   transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
 }
 
 .more-info-link:hover {
-  color: var(--lp-text);
+  color: var(--lp-primary-dark);
+  transform: translateX(2px);
 }
 
 .more-info-link svg {
   width: 16px;
   height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.more-info-link:hover svg {
+  transform: scale(1.1);
 }
 
 /* ============================================
@@ -955,8 +1096,20 @@ body {
 }
 
 .value-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(var(--lp-primary-rgb), 0.15) 0%, rgba(var(--lp-primary-rgb), 0.05) 100%);
+  border-radius: 16px;
+  margin: 0 auto 1rem auto;
+}
+
+.value-lucide {
+  width: 28px;
+  height: 28px;
+  color: var(--lp-primary);
 }
 
 .lp-value-card h3 {
@@ -1000,8 +1153,20 @@ body {
 }
 
 .advocacy-icon {
-  font-size: 3rem;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(var(--lp-primary-rgb), 0.2) 0%, rgba(var(--lp-primary-rgb), 0.08) 100%);
+  border-radius: 16px;
   flex-shrink: 0;
+}
+
+.advocacy-lucide {
+  width: 32px;
+  height: 32px;
+  color: var(--lp-primary);
 }
 
 .advocacy-text h3 {
@@ -1046,6 +1211,17 @@ body {
 
   .lp-hardware-showcase {
     grid-template-columns: 1fr;
+  }
+
+  .lp-hardware-stack {
+    grid-template-columns: repeat(2, 1fr);
+    position: relative;
+    top: 0;
+    margin-bottom: 2rem;
+  }
+
+  .hardware-stack-item img {
+    height: 100px;
   }
 
   .lp-hero-stats {
@@ -1100,5 +1276,35 @@ body {
 
   .component-footer {
     justify-content: center;
+  }
+}
+
+/* ============================================================================
+   HEADER RESPONSIVE (matching dashboard breakpoints)
+   ============================================================================ */
+
+/* Medium viewports - collapse nav to icons only (matching dashboard 900px) */
+@media (max-width: 900px) {
+  .knowledge-header .nav-text {
+    display: none;
+  }
+
+  .knowledge-header .header-nav-btn {
+    padding: 0.5rem;
+  }
+}
+
+/* Small viewports - compact header */
+@media (max-width: 600px) {
+  .knowledge-header .subtitle {
+    display: none;
+  }
+
+  .knowledge-header .brand h1 {
+    font-size: 1.25rem;
+  }
+
+  .knowledge-header .brand-logo {
+    height: 30px;
   }
 }

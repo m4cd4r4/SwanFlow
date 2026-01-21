@@ -36,20 +36,24 @@
     <div class="header-content">
       <div class="brand-wrapper">
         <div class="brand">
-          <img src="/dashboard/swan-logo-light.png" alt="SwanFlow" class="brand-logo light-logo">
-          <img src="/dashboard/swan-logo-dark.png" alt="SwanFlow" class="brand-logo dark-logo">
+          <img src="swan-logo-light.png" alt="SwanFlow" class="brand-logo light-logo">
+          <img src="swan-logo-dark.png" alt="SwanFlow" class="brand-logo dark-logo">
           <h1>SwanFlow</h1>
         </div>
         <p class="subtitle">Real-time vehicle detection using Edge AI</p>
       </div>
       <div class="header-actions">
-        <a href="/dashboard" class="header-nav-btn">
+        <a href="/" class="header-nav-btn active" title="Home">
+          <i data-lucide="home" class="nav-icon"></i>
+          <span class="nav-text">Home</span>
+        </a>
+        <a href="/dashboard" class="header-nav-btn" title="Dashboard">
           <i data-lucide="layout-dashboard" class="nav-icon"></i>
           <span class="nav-text">Dashboard</span>
         </a>
-        <a href="/dashboard/knowledge.html" class="header-nav-btn">
-          <i data-lucide="book-open" class="nav-icon"></i>
-          <span class="nav-text">Knowledge Base</span>
+        <a href="/dashboard/knowledge.html" class="header-nav-btn" title="Technical Documentation">
+          <i data-lucide="file-text" class="nav-icon"></i>
+          <span class="nav-text">Technical Docs</span>
         </a>
         <div class="theme-toggle">
           <button type="button" id="theme-toggle-btn" class="theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
@@ -60,6 +64,25 @@
       </div>
     </div>
   </header>
+
+  <!-- Scrolling Ticker Banner -->
+  <div class="ticker-banner">
+    <div class="ticker-track">
+      <div class="ticker-content">
+        <span>SIMULATED DATA - Phase 1 of PoC is in development</span>
+        <span class="ticker-separator">|</span>
+        <span>Hardware deployment at Mounts Bay Road coming soon</span>
+        <span class="ticker-separator">|</span>
+        <span>Real-time Edge AI vehicle detection</span>
+        <span class="ticker-separator">|</span>
+        <span>SIMULATED DATA - Phase 1 of PoC is in development</span>
+        <span class="ticker-separator">|</span>
+        <span>Hardware deployment at Mounts Bay Road coming soon</span>
+        <span class="ticker-separator">|</span>
+        <span>Real-time Edge AI vehicle detection</span>
+      </div>
+    </div>
+  </div>
 
   <!-- Hero Section -->
   <section class="lp-hero">
@@ -110,33 +133,23 @@
       </div>
 
       <div class="lp-hardware-showcase">
-        <!-- Spline 3D Animation Container -->
-        <div class="lp-spline-container">
-          <div class="spline-placeholder">
-            <!-- Replace this div with Spline embed when ready -->
-            <!-- <script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.0/build/spline-viewer.js"></script> -->
-            <!-- <spline-viewer url="YOUR_SPLINE_URL"></spline-viewer> -->
-
-            <div class="placeholder-content">
-              <div class="exploded-preview">
-                <div class="component solar-panel">
-                  <span class="component-label">20W Solar Panel</span>
-                </div>
-                <div class="component camera-module">
-                  <span class="component-label">ESP32-CAM</span>
-                </div>
-                <div class="component lte-module">
-                  <span class="component-label">4G LTE Modem</span>
-                </div>
-                <div class="component battery">
-                  <span class="component-label">12V Battery</span>
-                </div>
-                <div class="component enclosure">
-                  <span class="component-label">IP65 Enclosure</span>
-                </div>
-              </div>
-              <p class="placeholder-note">Interactive 3D coming soon</p>
-            </div>
+        <!-- Hardware 3D Image Stack -->
+        <div class="lp-hardware-stack">
+          <div class="hardware-stack-item" data-component="esp32">
+            <img src="assets/hardware/esp32-cam.png" alt="ESP32-CAM Module" loading="lazy">
+            <div class="hardware-stack-label">ESP32-CAM</div>
+          </div>
+          <div class="hardware-stack-item" data-component="solar">
+            <img src="assets/hardware/solar-controller.jpg" alt="Solar Charge Controller" loading="lazy">
+            <div class="hardware-stack-label">Solar Controller</div>
+          </div>
+          <div class="hardware-stack-item" data-component="battery">
+            <img src="assets/hardware/battery-12v.png" alt="12V 7Ah Battery" loading="lazy">
+            <div class="hardware-stack-label">12V Battery</div>
+          </div>
+          <div class="hardware-stack-item" data-component="enclosure">
+            <img src="assets/hardware/enclosure-ip65.jpg" alt="IP65 Weatherproof Enclosure" loading="lazy">
+            <div class="hardware-stack-label">IP65 Enclosure</div>
           </div>
         </div>
 
@@ -144,7 +157,9 @@
         <div class="lp-component-list">
           <!-- ESP32-CAM -->
           <div class="component-item">
-            <span class="component-icon">📷</span>
+            <div class="component-icon">
+              <i data-lucide="camera" class="component-lucide"></i>
+            </div>
             <div class="component-info">
               <h4>ESP32-CAM</h4>
               <p>Dual-core MCU with OV2640 camera running Edge Impulse FOMO</p>
@@ -171,7 +186,9 @@
 
           <!-- SIM7000A LTE -->
           <div class="component-item">
-            <span class="component-icon">📡</span>
+            <div class="component-icon">
+              <i data-lucide="signal" class="component-lucide"></i>
+            </div>
             <div class="component-info">
               <h4>SIM7000A 4G LTE</h4>
               <p>Cellular connectivity for remote deployment anywhere</p>
@@ -198,7 +215,9 @@ modem.<span class="function">gprsConnect</span>(<span class="string">"telstra.m2
 
           <!-- Solar Power -->
           <div class="component-item">
-            <span class="component-icon">☀️</span>
+            <div class="component-icon">
+              <i data-lucide="sun" class="component-lucide"></i>
+            </div>
             <div class="component-info">
               <h4>Solar Power System</h4>
               <p>20W panel + 12V battery for 24/7 off-grid operation</p>
@@ -225,7 +244,9 @@ Runtime:  <span class="number">~48h</span> without sun</pre>
 
           <!-- On-Device ML -->
           <div class="component-item">
-            <span class="component-icon">🧠</span>
+            <div class="component-icon">
+              <i data-lucide="brain" class="component-lucide"></i>
+            </div>
             <div class="component-info">
               <h4>On-Device ML</h4>
               <p>Vehicle detection at the edge — no cloud dependency</p>
@@ -260,17 +281,23 @@ ei_impulse_result_t result;
     <div class="lp-container">
       <div class="lp-grid-3">
         <div class="lp-value-card">
-          <div class="value-icon">🔓</div>
+          <div class="value-icon">
+            <i data-lucide="unlock" class="value-lucide"></i>
+          </div>
           <h3>Open Data</h3>
           <p>All traffic data freely available. No paywalls, no API keys, no restrictions.</p>
         </div>
         <div class="lp-value-card">
-          <div class="value-icon">🤝</div>
+          <div class="value-icon">
+            <i data-lucide="handshake" class="value-lucide"></i>
+          </div>
           <h3>Complementary</h3>
           <p>Designed to augment — not replace — official traffic infrastructure.</p>
         </div>
         <div class="lp-value-card">
-          <div class="value-icon">🌱</div>
+          <div class="value-icon">
+            <i data-lucide="leaf" class="value-lucide"></i>
+          </div>
           <h3>Sustainable</h3>
           <p>100% solar-powered. Zero ongoing energy costs. Deploy anywhere.</p>
         </div>
@@ -316,32 +343,44 @@ ei_impulse_result_t result;
 
       <div class="lp-grid-3">
         <div class="lp-feature-card">
-          <div class="feature-icon">📡</div>
+          <div class="feature-icon">
+            <i data-lucide="radio-tower" class="feature-lucide"></i>
+          </div>
           <h3>Real-time Monitoring</h3>
           <p>Live traffic data from arterial roads, updated every 60 seconds with vehicle counts and flow estimates.</p>
         </div>
         <div class="lp-feature-card">
-          <div class="feature-icon">🧠</div>
+          <div class="feature-icon">
+            <i data-lucide="brain-circuit" class="feature-lucide"></i>
+          </div>
           <h3>Edge AI Detection</h3>
           <p>Edge Impulse FOMO model running on ESP32-CAM for on-device ML inference with no cloud dependency.</p>
         </div>
         <div class="lp-feature-card">
-          <div class="feature-icon">🗺️</div>
+          <div class="feature-icon">
+            <i data-lucide="map" class="feature-lucide"></i>
+          </div>
           <h3>Interactive Map</h3>
           <p>Leaflet map with colour-coded congestion levels from green (flowing) to red (heavy traffic).</p>
         </div>
         <div class="lp-feature-card">
-          <div class="feature-icon">↔️</div>
+          <div class="feature-icon">
+            <i data-lucide="arrow-left-right" class="feature-lucide"></i>
+          </div>
           <h3>Bidirectional Tracking</h3>
           <p>Monitor both inbound and outbound traffic with separate sensors sharing solar infrastructure.</p>
         </div>
         <div class="lp-feature-card">
-          <div class="feature-icon">☀️</div>
+          <div class="feature-icon">
+            <i data-lucide="sun" class="feature-lucide"></i>
+          </div>
           <h3>Off-Grid Operation</h3>
           <p>Completely self-sufficient with solar power — deploy anywhere without mains electricity.</p>
         </div>
         <div class="lp-feature-card">
-          <div class="feature-icon">📖</div>
+          <div class="feature-icon">
+            <i data-lucide="book-open" class="feature-lucide"></i>
+          </div>
           <h3>Knowledge Base</h3>
           <p>Comprehensive documentation covering hardware, ML training, deployment, and traffic theory.</p>
         </div>
@@ -361,7 +400,9 @@ ei_impulse_result_t result;
     <div class="lp-container">
       <div class="lp-advocacy-card">
         <div class="advocacy-content">
-          <div class="advocacy-icon">📊</div>
+          <div class="advocacy-icon">
+            <i data-lucide="bar-chart-3" class="advocacy-lucide"></i>
+          </div>
           <div class="advocacy-text">
             <h3>A Case for More Open Data</h3>
             <p>We believe combining official infrastructure with citizen contributions could create richer traffic datasets for researchers, urban planners, and commuters alike.</p>
@@ -394,7 +435,9 @@ ei_impulse_result_t result;
           </div>
 
           <div class="research-callout">
-            <div class="research-icon">📚</div>
+            <div class="research-icon">
+              <i data-lucide="library" class="research-lucide"></i>
+            </div>
             <div class="research-text">
               <h3>Knowledge Base</h3>
               <p>Deep-dive into the technical details: hardware assembly, ML model training, traffic flow theory, and deployment guides.</p>
