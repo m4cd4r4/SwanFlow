@@ -98,7 +98,7 @@ Perfect for:
 
 ## Quick Start
 
-### Phase 1: Order Hardware (Today!)
+### Phase 1: Order Hardware
 
 See [hardware/shopping-lists.md](hardware/shopping-lists.md) for complete shopping list.
 
