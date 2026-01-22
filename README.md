@@ -10,6 +10,20 @@ Monitor traffic flow in real-time using affordable IoT hardware and machine lear
 
 ---
 
+## Dashboard Preview
+
+![SwanFlow Dashboard - Cottesloe Dark Theme](frontend/web-dashboard/screenshot-cottesloe-dark.png)
+
+**Real-time traffic monitoring dashboard featuring:**
+- **Full Corridor Visualisation** - CBD to Fremantle (3 stretches, 6 km)
+- **Speed Estimation** - Real-time traffic flow analysis using density theory
+- **Interactive Map** - Colour-coded routes showing congestion levels (Green → Orange → Red → Dark Red)
+- **Bidirectional Tracking** - Separate Northbound/Southbound monitoring
+- **Hourly Charts** - Historical patterns across 24 monitoring sites
+- **WA-Themed UI** - Cottesloe Beach and Indigenous Earth colour schemes (light/dark modes)
+
+---
+
 ## Citizen-Augmented Traffic Monitoring
 
 Main Roads Western Australia operates sophisticated Smart Freeway infrastructure with **1,400+ sensors** — a significant investment that requires coordination across departments, professional installation, ongoing maintenance, and integration with broader transport systems.
@@ -43,20 +57,6 @@ Perfect for:
 - Research projects (urban planning, transport optimisation)
 - Hobbyists (IoT, ML, embedded systems)
 - Community projects (local traffic advocacy)
-
----
-
-## Dashboard Preview
-
-![SwanFlow Dashboard - Cottesloe Dark Theme](frontend/web-dashboard/screenshot-cottesloe-dark.png)
-
-**Real-time traffic monitoring dashboard featuring:**
-- **Full Corridor Visualisation** - CBD to Fremantle (3 stretches, 6 km)
-- **Speed Estimation** - Real-time traffic flow analysis using density theory
-- **Interactive Map** - Colour-coded routes showing congestion levels (Green → Orange → Red → Dark Red)
-- **Bidirectional Tracking** - Separate Northbound/Southbound monitoring
-- **Hourly Charts** - Historical patterns across 24 monitoring sites
-- **WA-Themed UI** - Cottesloe Beach and Indigenous Earth colour schemes (light/dark modes)
 
 ---
 
