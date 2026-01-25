@@ -89,6 +89,20 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  /* Subtle grain texture for depth */
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.5' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.015;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 9999;
 }
 
 .container {
@@ -1920,6 +1934,44 @@ header h1 {
 .legend-dot.gridlock {
   background: #991b1b;
 }
+
+/* Staggered fade-in animation for journey segments */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.journey-segment {
+  animation: fadeInUp 0.5s ease-out backwards;
+}
+
+/* Stagger delays for first 20 segments */
+.journey-segment:nth-child(1) { animation-delay: 0.05s; }
+.journey-segment:nth-child(2) { animation-delay: 0.1s; }
+.journey-segment:nth-child(3) { animation-delay: 0.15s; }
+.journey-segment:nth-child(4) { animation-delay: 0.2s; }
+.journey-segment:nth-child(5) { animation-delay: 0.25s; }
+.journey-segment:nth-child(6) { animation-delay: 0.3s; }
+.journey-segment:nth-child(7) { animation-delay: 0.35s; }
+.journey-segment:nth-child(8) { animation-delay: 0.4s; }
+.journey-segment:nth-child(9) { animation-delay: 0.45s; }
+.journey-segment:nth-child(10) { animation-delay: 0.5s; }
+.journey-segment:nth-child(11) { animation-delay: 0.55s; }
+.journey-segment:nth-child(12) { animation-delay: 0.6s; }
+.journey-segment:nth-child(13) { animation-delay: 0.65s; }
+.journey-segment:nth-child(14) { animation-delay: 0.7s; }
+.journey-segment:nth-child(15) { animation-delay: 0.75s; }
+.journey-segment:nth-child(16) { animation-delay: 0.8s; }
+.journey-segment:nth-child(17) { animation-delay: 0.85s; }
+.journey-segment:nth-child(18) { animation-delay: 0.9s; }
+.journey-segment:nth-child(19) { animation-delay: 0.95s; }
+.journey-segment:nth-child(20) { animation-delay: 1s; }
 
 /* ============================================
    Perth-Wide Summary Banner (All Perth View)
@@ -5476,7 +5528,7 @@ body.map-fullscreen {
   /* Mobile Hero - Single column, map takes full width */
   .hero-dashboard {
     display: block;
-    min-height: calc(100vh - 200px);
+    min-height: 45vh;
     border-radius: 0;
     position: relative;
     margin: 0 -1rem;
@@ -5488,16 +5540,16 @@ body.map-fullscreen {
     display: none;
   }
 
-  /* Map takes full space */
+  /* Map takes reduced space on mobile (45vh instead of full screen) */
   .hero-map-column {
     width: 100%;
-    height: calc(100vh - 200px);
-    min-height: 400px;
+    height: 45vh;
+    min-height: 280px;
   }
 
   .hero-map-column #traffic-map {
     height: 100%;
-    min-height: 400px;
+    min-height: 280px;
   }
 
   .hero-map-controls {

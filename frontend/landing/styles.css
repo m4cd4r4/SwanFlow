@@ -112,6 +112,20 @@ body {
   color: var(--lp-text);
   line-height: 1.6;
   overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  /* Subtle grain texture for entire page */
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.5' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 9999;
 }
 
 /* Container */
@@ -191,19 +205,19 @@ body {
    Ensure theme-aware logo switching works
    ============================================ */
 .brand-logo.light-logo {
-  display: none !important;
+  display: block;
 }
 
 .brand-logo.dark-logo {
-  display: block !important;
+  display: none;
 }
 
 [data-theme="dark"] .brand-logo.light-logo {
-  display: block !important;
+  display: none;
 }
 
 [data-theme="dark"] .brand-logo.dark-logo {
-  display: none !important;
+  display: block;
 }
 
 /* ============================================
@@ -225,12 +239,28 @@ body {
   opacity: 0.08;
 }
 
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Grain texture overlay */
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
 .hero-bg::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 70%, rgba(var(--lp-primary-rgb), 0.12) 0%, transparent 50%),
-              radial-gradient(circle at 70% 30%, rgba(var(--lp-primary-rgb), 0.08) 0%, transparent 50%);
+  /* Multi-layer gradient mesh for depth */
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(var(--lp-primary-rgb), 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(var(--lp-primary-rgb), 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 60%, rgba(var(--lp-primary-rgb), 0.08) 0%, transparent 40%),
+    linear-gradient(145deg, transparent 0%, rgba(var(--lp-primary-rgb), 0.05) 100%);
 }
 
 .lp-hero-badge {
