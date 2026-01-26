@@ -22,17 +22,13 @@ const server = http.createServer((req, res) => {
   const urlWithoutQuery = req.url.split('?')[0];
 
   // Route mapping (mimicking vercel.json)
-  // Landing page removed from production - dashboard is now at /
+  // Dashboard is now at / (landing page removed)
   if (urlWithoutQuery === '/' || urlWithoutQuery === '' || urlWithoutQuery === '/dashboard') {
     filePath = path.join(__dirname, 'frontend/web-dashboard/index.html');
   } else if (urlWithoutQuery.startsWith('/dashboard/')) {
     // Remove /dashboard prefix and serve from web-dashboard folder
     const subPath = urlWithoutQuery.substring('/dashboard/'.length);
     filePath = path.join(__dirname, 'frontend/web-dashboard', subPath);
-  } else if (urlWithoutQuery === '/landing' || urlWithoutQuery.startsWith('/landing/')) {
-    // Landing page available at /landing for development
-    const subPath = urlWithoutQuery === '/landing' ? 'index.html' : urlWithoutQuery.substring('/landing/'.length);
-    filePath = path.join(__dirname, 'frontend/landing', subPath);
   } else {
     // Default: serve from web-dashboard folder
     const cleanPath = urlWithoutQuery.startsWith('/') ? urlWithoutQuery.substring(1) : urlWithoutQuery;
@@ -59,5 +55,4 @@ server.listen(PORT, () => {
   console.log(`✓ Dev server running at http://localhost:${PORT}`);
   console.log(`  Dashboard: http://localhost:${PORT}/`);
   console.log(`  Knowledge: http://localhost:${PORT}/knowledge.html`);
-  console.log(`  Landing (dev only): http://localhost:${PORT}/landing`);
 });
