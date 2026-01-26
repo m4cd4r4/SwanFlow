@@ -4821,3 +4821,149 @@ window.addEventListener('DOMContentLoaded', () => {
   // Check initial state on page load
   handleScroll();
 })();
+
+// ============================================================================
+// ONBOARDING MODAL
+// First-visit welcome experience with animated frame transitions
+// ============================================================================
+(function() {
+  const STORAGE_KEY = 'swanflow_onboarding_seen';
+  const modal = document.getElementById('onboarding-modal');
+  const skipBtn = document.getElementById('onboarding-skip');
+  const nextBtn = document.getElementById('onboarding-next');
+  const startBtn = document.getElementById('onboarding-start');
+  const dontShowCheckbox = document.getElementById('onboarding-dont-show');
+  const dots = document.querySelectorAll('.onboarding-dots .dot');
+  const frames = document.querySelectorAll('.onboarding-frame');
+
+  if (!modal) return; // Exit if modal doesn't exist
+
+  let currentFrame = 1;
+  const totalFrames = 4;
+
+  // Check if user has already seen onboarding
+  function hasSeenOnboarding() {
+    return localStorage.getItem(STORAGE_KEY) === 'true';
+  }
+
+  // Mark onboarding as seen
+  function markOnboardingSeen() {
+    localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  // Show the modal
+  function showModal() {
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+
+    // Initialize Lucide icons in the modal
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  }
+
+  // Hide the modal
+  function hideModal() {
+    modal.classList.remove('show');
+    document.body.style.overflow = ''; // Re-enable scrolling
+  }
+
+  // Switch to a specific frame
+  function goToFrame(frameNumber) {
+    if (frameNumber < 1 || frameNumber > totalFrames) return;
+
+    // Update frame visibility
+    frames.forEach((frame, index) => {
+      const frameNum = index + 1;
+      if (frameNum === frameNumber) {
+        frame.classList.add('active');
+      } else {
+        frame.classList.remove('active');
+      }
+    });
+
+    // Update dots
+    dots.forEach((dot, index) => {
+      const dotNum = index + 1;
+      if (dotNum === frameNumber) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+
+    // Update next button text
+    if (frameNumber === totalFrames) {
+      nextBtn.style.display = 'none';
+    } else {
+      nextBtn.style.display = 'block';
+      nextBtn.textContent = 'Next';
+    }
+
+    currentFrame = frameNumber;
+  }
+
+  // Next button handler
+  function handleNext() {
+    if (currentFrame < totalFrames) {
+      goToFrame(currentFrame + 1);
+    }
+  }
+
+  // Skip button handler
+  function handleSkip() {
+    hideModal();
+    if (dontShowCheckbox.checked) {
+      markOnboardingSeen();
+    }
+  }
+
+  // Start button handler (on final frame)
+  function handleStart() {
+    if (dontShowCheckbox.checked) {
+      markOnboardingSeen();
+    }
+    hideModal();
+  }
+
+  // Dot navigation
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      goToFrame(index + 1);
+    });
+  });
+
+  // Keyboard navigation
+  function handleKeydown(e) {
+    if (!modal.classList.contains('show')) return;
+
+    if (e.key === 'Escape') {
+      handleSkip();
+    } else if (e.key === 'ArrowRight' && currentFrame < totalFrames) {
+      handleNext();
+    } else if (e.key === 'ArrowLeft' && currentFrame > 1) {
+      goToFrame(currentFrame - 1);
+    }
+  }
+
+  // Click outside to close
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('onboarding-overlay')) {
+      handleSkip();
+    }
+  });
+
+  // Event listeners
+  skipBtn.addEventListener('click', handleSkip);
+  nextBtn.addEventListener('click', handleNext);
+  startBtn.addEventListener('click', handleStart);
+  document.addEventListener('keydown', handleKeydown);
+
+  // Show modal on first visit
+  if (!hasSeenOnboarding()) {
+    // Small delay to ensure page has loaded
+    setTimeout(() => {
+      showModal();
+    }, 500);
+  }
+})();

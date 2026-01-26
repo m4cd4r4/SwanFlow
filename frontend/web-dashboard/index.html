@@ -19,6 +19,113 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+  <!-- Onboarding Modal -->
+  <div class="onboarding-modal" id="onboarding-modal" role="dialog" aria-labelledby="onboarding-title" aria-modal="true">
+    <div class="onboarding-overlay"></div>
+    <div class="onboarding-content">
+      <!-- Frame 1: Welcome -->
+      <div class="onboarding-frame active" data-frame="1">
+        <div class="onboarding-logo">
+          <img src="swan-logo-light.png" alt="SwanFlow" class="onboarding-logo-img light-logo">
+          <img src="swan-logo-dark.png" alt="SwanFlow" class="onboarding-logo-img dark-logo">
+        </div>
+        <h2 id="onboarding-title" class="onboarding-title">Welcome to SwanFlow</h2>
+        <p class="onboarding-subtitle">Perth's real-time traffic monitoring platform</p>
+      </div>
+
+      <!-- Frame 2: How It Works -->
+      <div class="onboarding-frame" data-frame="2">
+        <div class="onboarding-flow">
+          <div class="flow-item">
+            <div class="flow-icon gradient-blue">
+              <i data-lucide="camera" class="icon"></i>
+            </div>
+            <div class="flow-label">ESP32-CAM</div>
+            <div class="flow-description">Solar-powered camera</div>
+          </div>
+          <div class="flow-arrow">
+            <i data-lucide="chevron-right"></i>
+          </div>
+          <div class="flow-item">
+            <div class="flow-icon gradient-purple">
+              <i data-lucide="cpu" class="icon"></i>
+            </div>
+            <div class="flow-label">Edge AI</div>
+            <div class="flow-description">Local processing</div>
+          </div>
+          <div class="flow-arrow">
+            <i data-lucide="chevron-right"></i>
+          </div>
+          <div class="flow-item">
+            <div class="flow-icon gradient-teal">
+              <i data-lucide="activity" class="icon"></i>
+            </div>
+            <div class="flow-label">Real-time Data</div>
+            <div class="flow-description">Live dashboard</div>
+          </div>
+        </div>
+        <h2 class="onboarding-title">Edge AI Vehicle Detection</h2>
+        <p class="onboarding-subtitle">Solar-powered cameras detect vehicles locally, no cloud needed</p>
+      </div>
+
+      <!-- Frame 3: Key Stats -->
+      <div class="onboarding-frame" data-frame="3">
+        <div class="onboarding-stats-grid">
+          <div class="onboarding-stat">
+            <div class="stat-icon gradient-blue">
+              <i data-lucide="map-pin" class="icon"></i>
+            </div>
+            <div class="stat-number">26</div>
+            <div class="stat-label">Monitoring Sites</div>
+          </div>
+          <div class="onboarding-stat">
+            <div class="stat-icon gradient-teal">
+              <i data-lucide="route" class="icon"></i>
+            </div>
+            <div class="stat-number">6km</div>
+            <div class="stat-label">Corridor Coverage</div>
+          </div>
+          <div class="onboarding-stat">
+            <div class="stat-icon gradient-orange">
+              <i data-lucide="sun" class="icon"></i>
+            </div>
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Solar Powered</div>
+          </div>
+        </div>
+        <h2 class="onboarding-title">Monitoring Perth Traffic</h2>
+        <p class="onboarding-subtitle">Citizen-powered infrastructure monitoring along Stirling Highway</p>
+      </div>
+
+      <!-- Frame 4: Get Started -->
+      <div class="onboarding-frame" data-frame="4">
+        <h2 class="onboarding-title">Ready to Explore?</h2>
+        <p class="onboarding-subtitle">View live traffic data and journey times</p>
+        <div class="onboarding-actions">
+          <button type="button" class="onboarding-btn primary" id="onboarding-start">
+            View Live Dashboard
+          </button>
+          <label class="onboarding-checkbox">
+            <input type="checkbox" id="onboarding-dont-show">
+            <span>Don't show this again</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="onboarding-nav">
+        <button type="button" class="onboarding-nav-btn skip" id="onboarding-skip">Skip</button>
+        <div class="onboarding-dots">
+          <span class="dot active" data-frame="1"></span>
+          <span class="dot" data-frame="2"></span>
+          <span class="dot" data-frame="3"></span>
+          <span class="dot" data-frame="4"></span>
+        </div>
+        <button type="button" class="onboarding-nav-btn next" id="onboarding-next">Next</button>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <!-- Header (matching knowledge.html) -->
     <header class="knowledge-header">
