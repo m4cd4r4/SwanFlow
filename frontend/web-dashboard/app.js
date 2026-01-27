@@ -10,6 +10,21 @@ const API_BASE_URL = window.location.hostname === 'localhost'
 const REFRESH_INTERVAL = 60000; // 60 seconds (normal mode)
 const LIVE_REFRESH_INTERVAL = 15000; // 15 seconds (live mode)
 
+// Keep-alive: Ping backend every 12 minutes to prevent Render.com cold starts
+if (window.location.hostname !== 'localhost') {
+  setInterval(async () => {
+    try {
+      await fetch(`${API_BASE_URL}/api/sites`, { method: 'HEAD' });
+      console.log('[Keep-Alive] Backend pinged successfully');
+    } catch (err) {
+      // Silently fail - backend might be temporarily down
+    }
+  }, 12 * 60 * 1000); // 12 minutes
+
+  // Initial ping on page load to wake backend immediately
+  fetch(`${API_BASE_URL}/api/sites`, { method: 'HEAD' }).catch(() => {});
+}
+
 // State
 let currentSite = null;
 let isLiveMode = false;

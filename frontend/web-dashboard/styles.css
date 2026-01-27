@@ -6422,6 +6422,14 @@ header.scrolled + .ticker-banner {
   margin-bottom: 0.75rem;
 }
 
+.stat-icon-simple {
+  width: 32px;
+  height: 32px;
+  color: var(--primary);
+  stroke-width: 2;
+  margin-bottom: 0.75rem;
+}
+
 .stat-icon .icon {
   width: 24px;
   height: 24px;

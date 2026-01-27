@@ -64,6 +64,17 @@
   gap: 0.25rem;
 }
 
+.knowledge-header .brand-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.knowledge-header .brand-link:hover {
+  opacity: 0.8;
+}
+
 .knowledge-header .brand {
   display: flex;
   align-items: center;
@@ -484,6 +495,10 @@
 
 .card-icon-wrapper.infrastructure {
   background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.card-icon-wrapper.integration {
+  background: linear-gradient(135deg, #f97316, #fb923c);
 }
 
 .card-title-group {

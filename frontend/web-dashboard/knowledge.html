@@ -22,11 +22,13 @@
     <header class="knowledge-header">
       <div class="header-content">
         <div class="brand-wrapper">
-          <div class="brand">
-            <img src="swan-logo-light.png" alt="SwanFlow" class="brand-logo light-logo">
-            <img src="swan-logo-dark.png" alt="SwanFlow" class="brand-logo dark-logo">
-            <h1>SwanFlow</h1>
-          </div>
+          <a href="index.html" class="brand-link">
+            <div class="brand">
+              <img src="swan-logo-light.png" alt="SwanFlow" class="brand-logo light-logo">
+              <img src="swan-logo-dark.png" alt="SwanFlow" class="brand-logo dark-logo">
+              <h1>SwanFlow</h1>
+            </div>
+          </a>
           <p class="subtitle">Real-time vehicle detection using Edge AI</p>
         </div>
         <div class="header-actions">
@@ -87,6 +89,9 @@
           </button>
           <button type="button" class="filter-btn" data-target="infrastructure">
             <i data-lucide="cloud"></i> Infrastructure
+          </button>
+          <button type="button" class="filter-btn" data-target="integration">
+            <i data-lucide="network"></i> Main Roads WA
           </button>
         </div>
       </div>
@@ -718,6 +723,113 @@ ssh root@45.77.233.102 "cd /opt/swanflow && docker compose restart api"
 # View logs
 ssh root@45.77.233.102 "docker logs -f swanflow-api --tail 100"</code></pre>
               </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 7: Main Roads WA Integration -->
+        <article class="knowledge-card" data-category="integration">
+          <div class="card-header">
+            <div class="card-icon-wrapper integration">
+              <i data-lucide="network" class="card-icon"></i>
+            </div>
+            <div class="card-title-group">
+              <h2>Main Roads WA Integration</h2>
+              <span class="card-badge">Live Data</span>
+            </div>
+            <button type="button" class="card-expand" aria-label="Expand card">
+              <i data-lucide="chevron-down" class="expand-icon"></i>
+            </button>
+          </div>
+          <div class="card-content">
+            <div class="content-section">
+              <h3>Real-Time Incident Data</h3>
+              <p class="section-text">SwanFlow integrates live incident and roadworks data from Main Roads Western Australia's public ArcGIS REST API, demonstrating how <strong>citizen-augmented monitoring complements official infrastructure</strong>.</p>
+              <ul class="spec-list">
+                <li>
+                  <span class="spec-label">Data Source</span>
+                  <span class="spec-value">Main Roads WA ArcGIS API</span>
+                </li>
+                <li>
+                  <span class="spec-label">Update Frequency</span>
+                  <span class="spec-value">Real-time (15-second refresh)</span>
+                </li>
+                <li>
+                  <span class="spec-label">Coverage</span>
+                  <span class="spec-value">Perth Metro + Regional WA</span>
+                </li>
+                <li>
+                  <span class="spec-label">Data Types</span>
+                  <span class="spec-value">Incidents, Roadworks, Closures</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>API Endpoints</h3>
+              <div class="code-block">
+                <pre><code>// Incidents API
+const INCIDENTS_URL = 'https://services2.arcgis.com/cHGEnmsJ165IBJRM/arcgis/rest/services/WebEoc_RoadIncidents/FeatureServer/1/query';
+
+// Roadworks API
+const ROADWORKS_URL = 'https://services2.arcgis.com/cHGEnmsJ165IBJRM/arcgis/rest/services/WebEoc_RoadworksPlanned/FeatureServer/0/query';
+
+// Fields returned
+outFields: "Location,IncidentTy,ClosureTyp,TrafficCon,TrafficImp,Road,Region,Suburb,EntryDate,UpdateDate,SeeMoreUrl"</code></pre>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Incident Types</h3>
+              <ul class="feature-list">
+                <li><strong>Crashes</strong> — Multi-vehicle collisions, single-vehicle incidents</li>
+                <li><strong>Breakdowns</strong> — Disabled vehicles blocking lanes</li>
+                <li><strong>Hazards</strong> — Debris, oil spills, fallen trees</li>
+                <li><strong>Roadworks</strong> — Planned maintenance with lane closures</li>
+                <li><strong>Closures</strong> — Full road closures and detours</li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Map Visualization</h3>
+              <p class="section-text">Incidents appear as <strong>orange markers</strong> on the SwanFlow map with interactive popups showing:</p>
+              <ul class="feature-list">
+                <li>Incident type badge (Maintenance, Crash, Hazard)</li>
+                <li>Location and affected road</li>
+                <li>Traffic impact and closure details</li>
+                <li>Estimated completion time</li>
+                <li>Link to Main Roads WA for updates</li>
+              </ul>
+            </div>
+
+            <div class="content-section">
+              <h3>Complementary Monitoring</h3>
+              <div class="privacy-highlight">
+                <p class="section-text"><strong>🤝 Citizen + Official:</strong> Main Roads WA operates 1,400+ Smart Freeway sensors. SwanFlow complements this with arterial road monitoring where freeway sensors don't reach—demonstrating how citizen data can augment professional infrastructure.</p>
+              </div>
+              <div class="monitoring-grid">
+                <div class="monitor-item">
+                  <i data-lucide="building-2" class="monitor-icon"></i>
+                  <span class="monitor-label">Main Roads WA</span>
+                  <span class="monitor-status">Freeways + Major Incidents</span>
+                </div>
+                <div class="monitor-item">
+                  <i data-lucide="users" class="monitor-icon"></i>
+                  <span class="monitor-label">SwanFlow</span>
+                  <span class="monitor-status">Arterial Roads + Flow Data</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3>Data Attribution</h3>
+              <p class="section-text">All incident and roadworks data is provided by Main Roads Western Australia via their public ArcGIS REST API. SwanFlow displays this data to enhance traffic awareness alongside our citizen-collected vehicle counts.</p>
+              <ul class="feature-list">
+                <li>Data source: Main Roads WA (https://www.mainroads.wa.gov.au)</li>
+                <li>API access: Public (no authentication required)</li>
+                <li>Updates: Real-time via ArcGIS Feature Service</li>
+                <li>License: Open data for public use</li>
+              </ul>
             </div>
           </div>
         </article>

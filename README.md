@@ -239,6 +239,47 @@ Dashboard accessible at [http://localhost:8080](http://localhost:8080)
 
 ---
 
+## Current Deployment: Simulation Mode
+
+**Live Site**: [swanflow.com.au](https://swanflow.com.au) (Vercel) → Backend: [perth-traffic-watch.onrender.com](https://perth-traffic-watch.onrender.com) (Render.com)
+
+### How It Works
+
+The live dashboard currently runs on **simulated traffic data** while hardware is being prepared:
+
+**Backend (Render.com Free Tier)**:
+- Express.js API generating realistic traffic patterns for all 26 monitoring sites
+- Simulates bidirectional flow (Northbound/Southbound) with time-of-day variations
+- SQLite database stores simulated counts and statistics
+- **Cost: $0/month** (within 750 hours/month free tier limit)
+
+**Keep-Alive Mechanism (Zero Cost)**:
+1. **Primary**: Cron job on Donnacha VPS (45.77.233.102) pings backend every 12 minutes
+   ```bash
+   */12 * * * * curl -s -X HEAD https://perth-traffic-watch.onrender.com/api/sites
+   ```
+2. **Redundancy**: Frontend JavaScript pings backend when users have dashboard open
+3. **Result**: Backend stays warm 24/7, users get instant data loads (1-2 seconds instead of 30+ second cold starts)
+
+**Why Keep-Alive?**
+- Render.com free tier "sleeps" after 15 minutes of inactivity
+- Without keep-alive: 30+ second wait for first load
+- With keep-alive: Instant data every time
+
+**Simulation → Real Data Transition**:
+- Backend API endpoints remain identical
+- When ESP32-CAM devices are deployed, they'll POST real counts to same endpoints
+- Dashboard seamlessly switches from simulated to real data
+- No frontend changes required
+
+**Cost Summary**:
+- Backend hosting: **$0** (Render.com free tier)
+- Keep-alive cron job: **$0** (runs on existing Donnacha VPS)
+- Frontend hosting: **$0** (Vercel free tier)
+- **Total: $0/month** 🎉
+
+---
+
 ## Repository Structure
 
 ```
