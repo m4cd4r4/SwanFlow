@@ -1,12 +1,12 @@
 # SwanFlow
 
-**Open-source vehicle detection system using Edge AI, ESP32-CAM, and FOMO (Faster Objects, More Objects)**
-
-Monitor traffic flow in real-time using affordable IoT hardware and machine learning at the edge.
+**SwanFlow is a technical demonstration of Edge AI, IoT systems, and real-time data pipelines applied to traffic monitoring. It showcases skills relevant to IoT engineering, embedded machine learning, and civic tech roles, particularly for clients in smart city infrastructure, transportation, and public sector innovation.**
 
 ![Status](https://img.shields.io/badge/status-proof_of_concept-yellow)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-ESP32-green)
+
+**Live Demo:** [swanflow.com.au](https://swanflow.com.au) | **Source:** [github.com/m4cd4r4/SwanFlow](https://github.com/m4cd4r4/SwanFlow)
 
 ---
 
@@ -14,49 +14,105 @@ Monitor traffic flow in real-time using affordable IoT hardware and machine lear
 
 ![SwanFlow Dashboard - Cottesloe Dark Theme](frontend/web-dashboard/screenshot-cottesloe-dark.png)
 
-**Real-time traffic monitoring dashboard featuring:**
-- **Full Corridor Visualisation** - CBD to Fremantle (3 stretches, 6 km)
-- **Speed Estimation** - Real-time traffic flow analysis using density theory
-- **Interactive Map** - Colour-coded routes showing congestion levels (Green → Orange → Red → Dark Red)
-- **Bidirectional Tracking** - Separate Northbound/Southbound monitoring
-- **Hourly Charts** - Historical patterns across 24 monitoring sites
-- **WA-Themed UI** - Cottesloe Beach and Indigenous Earth colour schemes (light/dark modes)
+---
+
+## Technical Capabilities Demonstrated
+
+### Edge AI & Machine Learning
+- **TensorFlow Lite Micro** deployment on resource-constrained hardware (ESP32)
+- **FOMO** (Faster Objects, More Objects) object detection architecture
+- **Model quantization** (float32 → int8) for 4x memory reduction
+- **On-device inference** (~48ms) with **89% precision, 92% recall**
+- Training pipeline with Edge Impulse Studio
+
+### Embedded Systems & IoT
+- **ESP32-CAM firmware** development with PlatformIO
+- **Power optimization** for solar-powered deployment (20W panel, 12V battery)
+- **4G LTE connectivity** (SIM7000A) with TinyGSM library
+- **Weatherproof deployment** (IP65 enclosures)
+- **Real-time data aggregation** and transmission
+
+### Backend & Data Pipeline
+- **Node.js/Express.js** REST API
+- **SQLite** time-series data storage
+- **Real-time aggregation** algorithms
+- **Speed estimation** using traffic flow theory
+- **Scalable cloud deployment** (Render.com free tier, $0/month)
+
+### Frontend & Visualization
+- **Interactive map-based dashboard** (Leaflet.js)
+- **Real-time data visualization** (Chart.js)
+- **Responsive design** with WA-themed UI (Cottesloe Beach colors)
+- **Vercel edge deployment** with global CDN
+
+### DevOps & Testing
+- **Comprehensive E2E test suite** (120+ Playwright tests)
+- **Accessibility compliance** (WCAG 2.1 AA)
+- **Performance monitoring** (Core Web Vitals)
+- **CI/CD** with GitHub → Vercel/Render auto-deployment
 
 ---
 
-## Citizen-Augmented Traffic Monitoring
+## Industries & Applications
 
-Main Roads Western Australia operates sophisticated Smart Freeway infrastructure with **1,400+ sensors** — a significant investment that requires coordination across departments, professional installation, ongoing maintenance, and integration with broader transport systems.
+### Smart Cities & Transportation
+- Traffic optimization and congestion management
+- Urban planning and infrastructure development
+- Real-time commuter intelligence systems
+- Open data initiatives for public benefit
 
-SwanFlow explores how **citizen-led monitoring might complement official infrastructure** by providing additional data points on arterial roads that may fall outside freeway sensor coverage.
+### IoT & Edge Computing
+- Distributed sensing networks
+- Edge inference deployments
+- Low-power, solar-powered monitoring systems
+- Scalable IoT architecture patterns
 
-> **This project is a technical proof-of-concept and a gentle advocacy tool for greater open data access.**
-
-We believe that combining official infrastructure with citizen contributions could create richer traffic datasets for researchers, urban planners, and commuters alike.
-
-📖 See [docs/mainroads-api-investigation.md](docs/mainroads-api-investigation.md) for our research into public API availability.
+### Public Sector & Civic Tech
+- Citizen engagement platforms
+- Complementary monitoring to augment official infrastructure
+- Cost-effective proof-of-concept demonstrations
+- Open data advocacy tools
 
 ---
 
-## What is SwanFlow?
+## System Overview
 
-SwanFlow is a DIY traffic monitoring system that:
+**SwanFlow** monitors a 6 km arterial corridor in Perth, Western Australia using:
 
-- **Monitors 6 km arterial corridor** from CBD to Fremantle (3 stretches)
 - **18 monitoring sites** with bidirectional tracking (Northbound/Southbound)
-- **Real-time speed estimation** using traffic flow theory
 - **Edge AI detection** using Edge Impulse FOMO (ML model on ESP32)
-- **Closed-segment monitoring** for accurate flow measurement
-- **Costs ~$223 AUD** per monitoring site (solar-powered)
-- **Runs 24/7** completely off-grid with solar power
+- **Real-time speed estimation** using traffic flow theory
+- **Interactive dashboard** with colour-coded congestion visualization
+- **100% solar-powered** hardware (~$223 AUD per site)
+- **$0/month hosting** (Render.com + Vercel free tiers)
 
-Perfect for:
-- **Commuter intelligence**: Real-time arterial road monitoring
-- **Open data advocacy**: Demonstrating value of accessible traffic data
-- **Proof of concept**: Closed-segment monitoring validation
-- Research projects (urban planning, transport optimisation)
-- Hobbyists (IoT, ML, embedded systems)
-- Community projects (local traffic advocacy)
+### Real-World Application
+
+While SwanFlow demonstrates technical capabilities, it also addresses a real need: Main Roads Western Australia operates 1,400+ Smart Freeway sensors, but their public APIs have been offline since August 2023, and arterial roads lack coverage entirely. SwanFlow explores how **citizen-led monitoring can complement official infrastructure**.
+
+📖 See [docs/mainroads-api-investigation.md](docs/mainroads-api-investigation.md) for research into public data availability.
+
+---
+
+## Cost-Effective Innovation
+
+SwanFlow demonstrates how modern IoT and Edge AI can deliver professional-grade capabilities at a fraction of traditional costs:
+
+| Component | Cost | Details |
+|-----------|------|---------|
+| **Hardware per site** | ~$223 AUD | 100% solar-powered, off-grid |
+| **Cloud hosting** | $0/month | Render.com + Vercel free tiers |
+| **Data transmission** | ~$8/month | M2M SIM (1GB/month) |
+| **Proof of Concept** | **$540 total** | 2 locations, 4 cameras, both directions |
+
+**Total operating cost:** ~$8/month for complete system (18 sites planned)
+
+### Why This Matters
+
+- **No power infrastructure required** — Solar eliminates electrician fees (~$200-500/site saved)
+- **Scalable architecture** — Same codebase from 2 sensors to 100+
+- **Zero hosting costs** — Modern serverless platforms enable free operation
+- **Reproducible** — Complete documentation enables deployment anywhere
 
 ---
 
@@ -248,7 +304,7 @@ Dashboard accessible at [http://localhost:8080](http://localhost:8080)
 The live dashboard currently runs on **simulated traffic data** while hardware is being prepared:
 
 **Backend (Render.com Free Tier)**:
-- Express.js API generating realistic traffic patterns for all 26 monitoring sites
+- Express.js API generating realistic traffic patterns for all 18 monitoring sites
 - Simulates bidirectional flow (Northbound/Southbound) with time-of-day variations
 - SQLite database stores simulated counts and statistics
 - **Cost: $0/month** (within 750 hours/month free tier limit)

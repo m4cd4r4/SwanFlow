@@ -6,7 +6,7 @@
 
 ## Overview
 
-The CBD to Fremantle corridor system monitors 6 km of Stirling Highway using a closed-segment approach with 24 monitoring sites across 3 distinct stretches. This document outlines the algorithm development, ML integration strategy, and evolution from simulation to production deployment.
+The CBD to Fremantle corridor system monitors 6 km of Stirling Highway using a closed-segment approach with 18 monitoring sites across 3 distinct stretches. This document outlines the algorithm development, ML integration strategy, and evolution from simulation to production deployment.
 
 ---
 

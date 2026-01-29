@@ -628,60 +628,53 @@ CREATE TABLE sites (
           </div>
           <div class="card-content">
             <div class="content-section">
-              <h3>VPS Architecture</h3>
+              <h3>Cloud Hosting Architecture</h3>
               <ul class="spec-list">
                 <li>
-                  <span class="spec-label">Provider</span>
-                  <span class="spec-value">Vultr (Sydney, AU)</span>
+                  <span class="spec-label">Frontend</span>
+                  <span class="spec-value">Vercel (Global CDN)</span>
                 </li>
                 <li>
-                  <span class="spec-label">Instance</span>
-                  <span class="spec-value">4 vCPU, 8GB RAM, 160GB SSD</span>
+                  <span class="spec-label">Backend API</span>
+                  <span class="spec-value">Render.com (Free Tier)</span>
                 </li>
                 <li>
-                  <span class="spec-label">OS</span>
-                  <span class="spec-value">Ubuntu 22.04 LTS</span>
+                  <span class="spec-label">Database</span>
+                  <span class="spec-value">SQLite (Render persistent disk)</span>
                 </li>
                 <li>
                   <span class="spec-label">Monthly Cost</span>
-                  <span class="spec-value">~AU$60</span>
+                  <span class="spec-value">$0 (100% free hosting)</span>
                 </li>
               </ul>
             </div>
 
             <div class="content-section">
-              <h3>Docker Container Setup</h3>
+              <h3>Backend Configuration</h3>
               <div class="code-block">
-                <pre><code>services:
-  api:
-    build: ./backend/api
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./data:/app/data
-    restart: unless-stopped
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/ssl/certs
-    depends_on:
-      - api</code></pre>
+                <pre><code>// Render.com Web Service
+{
+  "name": "perth-traffic-watch",
+  "type": "web",
+  "env": "node",
+  "buildCommand": "npm install",
+  "startCommand": "npm start",
+  "healthCheckPath": "/api/health",
+  "envVars": {
+    "API_KEY": "generated_secret"
+  }
+}</code></pre>
               </div>
             </div>
 
             <div class="content-section">
-              <h3>Nginx Configuration</h3>
+              <h3>Frontend Configuration</h3>
               <ul class="feature-list">
-                <li>Reverse proxy to Node.js API on port 3000</li>
-                <li>SSL/TLS termination with Let's Encrypt certificates</li>
-                <li>Gzip compression for static assets</li>
-                <li>Rate limiting: 100 requests/minute per IP</li>
-                <li>CORS headers for dashboard API access</li>
+                <li>Vercel Edge Network for global CDN delivery</li>
+                <li>Automatic HTTPS/SSL certificates</li>
+                <li>Git-based deployments (auto-deploy on push)</li>
+                <li>Environment variable management</li>
+                <li>Custom domain support (swanflow.com.au)</li>
               </ul>
             </div>
 
@@ -714,14 +707,15 @@ CREATE TABLE sites (
             <div class="content-section">
               <h3>Deployment Commands</h3>
               <div class="code-block">
-                <pre><code># Deploy frontend updates
-scp frontend/web-dashboard/* root@45.77.233.102:/var/www/swanflow/
+                <pre><code># Deploy frontend to Vercel
+cd frontend/web-dashboard
+vercel --prod
 
-# Restart API container
-ssh root@45.77.233.102 "cd /opt/swanflow && docker compose restart api"
+# Deploy backend to Render.com
+git push origin main  # Auto-deploys via GitHub integration
 
-# View logs
-ssh root@45.77.233.102 "docker logs -f swanflow-api --tail 100"</code></pre>
+# View backend logs
+# Visit: https://dashboard.render.com → Select service → Logs tab</code></pre>
               </div>
             </div>
           </div>
