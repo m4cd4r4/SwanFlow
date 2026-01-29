@@ -22,7 +22,8 @@
 - **TensorFlow Lite Micro** deployment on resource-constrained hardware (ESP32)
 - **FOMO** (Faster Objects, More Objects) object detection architecture
 - **Model quantization** (float32 → int8) for 4x memory reduction
-- **On-device inference** (~48ms) with **89% precision, 92% recall**
+- **On-device inference** targeting ~48ms based on Edge Impulse FOMO benchmarks
+- **Performance targets**: 85-90% precision, 90-95% recall (based on similar FOMO deployments)
 - Training pipeline with Edge Impulse Studio
 
 ### Embedded Systems & IoT

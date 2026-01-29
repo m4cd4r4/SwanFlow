@@ -8,7 +8,7 @@
 
 ```
 SwanFlow demonstrates:
-• Edge AI (TensorFlow Lite Micro on ESP32, 89% precision)
+• Edge AI (TensorFlow Lite Micro on ESP32, targeting 85-90% precision)
 • IoT architecture (Solar-powered, 4G LTE, $223/site)
 • Real-time data pipelines (Express.js, SQLite, Render.com)
 • Full-stack development (Leaflet.js, Chart.js, Vercel)
@@ -35,7 +35,7 @@ Perfect for: Smart cities, transportation tech, public sector innovation, edge c
 - **Real-time metrics**: Speed, vehicles, confidence
 - **Flow states**: FLOWING / MODERATE / HEAVY / GRIDLOCK (colour-coded)
 - **Map views**: Street / Satellite / Dark theme toggle
-- **Knowledge page**: Code blocks, specs tables, 89% precision / 92% recall
+- **Knowledge page**: Code blocks, specs tables, ML performance targets
 
 ---
 
@@ -144,7 +144,7 @@ With Edge Impulse FOMO:
 
 ![SwanFlow Knowledge Base - Technical Documentation](https://raw.githubusercontent.com/m4cd4r4/SwanFlow/main/screenshot-knowledge.png)
 
-*The Knowledge Base includes hardware specs, API documentation, and ML model metrics (89% precision, 92% recall).*
+*The Knowledge Base includes hardware specs, API documentation, and ML performance targets (based on similar FOMO deployments).*
 
 ---
 
@@ -207,7 +207,7 @@ Hi HN,
 SwanFlow is a technical demonstration of Edge AI, IoT systems, and real-time data pipelines applied to traffic monitoring. It showcases the kind of work I do for smart city and transportation clients.
 
 Technical capabilities demonstrated:
-- Edge AI: TensorFlow Lite Micro on ESP32-CAM (FOMO architecture, 89% precision)
+- Edge AI: TensorFlow Lite Micro on ESP32-CAM (FOMO architecture, targeting 85-90% precision)
 - IoT: Solar-powered deployment, 4G LTE, power optimization
 - Backend: Express.js + SQLite, real-time aggregation, speed estimation algorithms
 - Frontend: Leaflet.js maps, Chart.js visualization
@@ -240,7 +240,7 @@ Would love feedback on:
 I built SwanFlow to demonstrate Edge AI, IoT systems, and real-time data pipelines applied to traffic monitoring.
 
 Technical capabilities showcased:
-• Edge AI: TensorFlow Lite Micro on ESP32 (89% precision, 92% recall)
+• Edge AI: TensorFlow Lite Micro on ESP32 (targeting 85-90% precision)
 • IoT Architecture: Solar-powered ESP32-CAM + 4G LTE (~$223/site)
 • Real-time Pipeline: Express.js + SQLite + speed estimation algorithms
 • Full-stack Development: Leaflet.js maps, Chart.js visualization, Vercel deployment

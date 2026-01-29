@@ -271,22 +271,23 @@ corridors: {
             </div>
 
             <div class="content-section">
-              <h3>Performance Metrics</h3>
+              <h3>Performance Targets</h3>
+              <p class="section-text" style="margin-bottom: 1rem; font-size: 0.85rem; opacity: 0.8;">Based on similar FOMO deployments and Edge Impulse benchmarks</p>
               <div class="metrics-grid">
                 <div class="metric-card">
-                  <span class="metric-value">89%</span>
-                  <span class="metric-label">Precision</span>
+                  <span class="metric-value">85-90%</span>
+                  <span class="metric-label">Precision Target</span>
                 </div>
                 <div class="metric-card">
-                  <span class="metric-value">92%</span>
-                  <span class="metric-label">Recall</span>
+                  <span class="metric-value">90-95%</span>
+                  <span class="metric-label">Recall Target</span>
                 </div>
                 <div class="metric-card">
-                  <span class="metric-value">90.5%</span>
-                  <span class="metric-label">F1 Score</span>
+                  <span class="metric-value">~90%</span>
+                  <span class="metric-label">F1 Target</span>
                 </div>
                 <div class="metric-card">
-                  <span class="metric-value">48ms</span>
+                  <span class="metric-value">~50ms</span>
                   <span class="metric-label">Inference</span>
                 </div>
               </div>
@@ -509,6 +510,16 @@ CREATE TABLE sites (
                   <span class="method get">GET</span>
                   <span class="endpoint">/api/health</span>
                   <span>System health check</span>
+                </div>
+                <div class="api-row">
+                  <span class="method get">GET</span>
+                  <span class="endpoint">/api/devices</span>
+                  <span>Simulated device states</span>
+                </div>
+                <div class="api-row">
+                  <span class="method get">GET</span>
+                  <span class="endpoint">/api/incidents</span>
+                  <span>Simulated traffic incidents</span>
                 </div>
               </div>
             </div>
