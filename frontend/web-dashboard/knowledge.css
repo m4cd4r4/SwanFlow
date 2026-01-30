@@ -372,6 +372,36 @@
   color: white;
 }
 
+/* Collapse All Button */
+.collapse-all-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  margin-left: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.collapse-all-btn [data-lucide] {
+  width: 16px;
+  height: 16px;
+}
+
+.collapse-all-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(45, 139, 148, 0.05);
+}
+
+.collapse-all-btn.all-collapsed [data-lucide] {
+  transform: rotate(180deg);
+}
+
 /* Responsive Filter Bar */
 @media (max-width: 768px) {
   .filter-bar {

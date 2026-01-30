@@ -190,6 +190,58 @@
   }
 
   // ============================================================================
+  // COLLAPSE ALL BUTTON
+  // ============================================================================
+
+  function initCollapseAll() {
+    const collapseBtn = document.getElementById('collapse-all-btn');
+    if (!collapseBtn) return;
+
+    collapseBtn.addEventListener('click', () => {
+      const cards = document.querySelectorAll('.knowledge-card:not(.hidden)');
+      const allCollapsed = Array.from(cards).every(card => !card.classList.contains('expanded'));
+
+      if (allCollapsed) {
+        // Expand all visible cards
+        cards.forEach(card => card.classList.add('expanded'));
+        collapseBtn.classList.remove('all-collapsed');
+        collapseBtn.setAttribute('title', 'Collapse All Cards');
+      } else {
+        // Collapse all visible cards
+        cards.forEach(card => card.classList.remove('expanded'));
+        collapseBtn.classList.add('all-collapsed');
+        collapseBtn.setAttribute('title', 'Expand All Cards');
+      }
+    });
+
+    // Update button state when cards are toggled individually
+    function updateCollapseButtonState() {
+      const cards = document.querySelectorAll('.knowledge-card:not(.hidden)');
+      const allCollapsed = Array.from(cards).every(card => !card.classList.contains('expanded'));
+
+      if (allCollapsed) {
+        collapseBtn.classList.add('all-collapsed');
+        collapseBtn.setAttribute('title', 'Expand All Cards');
+      } else {
+        collapseBtn.classList.remove('all-collapsed');
+        collapseBtn.setAttribute('title', 'Collapse All Cards');
+      }
+    }
+
+    // Observe card state changes
+    const observer = new MutationObserver(() => {
+      updateCollapseButtonState();
+    });
+
+    document.querySelectorAll('.knowledge-card').forEach(card => {
+      observer.observe(card, { attributes: true, attributeFilter: ['class'] });
+    });
+
+    // Set initial state
+    updateCollapseButtonState();
+  }
+
+  // ============================================================================
   // CODE BLOCK COPY FUNCTIONALITY
   // ============================================================================
 
@@ -380,6 +432,7 @@
     initQuickNav();
     initSmoothScroll();
     initKeyboardNav();
+    initCollapseAll();
     initCodeCopy();
     initScrollAnimations();
     initTouchEnhancements();
