@@ -10,7 +10,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const Database = require('better-sqlite3');
-const { startSimulator } = require('./live-simulator');
+const { startSimulator, deviceStates, activeIncidents } = require('./live-simulator');
 require('dotenv').config();
 
 const app = express();
@@ -414,6 +414,82 @@ app.get('/api/stats/:site/hourly', (req, res) => {
   }
 });
 
+// GET /api/devices - Get simulated device states (battery, solar, signal)
+app.get('/api/devices', (req, res) => {
+  const { site } = req.query;
+
+  try {
+    if (site) {
+      // Return device state for specific site
+      const device = deviceStates.get(site);
+      if (!device) {
+        return res.status(404).json({ error: 'Device not found for site' });
+      }
+      return res.json({
+        success: true,
+        site,
+        device
+      });
+    }
+
+    // Return all device states
+    const devices = {};
+    for (const [siteName, state] of deviceStates) {
+      devices[siteName] = state;
+    }
+
+    // Calculate fleet summary
+    const deviceList = Array.from(deviceStates.values());
+    const onlineCount = deviceList.filter(d => d.status === 'online').length;
+    const offlineCount = deviceList.filter(d => d.status === 'offline').length;
+    const avgBattery = deviceList.reduce((sum, d) => sum + d.battery, 0) / deviceList.length;
+    const avgSignal = deviceList.reduce((sum, d) => sum + d.signalStrength, 0) / deviceList.length;
+    const lowBatteryCount = deviceList.filter(d => d.battery < 30).length;
+
+    res.json({
+      success: true,
+      count: deviceStates.size,
+      summary: {
+        online: onlineCount,
+        offline: offlineCount,
+        avgBattery: Math.round(avgBattery),
+        avgSignal: Math.round(avgSignal),
+        lowBattery: lowBatteryCount
+      },
+      devices
+    });
+
+  } catch (error) {
+    console.error('Error fetching device states:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/incidents - Get active simulated traffic incidents
+app.get('/api/incidents', (req, res) => {
+  try {
+    const incidents = Array.from(activeIncidents.values());
+
+    // Calculate summary
+    const bySeverity = {
+      high: incidents.filter(i => i.severity === 'high').length,
+      medium: incidents.filter(i => i.severity === 'medium').length,
+      low: incidents.filter(i => i.severity === 'low').length
+    };
+
+    res.json({
+      success: true,
+      count: incidents.length,
+      summary: bySeverity,
+      incidents
+    });
+
+  } catch (error) {
+    console.error('Error fetching incidents:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // ============================================================================
 // Frontend Static Files
 // ============================================================================
@@ -449,6 +525,8 @@ app.listen(PORT, () => {
   console.log(`  GET  /api/sites`);
   console.log(`  GET  /api/stats/:site`);
   console.log(`  GET  /api/stats/:site/hourly`);
+  console.log(`  GET  /api/devices (simulated device states)`);
+  console.log(`  GET  /api/incidents (simulated traffic incidents)`);
   console.log(`=================================\n`);
 
   // Start live traffic simulator for arterial roads
