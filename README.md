@@ -19,19 +19,19 @@
 ## Technical Capabilities Demonstrated
 
 ### Edge AI & Machine Learning
-- **TensorFlow Lite Micro** deployment on resource-constrained hardware (ESP32)
-- **FOMO** (Faster Objects, More Objects) object detection architecture
-- **Model quantization** (float32 → int8) for 4x memory reduction
-- **On-device inference** targeting ~48ms based on Edge Impulse FOMO benchmarks
+- **Architecture designed for** TensorFlow Lite Micro on ESP32
+- **FOMO** (Faster Objects, More Objects) object detection architecture (firmware scaffold ready)
+- **Model quantization** pipeline (float32 → int8) for 4x memory reduction
+- **Target inference time**: ~48ms (based on Edge Impulse FOMO benchmarks)
 - **Performance targets**: 85-90% precision, 90-95% recall (based on similar FOMO deployments)
-- Training pipeline with Edge Impulse Studio
+- Edge Impulse Studio training pipeline prepared (model training pending)
 
 ### Embedded Systems & IoT
-- **ESP32-CAM firmware** development with PlatformIO
-- **Power optimization** for solar-powered deployment (20W panel, 12V battery)
-- **4G LTE connectivity** (SIM7000A) with TinyGSM library
-- **Weatherproof deployment** (IP65 enclosures)
-- **Real-time data aggregation** and transmission
+- **ESP32-CAM firmware scaffold** ready for deployment (PlatformIO)
+- **Designed for solar-powered operation** (20W panel, 12V battery)
+- **4G LTE connectivity** stack implemented (SIM7000A with TinyGSM)
+- **Deployment architecture** defined (IP65 weatherproof enclosures)
+- **Real-time data aggregation** pipeline implemented
 
 ### Backend & Data Pipeline
 - **Node.js/Express.js** REST API
@@ -47,7 +47,7 @@
 - **Vercel edge deployment** with global CDN
 
 ### DevOps & Testing
-- **Comprehensive E2E test suite** (120+ Playwright tests)
+- **Comprehensive E2E test suite** (75+ Playwright tests)
 - **Accessibility compliance** (WCAG 2.1 AA)
 - **Performance monitoring** (Core Web Vitals)
 - **CI/CD** with GitHub → Vercel/Render auto-deployment
@@ -78,14 +78,14 @@
 
 ## System Overview
 
-**SwanFlow** monitors a 6 km arterial corridor in Perth, Western Australia using:
+**SwanFlow** demonstrates a complete IoT monitoring architecture for a 6 km arterial corridor in Perth, Western Australia:
 
-- **18 monitoring sites** with bidirectional tracking (Northbound/Southbound)
-- **Edge AI detection** using Edge Impulse FOMO (ML model on ESP32)
-- **Real-time speed estimation** using traffic flow theory
-- **Interactive dashboard** with colour-coded congestion visualization
-- **100% solar-powered** hardware (~$223 AUD per site)
-- **$0/month hosting** (Render.com + Vercel free tiers)
+- **18 monitoring sites** (simulated data with realistic traffic patterns)
+- **Designed for Edge AI detection** using Edge Impulse FOMO architecture
+- **Real-time speed estimation** using traffic flow theory (implemented)
+- **Interactive dashboard** with colour-coded congestion visualization (live at swanflow.com.au)
+- **Target deployment**: Solar-powered ESP32-CAM hardware (~$223 AUD per site)
+- **Production hosting**: $0/month (Render.com + Vercel free tiers)
 
 ### Real-World Application
 
@@ -97,16 +97,16 @@ While SwanFlow demonstrates technical capabilities, it also addresses a real nee
 
 ## Cost-Effective Innovation
 
-SwanFlow demonstrates how modern IoT and Edge AI can deliver professional-grade capabilities at a fraction of traditional costs:
+SwanFlow's architecture demonstrates how modern IoT and Edge AI can deliver professional-grade capabilities at a fraction of traditional costs:
 
-| Component | Cost | Details |
-|-----------|------|---------|
-| **Hardware per site** | ~$223 AUD | 100% solar-powered, off-grid |
-| **Cloud hosting** | $0/month | Render.com + Vercel free tiers |
-| **Data transmission** | ~$8/month | M2M SIM (1GB/month) |
-| **Proof of Concept** | **$540 total** | 2 locations, 4 cameras, both directions |
+| Component | Target Cost | Details |
+|-----------|-------------|---------|
+| **Hardware per site** | ~$223 AUD | Designed for solar-powered, off-grid operation |
+| **Cloud hosting** | $0/month | Currently running on Render.com + Vercel free tiers |
+| **Data transmission** | ~$8/month | M2M SIM estimate (1GB/month) |
+| **Proof of Concept** | **$540 total** | Target for 2 locations, 4 cameras, both directions |
 
-**Total operating cost:** ~$8/month for complete system (18 sites planned)
+**Target operating cost:** ~$8/month for complete system (18 sites planned)
 
 ### Why This Matters
 
@@ -119,36 +119,38 @@ SwanFlow demonstrates how modern IoT and Edge AI can deliver professional-grade 
 
 ## Features
 
-### Hardware
+### Hardware (Target Architecture)
 - **ESP32-CAM** (OV2640 camera) - $8-12
 - **SIM7000A** (4G LTE module) - $15-20
 - **20W Solar Panel + 12V Battery** - ~$80
-- **Edge Impulse FOMO** (on-device ML inference)
+- **Edge Impulse FOMO** (on-device ML inference - model training pending)
 - **MicroSD** for local image buffering
 - **Weatherproof** (IP65 junction box)
 - **100% off-grid** with solar power (no mains required)
 
-### Firmware
-- PlatformIO (Arduino framework)
-- Real-time vehicle counting
+### Firmware (Scaffold Ready)
+- PlatformIO (Arduino framework) - configured
+- Real-time vehicle counting logic - implemented
 - Configurable detection thresholds
-- SD card logging
-- LTE data upload (via TinyGSM)
-- Watchdog and error recovery
+- SD card logging capability
+- LTE data upload stack (via TinyGSM) - ready
+- Watchdog and error recovery - implemented
 
-### Backend
-- Express.js REST API
-- SQLite database
+### Backend (Production)
+- Express.js REST API - live on Render.com
+- SQLite database with time-series data
 - Aggregated statistics (hourly, daily, monthly)
+- Realistic traffic simulation (weekday/weekend patterns, incidents)
+- Device state simulation (battery, solar, signal strength)
 - Authentication (API key)
 - CORS-enabled for dashboard
 
-### Frontend
-- Real-time dashboard (Chart.js)
-- Traffic flow visualisation
-- Multi-site support
-- Mobile-responsive
-- Auto-refresh (60s interval)
+### Frontend (Production)
+- Real-time dashboard (Chart.js) - live at swanflow.com.au
+- Traffic flow visualisation with Leaflet.js maps
+- Multi-site support (18 locations)
+- Mobile-responsive design
+- Auto-refresh (15s interval)
 - **Knowledge Base** — Technical documentation with interactive cards and Lucide icons
 
 ---
