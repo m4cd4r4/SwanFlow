@@ -180,7 +180,7 @@ See [hardware/shopping-lists.md](hardware/shopping-lists.md) for complete shoppi
 
 **Total Budget**: ~$223 AUD (Phase 1 - Solar-Powered)
 
-### Phase 2: Train ML Model (While Hardware Ships)
+### Phase 2: Train ML Model
 
 1. Create account at [Edge Impulse Studio](https://studio.edgeimpulse.com)
 2. Collect 300-500 training images (use phone or ESP32-CAM)
@@ -188,7 +188,7 @@ See [hardware/shopping-lists.md](hardware/shopping-lists.md) for complete shoppi
 4. Train FOMO model (see [docs/ml-development-guide.md](docs/ml-development-guide.md))
 5. Export as Arduino library
 
-### Phase 3: Flash Firmware (When Hardware Arrives)
+### Phase 3: Flash Firmware
 
 ```bash
 cd firmware/esp32-cam-counter
